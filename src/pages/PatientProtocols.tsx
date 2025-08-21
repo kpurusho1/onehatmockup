@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { ProtocolBuilder } from "@/components/protocol/ProtocolBuilder";
+import { TreatmentPlanTab } from "@/components/protocol/TreatmentPlanTab";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,6 +68,7 @@ const patients = [
 export default function PatientProtocols() {
   const [selectedPatient, setSelectedPatient] = useState(patients[0]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showProtocolBuilder, setShowProtocolBuilder] = useState(false);
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -77,6 +80,22 @@ export default function PatientProtocols() {
     if (adherence >= 50) return "bg-warning";
     return "bg-destructive";
   };
+
+  const handleSaveProtocol = (protocol: any) => {
+    // In a real app, this would save to the backend
+    console.log("Saving protocol:", protocol);
+    setShowProtocolBuilder(false);
+  };
+
+  if (showProtocolBuilder) {
+    return (
+      <ProtocolBuilder
+        patientName={selectedPatient.name}
+        onSave={handleSaveProtocol}
+        onCancel={() => setShowProtocolBuilder(false)}
+      />
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -255,19 +274,10 @@ export default function PatientProtocols() {
                 </TabsContent>
                 
                 <TabsContent value="treatment-plan" className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Treatment Plan Progress</h3>
-                    <Button variant="outline" size="sm">
-                      <Plus size={16} className="mr-2" />
-                      Create Treatment Plan
-                    </Button>
-                  </div>
-                  
-                  <div className="text-center py-8">
-                    <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">No treatment plan assigned</p>
-                    <Button className="mt-4">Create from Template</Button>
-                  </div>
+                  <TreatmentPlanTab 
+                    patient={selectedPatient}
+                    onCreateProtocol={() => setShowProtocolBuilder(true)}
+                  />
                 </TabsContent>
                 
                 <TabsContent value="health-records" className="space-y-4">
