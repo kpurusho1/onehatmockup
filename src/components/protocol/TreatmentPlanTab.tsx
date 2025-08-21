@@ -11,8 +11,12 @@ import {
   Circle,
   Edit,
   Play,
-  FileText
+  FileText,
+  GripVertical,
+  Trash2,
+  Settings
 } from "lucide-react";
+import { EventBlock } from "./EventBlock";
 
 interface Patient {
   id: number;
@@ -46,48 +50,136 @@ const mockTreatmentPlan = {
       id: 1,
       name: "Physiotherapy Knee Exercises",
       type: "Physiotherapy",
+      activity: "Physiotherapy",
+      subActivity: "Physiotherapy Knee Exercises",
       frequency: "Daily",
       duration: "30 min",
       completed: true,
       dueDate: "2025-08-21",
-      description: "Range of motion exercises to improve knee flexibility"
+      description: "Range of motion exercises to improve knee flexibility",
+      instructions: "Perform 3 sets of 10 repetitions, hold each position for 5 seconds",
+      patientAction: "complete-exercise",
+      doctorAction: "review-report",
+      videoUrl: ""
     },
     {
       id: 2,
       name: "Follow-up Consultation",
       type: "Consultation",
+      activity: "Consultation",
+      subActivity: "Follow-up",
       frequency: "Weekly",
       duration: "30 min",
       completed: true,
       dueDate: "2025-08-22",
-      description: "Regular check-up to monitor recovery progress"
+      description: "Regular check-up to monitor recovery progress",
+      instructions: "Come prepared with any concerns or questions",
+      patientAction: "book-appointment",
+      doctorAction: "provide-feedback",
+      videoUrl: ""
     },
     {
       id: 3,
       name: "Pain Management",
       type: "Medication",
+      activity: "Medication",
+      subActivity: "Oral Medication",
       frequency: "As needed",
       duration: "5 min",
       completed: false,
       dueDate: "2025-08-23",
-      description: "Take prescribed medication for pain relief"
+      description: "Take prescribed medication for pain relief",
+      instructions: "Take medication with food to prevent stomach upset",
+      patientAction: "take-medication",
+      doctorAction: "adjust-medication",
+      videoUrl: ""
     },
     {
       id: 4,
       name: "Strength Building Exercises",
       type: "Exercise",
+      activity: "Exercise",
+      subActivity: "Strength Training",
       frequency: "3x per week",
       duration: "45 min",
       completed: false,
       dueDate: "2025-08-24",
-      description: "Progressive strength training for leg muscles"
+      description: "Progressive strength training for leg muscles",
+      instructions: "Start with light weights and gradually increase intensity",
+      patientAction: "complete-exercise",
+      doctorAction: "review-report",
+      videoUrl: ""
     }
   ]
 };
 
 export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTabProps) {
-  const [treatmentPlan] = useState(mockTreatmentPlan);
+  const [treatmentPlan, setTreatmentPlan] = useState(mockTreatmentPlan);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<string | null>(null);
   const hasTreatmentPlan = patient.adherence > 50; // Mock condition
+
+  const activityOptions = ["Exercise", "Consultation", "Physiotherapy", "Medication", "Diet", "Rest"];
+  const subActivityOptions = {
+    Exercise: ["Jog", "Walk", "Cycling", "Swimming", "Strength Training"],
+    Consultation: ["Consultation", "Follow-up", "Check-up", "Assessment"],
+    Physiotherapy: ["Physiotherapy Knee Exercises", "Range of Motion", "Strength Building", "Pain Management"],
+    Medication: ["Oral Medication", "Injection", "Topical Application"],
+    Diet: ["Meal Plan", "Supplements", "Hydration", "Restrictions"],
+    Rest: ["Bed Rest", "Activity Limitation", "Sleep Schedule"]
+  };
+  const frequencyOptions = ["Daily", "Twice Daily", "Weekly", "Twice Weekly", "Choose manually", "As needed"];
+
+  const addNewActivity = () => {
+    const newActivity = {
+      id: Date.now(),
+      name: "New Activity",
+      type: "Exercise",
+      frequency: "Daily",
+      duration: "30 min",
+      completed: false,
+      dueDate: new Date().toISOString().split('T')[0],
+      description: "New activity description",
+      activity: "Exercise",
+      subActivity: "Walk",
+      instructions: "Instructions for the new activity",
+      patientAction: "complete-exercise",
+      doctorAction: "review-report",
+      videoUrl: ""
+    };
+    setTreatmentPlan(prev => ({
+      ...prev,
+      activities: [...prev.activities, newActivity],
+      totalActivities: prev.totalActivities + 1
+    }));
+  };
+
+  const updateActivity = (id: string | number, updatedActivity: any) => {
+    setTreatmentPlan(prev => ({
+      ...prev,
+      activities: prev.activities.map(activity => 
+        activity.id === id ? { ...activity, ...updatedActivity } : activity
+      )
+    }));
+  };
+
+  const deleteActivity = (id: string | number) => {
+    setTreatmentPlan(prev => ({
+      ...prev,
+      activities: prev.activities.filter(activity => activity.id !== id),
+      totalActivities: prev.totalActivities - 1
+    }));
+  };
+
+  const reorderActivities = (fromIndex: number, toIndex: number) => {
+    const newActivities = [...treatmentPlan.activities];
+    const [removed] = newActivities.splice(fromIndex, 1);
+    newActivities.splice(toIndex, 0, removed);
+    setTreatmentPlan(prev => ({
+      ...prev,
+      activities: newActivities
+    }));
+  };
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -154,104 +246,142 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
         </div>
       </div>
 
-      {/* Treatment Plan Overview */}
+      {/* Treatment Plan Overview - Compact */}
       <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-3">
             <div>
-              <h4 className="text-xl font-semibold">{treatmentPlan.name}</h4>
-              <p className="text-muted-foreground">
+              <h4 className="text-lg font-semibold">{treatmentPlan.name}</h4>
+              <p className="text-sm text-muted-foreground">
                 Week {treatmentPlan.currentWeek} of {treatmentPlan.totalWeeks}
               </p>
             </div>
-            <Badge variant="secondary" className="text-lg px-3 py-1">
-              {treatmentPlan.progress}% Complete
-            </Badge>
+            <div className="flex items-center space-x-3">
+              <Badge variant="secondary" className="px-2 py-1">
+                {treatmentPlan.progress}% Complete
+              </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditing(!isEditing)}
+              >
+                <Settings size={14} className="mr-1" />
+                {isEditing ? 'Done' : 'Edit Plan'}
+              </Button>
+            </div>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">Overall Progress</span>
-                <span className="text-sm text-muted-foreground">
-                  {treatmentPlan.completedActivities} of {treatmentPlan.totalActivities} activities
-                </span>
-              </div>
-              <Progress value={treatmentPlan.progress} className="h-2" />
+          <div className="flex items-center justify-between">
+            <div className="flex-1 mr-4">
+              <Progress value={treatmentPlan.progress} className="h-1.5" />
             </div>
-
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-success">{treatmentPlan.completedActivities}</div>
-                <div className="text-sm text-muted-foreground">Completed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">
-                  {treatmentPlan.totalActivities - treatmentPlan.completedActivities}
-                </div>
-                <div className="text-sm text-muted-foreground">Remaining</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">{treatmentPlan.totalWeeks}</div>
-                <div className="text-sm text-muted-foreground">Total Weeks</div>
-              </div>
-            </div>
+            <span className="text-xs text-muted-foreground min-w-fit">
+              {treatmentPlan.completedActivities}/{treatmentPlan.totalActivities} activities
+            </span>
           </div>
         </CardContent>
       </Card>
 
       {/* Current Activities */}
       <Card>
-        <CardContent className="p-6">
-          <h4 className="text-lg font-semibold mb-4">Current Activities</h4>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-lg font-semibold">Current Activities</h4>
+            {isEditing && (
+              <Button onClick={addNewActivity} size="sm">
+                <Plus size={16} className="mr-2" />
+                Add Activity
+              </Button>
+            )}
+          </div>
+          
           <div className="space-y-3">
-            {treatmentPlan.activities.map((activity) => (
-              <div
-                key={activity.id}
-                className={`flex items-center justify-between p-4 rounded-lg border ${
-                  activity.completed ? 'bg-success/5 border-success/20' : 'bg-muted/50'
-                }`}
-              >
-                <div className="flex items-center space-x-4">
-                  {activity.completed ? (
-                    <CheckCircle2 size={20} className="text-success" />
-                  ) : (
-                    <Circle size={20} className="text-muted-foreground" />
-                  )}
-                  
-                  <div className="flex items-center space-x-2">
-                    {getActivityIcon(activity.type)}
-                    <Badge variant="outline" className="text-xs">
-                      {activity.type}
-                    </Badge>
+            {treatmentPlan.activities.map((activity, index) => {
+              if (isEditing) {
+                return (
+                  <EventBlock
+                    key={activity.id}
+                    event={{
+                      id: activity.id.toString(),
+                      activity: activity.activity || activity.type,
+                      subActivity: activity.subActivity || activity.name,
+                      frequency: activity.frequency,
+                      duration: activity.duration.replace(' min', ''),
+                      description: activity.description,
+                      instructions: activity.instructions || '',
+                      patientAction: activity.patientAction || '',
+                      doctorAction: activity.doctorAction || '',
+                      videoUrl: activity.videoUrl
+                    }}
+                    index={index}
+                    isEditing={editingEvent === activity.id.toString()}
+                    onUpdate={(updatedEvent) => updateActivity(activity.id, {
+                      activity: updatedEvent.activity,
+                      subActivity: updatedEvent.subActivity,
+                      name: updatedEvent.subActivity,
+                      type: updatedEvent.activity,
+                      frequency: updatedEvent.frequency,
+                      duration: updatedEvent.duration + ' min',
+                      description: updatedEvent.description,
+                      instructions: updatedEvent.instructions,
+                      patientAction: updatedEvent.patientAction,
+                      doctorAction: updatedEvent.doctorAction,
+                      videoUrl: updatedEvent.videoUrl
+                    })}
+                    onDelete={() => deleteActivity(activity.id)}
+                    onEdit={() => setEditingEvent(activity.id.toString())}
+                    onSave={() => setEditingEvent(null)}
+                    onReorder={reorderActivities}
+                    activityOptions={activityOptions}
+                    subActivityOptions={subActivityOptions}
+                    frequencyOptions={frequencyOptions}
+                  />
+                );
+              }
+
+              return (
+                <div
+                  key={activity.id}
+                  className={`flex items-center justify-between p-3 rounded-lg border ${
+                    activity.completed ? 'bg-success/5 border-success/20' : 'bg-muted/50'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    {activity.completed ? (
+                      <CheckCircle2 size={18} className="text-success" />
+                    ) : (
+                      <Circle size={18} className="text-muted-foreground" />
+                    )}
+                    
+                    <div className="flex items-center space-x-2">
+                      {getActivityIcon(activity.type)}
+                      <Badge variant="outline" className="text-xs">
+                        {activity.type}
+                      </Badge>
+                    </div>
+
+                    <div className="flex-1">
+                      <h5 className="font-medium text-sm">{activity.name}</h5>
+                      <p className="text-xs text-muted-foreground">
+                        {activity.description}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex-1">
-                    <h5 className="font-medium">{activity.name}</h5>
-                    <p className="text-sm text-muted-foreground">
-                      {activity.description}
-                    </p>
+                  <div className="flex items-center space-x-3 min-w-fit text-xs">
+                    <div className="text-right">
+                      <div className="font-medium">{activity.frequency}</div>
+                      <div className="text-muted-foreground">{activity.duration}</div>
+                    </div>
+                    
+                    <div className="text-right">
+                      <div className="text-muted-foreground">Due</div>
+                      <div className="font-medium">{activity.dueDate}</div>
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex items-center space-x-4 min-w-fit">
-                  <div className="text-right text-sm">
-                    <div className="font-medium">{activity.frequency}</div>
-                    <div className="text-muted-foreground">{activity.duration}</div>
-                  </div>
-                  
-                  <div className="text-right text-sm">
-                    <div className="text-muted-foreground">Due</div>
-                    <div className="font-medium">{activity.dueDate}</div>
-                  </div>
-
-                  <Button variant="outline" size="sm">
-                    <Edit size={14} className="mr-1" />
-                    Edit
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
