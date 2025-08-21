@@ -18,9 +18,7 @@ import {
   Edit,
   Eye
 } from "lucide-react";
-import patientAvatar1 from "@/assets/patient-avatar-1.jpg";
-import patientAvatar2 from "@/assets/patient-avatar-2.jpg";
-import patientAvatar3 from "@/assets/patient-avatar-3.jpg";
+import patientGenericAvatar from "@/assets/patient-generic-avatar.jpg";
 
 const patients = [
   {
@@ -28,7 +26,7 @@ const patients = [
     name: "Parivel",
     phone: "8954229999",
     adherence: 85,
-    avatar: patientAvatar1,
+    avatar: patientGenericAvatar,
     lastVisit: "Aug 4, 2025",
     diagnosis: "Fever",
     prescriptions: [
@@ -64,7 +62,7 @@ const patients = [
     name: "Ashwin",
     phone: "6382214165",
     adherence: 33,
-    avatar: patientAvatar2,
+    avatar: patientGenericAvatar,
     lastVisit: "Jul 25, 2025",
     diagnosis: "Knee Surgery Recovery",
     prescriptions: [
@@ -90,7 +88,7 @@ const patients = [
     name: "Visveshwar",
     phone: "9488091926",
     adherence: 92,
-    avatar: patientAvatar3,
+    avatar: patientGenericAvatar,
     lastVisit: "Aug 1, 2025",
     diagnosis: "Physiotherapy",
     prescriptions: [
