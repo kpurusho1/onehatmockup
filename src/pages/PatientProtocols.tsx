@@ -197,7 +197,6 @@ export default function PatientProtocols() {
                   </div>
                 </div>
                 <div className="flex space-x-2">
-                  <Button variant="outline">Assign Protocol</Button>
                   <Button>Create e-prescription</Button>
                 </div>
               </div>

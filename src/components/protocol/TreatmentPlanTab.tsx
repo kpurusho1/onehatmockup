@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { 
   Plus, 
   Calendar,
@@ -14,7 +15,9 @@ import {
   FileText,
   GripVertical,
   Trash2,
-  Settings
+  Settings,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 import { EventBlock } from "./EventBlock";
 
@@ -35,89 +38,156 @@ interface TreatmentPlanTabProps {
   onCreateProtocol: () => void;
 }
 
-// Mock treatment plan data
-const mockTreatmentPlan = {
-  name: "Knee Surgery Recovery Protocol",
-  startDate: "2025-08-15",
-  endDate: "2025-10-15",
-  progress: 65,
-  totalActivities: 12,
-  completedActivities: 8,
-  currentWeek: 4,
-  totalWeeks: 8,
-  activities: [
-    {
-      id: 1,
-      name: "Physiotherapy Knee Exercises",
-      type: "Physiotherapy",
-      activity: "Physiotherapy",
-      subActivity: "Physiotherapy Knee Exercises",
-      frequency: "Daily",
-      duration: "30 min",
-      completed: true,
-      dueDate: "2025-08-21",
-      description: "Range of motion exercises to improve knee flexibility",
-      instructions: "Perform 3 sets of 10 repetitions, hold each position for 5 seconds",
-      patientAction: "complete-exercise",
-      doctorAction: "review-report",
-      videoUrl: ""
-    },
-    {
-      id: 2,
-      name: "Follow-up Consultation",
-      type: "Consultation",
-      activity: "Consultation",
-      subActivity: "Follow-up",
-      frequency: "Weekly",
-      duration: "30 min",
-      completed: true,
-      dueDate: "2025-08-22",
-      description: "Regular check-up to monitor recovery progress",
-      instructions: "Come prepared with any concerns or questions",
-      patientAction: "book-appointment",
-      doctorAction: "provide-feedback",
-      videoUrl: ""
-    },
-    {
-      id: 3,
-      name: "Pain Management",
-      type: "Medication",
-      activity: "Medication",
-      subActivity: "Oral Medication",
-      frequency: "As needed",
-      duration: "5 min",
-      completed: false,
-      dueDate: "2025-08-23",
-      description: "Take prescribed medication for pain relief",
-      instructions: "Take medication with food to prevent stomach upset",
-      patientAction: "take-medication",
-      doctorAction: "adjust-medication",
-      videoUrl: ""
-    },
-    {
-      id: 4,
-      name: "Strength Building Exercises",
-      type: "Exercise",
-      activity: "Exercise",
-      subActivity: "Strength Training",
-      frequency: "3x per week",
-      duration: "45 min",
-      completed: false,
-      dueDate: "2025-08-24",
-      description: "Progressive strength training for leg muscles",
-      instructions: "Start with light weights and gradually increase intensity",
-      patientAction: "complete-exercise",
-      doctorAction: "review-report",
-      videoUrl: ""
-    }
-  ]
-};
+// Mock treatment plan data - now supporting multiple protocols
+const mockTreatmentPlans = [
+  {
+    id: 1,
+    name: "Knee Surgery Recovery Protocol",
+    startDate: "2025-08-15",
+    endDate: "2025-10-15",
+    progress: 65,
+    totalActivities: 4,
+    completedActivities: 2,
+    currentWeek: 4,
+    totalWeeks: 8,
+    status: "active",
+    activities: [
+      {
+        id: 1,
+        name: "Physiotherapy Knee Exercises",
+        type: "Physiotherapy",
+        activity: "Physiotherapy",
+        subActivity: "Physiotherapy Knee Exercises",
+        frequency: "Daily",
+        duration: "30 min",
+        completed: true,
+        dueDate: "2025-08-21",
+        description: "Range of motion exercises to improve knee flexibility",
+        instructions: "Perform 3 sets of 10 repetitions, hold each position for 5 seconds",
+        patientAction: "complete-exercise",
+        doctorAction: "review-report",
+        videoUrl: ""
+      },
+      {
+        id: 2,
+        name: "Follow-up Consultation",
+        type: "Consultation",
+        activity: "Consultation",
+        subActivity: "Follow-up",
+        frequency: "Weekly",
+        duration: "30 min",
+        completed: true,
+        dueDate: "2025-08-22",
+        description: "Regular check-up to monitor recovery progress",
+        instructions: "Come prepared with any concerns or questions",
+        patientAction: "book-appointment",
+        doctorAction: "provide-feedback",
+        videoUrl: ""
+      },
+      {
+        id: 3,
+        name: "Pain Management",
+        type: "Medication",
+        activity: "Medication",
+        subActivity: "Oral Medication",
+        frequency: "As needed",
+        duration: "5 min",
+        completed: false,
+        dueDate: "2025-08-23",
+        description: "Take prescribed medication for pain relief",
+        instructions: "Take medication with food to prevent stomach upset",
+        patientAction: "take-medication",
+        doctorAction: "adjust-medication",
+        videoUrl: ""
+      },
+      {
+        id: 4,
+        name: "Strength Building Exercises",
+        type: "Exercise",
+        activity: "Exercise",
+        subActivity: "Strength Training",
+        frequency: "3x per week",
+        duration: "45 min",
+        completed: false,
+        dueDate: "2025-08-24",
+        description: "Progressive strength training for leg muscles",
+        instructions: "Start with light weights and gradually increase intensity",
+        patientAction: "complete-exercise",
+        doctorAction: "review-report",
+        videoUrl: ""
+      }
+    ]
+  },
+  {
+    id: 2,
+    name: "Post-Surgery Mobility Protocol",
+    startDate: "2025-08-20",
+    endDate: "2025-09-20",
+    progress: 25,
+    totalActivities: 3,
+    completedActivities: 1,
+    currentWeek: 1,
+    totalWeeks: 4,
+    status: "active",
+    activities: [
+      {
+        id: 5,
+        name: "Walking Exercises",
+        type: "Exercise",
+        activity: "Exercise",
+        subActivity: "Walk",
+        frequency: "Twice Daily",
+        duration: "15 min",
+        completed: true,
+        dueDate: "2025-08-21",
+        description: "Gentle walking to improve mobility",
+        instructions: "Start with short distances and gradually increase",
+        patientAction: "complete-exercise",
+        doctorAction: "review-report",
+        videoUrl: ""
+      },
+      {
+        id: 6,
+        name: "Range of Motion Assessment",
+        type: "Consultation",
+        activity: "Consultation",
+        subActivity: "Assessment",
+        frequency: "Weekly",
+        duration: "20 min",
+        completed: false,
+        dueDate: "2025-08-25",
+        description: "Assess progress in joint mobility",
+        instructions: "Prepare to demonstrate current range of motion",
+        patientAction: "book-appointment",
+        doctorAction: "provide-feedback",
+        videoUrl: ""
+      },
+      {
+        id: 7,
+        name: "Rest and Recovery",
+        type: "Rest",
+        activity: "Rest",
+        subActivity: "Bed Rest",
+        frequency: "As needed",
+        duration: "Variable",
+        completed: false,
+        dueDate: "2025-08-26",
+        description: "Adequate rest to support healing",
+        instructions: "Elevate leg when resting, avoid overexertion",
+        patientAction: "complete-exercise",
+        doctorAction: "review-report",
+        videoUrl: ""
+      }
+    ]
+  }
+];
 
 export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTabProps) {
-  const [treatmentPlan, setTreatmentPlan] = useState(mockTreatmentPlan);
-  const [isEditing, setIsEditing] = useState(false);
+  const [treatmentPlans, setTreatmentPlans] = useState(mockTreatmentPlans);
+  const [editingProtocol, setEditingProtocol] = useState<number | null>(null);
   const [editingEvent, setEditingEvent] = useState<string | null>(null);
-  const hasTreatmentPlan = patient.adherence > 50; // Mock condition
+  const [openProtocols, setOpenProtocols] = useState<number[]>([1]); // First protocol open by default
+  const hasProtocols = patient.adherence > 30; // Mock condition - adjusted to show protocols
 
   const activityOptions = ["Exercise", "Consultation", "Physiotherapy", "Medication", "Diet", "Rest"];
   const subActivityOptions = {
@@ -130,7 +200,19 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
   };
   const frequencyOptions = ["Daily", "Twice Daily", "Weekly", "Twice Weekly", "Choose manually", "As needed"];
 
-  const addNewActivity = () => {
+  const toggleProtocol = (protocolId: number) => {
+    setOpenProtocols(prev => 
+      prev.includes(protocolId) 
+        ? prev.filter(id => id !== protocolId)
+        : [...prev, protocolId]
+    );
+  };
+
+  const addNewProtocol = () => {
+    onCreateProtocol();
+  };
+
+  const addNewActivity = (protocolId: number) => {
     const newActivity = {
       id: Date.now(),
       name: "New Activity",
@@ -147,37 +229,52 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
       doctorAction: "review-report",
       videoUrl: ""
     };
-    setTreatmentPlan(prev => ({
-      ...prev,
-      activities: [...prev.activities, newActivity],
-      totalActivities: prev.totalActivities + 1
-    }));
+
+    setTreatmentPlans(prev => prev.map(protocol => 
+      protocol.id === protocolId 
+        ? {
+            ...protocol,
+            activities: [...protocol.activities, newActivity],
+            totalActivities: protocol.totalActivities + 1
+          }
+        : protocol
+    ));
   };
 
-  const updateActivity = (id: string | number, updatedActivity: any) => {
-    setTreatmentPlan(prev => ({
-      ...prev,
-      activities: prev.activities.map(activity => 
-        activity.id === id ? { ...activity, ...updatedActivity } : activity
-      )
-    }));
+  const updateActivity = (protocolId: number, activityId: string | number, updatedActivity: any) => {
+    setTreatmentPlans(prev => prev.map(protocol => 
+      protocol.id === protocolId 
+        ? {
+            ...protocol,
+            activities: protocol.activities.map(activity => 
+              activity.id === activityId ? { ...activity, ...updatedActivity } : activity
+            )
+          }
+        : protocol
+    ));
   };
 
-  const deleteActivity = (id: string | number) => {
-    setTreatmentPlan(prev => ({
-      ...prev,
-      activities: prev.activities.filter(activity => activity.id !== id),
-      totalActivities: prev.totalActivities - 1
-    }));
+  const deleteActivity = (protocolId: number, activityId: string | number) => {
+    setTreatmentPlans(prev => prev.map(protocol => 
+      protocol.id === protocolId 
+        ? {
+            ...protocol,
+            activities: protocol.activities.filter(activity => activity.id !== activityId),
+            totalActivities: protocol.totalActivities - 1
+          }
+        : protocol
+    ));
   };
 
-  const reorderActivities = (fromIndex: number, toIndex: number) => {
-    const newActivities = [...treatmentPlan.activities];
-    const [removed] = newActivities.splice(fromIndex, 1);
-    newActivities.splice(toIndex, 0, removed);
-    setTreatmentPlan(prev => ({
-      ...prev,
-      activities: newActivities
+  const reorderActivities = (protocolId: number, fromIndex: number, toIndex: number) => {
+    setTreatmentPlans(prev => prev.map(protocol => {
+      if (protocol.id === protocolId) {
+        const newActivities = [...protocol.activities];
+        const [removed] = newActivities.splice(fromIndex, 1);
+        newActivities.splice(toIndex, 0, removed);
+        return { ...protocol, activities: newActivities };
+      }
+      return protocol;
     }));
   };
 
@@ -194,11 +291,11 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
     }
   };
 
-  if (!hasTreatmentPlan) {
+  if (!hasProtocols) {
     return (
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold">Treatment Plan Progress</h3>
+          <h3 className="text-lg font-semibold">Treatment Protocols</h3>
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" onClick={onCreateProtocol}>
               <Plus size={16} className="mr-2" />
@@ -213,9 +310,9 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
         
         <div className="text-center py-12">
           <Calendar className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-          <h4 className="text-lg font-medium mb-2">No treatment plan assigned</h4>
+          <h4 className="text-lg font-medium mb-2">No treatment protocols assigned</h4>
           <p className="text-muted-foreground mb-6">
-            Create a personalized treatment plan to track {patient.name}'s recovery progress
+            Create a personalized treatment protocol to track {patient.name}'s recovery progress
           </p>
           <div className="flex justify-center space-x-3">
             <Button onClick={onCreateProtocol}>
@@ -231,160 +328,205 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Treatment Plan Progress</h3>
-        <div className="flex space-x-2">
-          <Button variant="outline" size="sm">
-            <Edit size={16} className="mr-2" />
-            Edit Plan
-          </Button>
-          <Button size="sm" onClick={onCreateProtocol}>
-            <Plus size={16} className="mr-2" />
-            Create New Plan
-          </Button>
-        </div>
+        <h3 className="text-lg font-semibold">Treatment Protocols ({treatmentPlans.length})</h3>
+        <Button onClick={addNewProtocol} size="sm">
+          <Plus size={16} className="mr-2" />
+          Add New Protocol
+        </Button>
       </div>
 
-      {/* Treatment Plan Overview - Compact */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h4 className="text-lg font-semibold">{treatmentPlan.name}</h4>
-              <p className="text-sm text-muted-foreground">
-                Week {treatmentPlan.currentWeek} of {treatmentPlan.totalWeeks}
-              </p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Badge variant="secondary" className="px-2 py-1">
-                {treatmentPlan.progress}% Complete
-              </Badge>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                <Settings size={14} className="mr-1" />
-                {isEditing ? 'Done' : 'Edit Plan'}
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex-1 mr-4">
-              <Progress value={treatmentPlan.progress} className="h-1.5" />
-            </div>
-            <span className="text-xs text-muted-foreground min-w-fit">
-              {treatmentPlan.completedActivities}/{treatmentPlan.totalActivities} activities
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Current Activities */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-semibold">Current Activities</h4>
-            {isEditing && (
-              <Button onClick={addNewActivity} size="sm">
-                <Plus size={16} className="mr-2" />
-                Add Activity
-              </Button>
-            )}
-          </div>
+      {/* Protocols List */}
+      <div className="space-y-3">
+        {treatmentPlans.map((protocol) => {
+          const isOpen = openProtocols.includes(protocol.id);
+          const isEditing = editingProtocol === protocol.id;
           
-          <div className="space-y-3">
-            {treatmentPlan.activities.map((activity, index) => {
-              if (isEditing) {
-                return (
-                  <EventBlock
-                    key={activity.id}
-                    event={{
-                      id: activity.id.toString(),
-                      activity: activity.activity || activity.type,
-                      subActivity: activity.subActivity || activity.name,
-                      frequency: activity.frequency,
-                      duration: activity.duration.replace(' min', ''),
-                      description: activity.description,
-                      instructions: activity.instructions || '',
-                      patientAction: activity.patientAction || '',
-                      doctorAction: activity.doctorAction || '',
-                      videoUrl: activity.videoUrl
-                    }}
-                    index={index}
-                    isEditing={editingEvent === activity.id.toString()}
-                    onUpdate={(updatedEvent) => updateActivity(activity.id, {
-                      activity: updatedEvent.activity,
-                      subActivity: updatedEvent.subActivity,
-                      name: updatedEvent.subActivity,
-                      type: updatedEvent.activity,
-                      frequency: updatedEvent.frequency,
-                      duration: updatedEvent.duration + ' min',
-                      description: updatedEvent.description,
-                      instructions: updatedEvent.instructions,
-                      patientAction: updatedEvent.patientAction,
-                      doctorAction: updatedEvent.doctorAction,
-                      videoUrl: updatedEvent.videoUrl
-                    })}
-                    onDelete={() => deleteActivity(activity.id)}
-                    onEdit={() => setEditingEvent(activity.id.toString())}
-                    onSave={() => setEditingEvent(null)}
-                    onReorder={reorderActivities}
-                    activityOptions={activityOptions}
-                    subActivityOptions={subActivityOptions}
-                    frequencyOptions={frequencyOptions}
-                  />
-                );
-              }
-
-              return (
-                <div
-                  key={activity.id}
-                  className={`flex items-center justify-between p-3 rounded-lg border ${
-                    activity.completed ? 'bg-success/5 border-success/20' : 'bg-muted/50'
-                  }`}
-                >
+          return (
+            <Card key={protocol.id} className="overflow-hidden">
+              {/* Protocol Header */}
+              <div 
+                className="p-4 cursor-pointer hover:bg-muted/50 transition-colors border-b"
+                onClick={() => toggleProtocol(protocol.id)}
+              >
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    {activity.completed ? (
-                      <CheckCircle2 size={18} className="text-success" />
+                    {isOpen ? (
+                      <ChevronDown size={16} className="text-muted-foreground" />
                     ) : (
-                      <Circle size={18} className="text-muted-foreground" />
+                      <ChevronRight size={16} className="text-muted-foreground" />
                     )}
                     
-                    <div className="flex items-center space-x-2">
-                      {getActivityIcon(activity.type)}
-                      <Badge variant="outline" className="text-xs">
-                        {activity.type}
-                      </Badge>
-                    </div>
-
-                    <div className="flex-1">
-                      <h5 className="font-medium text-sm">{activity.name}</h5>
-                      <p className="text-xs text-muted-foreground">
-                        {activity.description}
+                    <div>
+                      <h4 className="font-semibold">{protocol.name}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Week {protocol.currentWeek} of {protocol.totalWeeks} • {protocol.status}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3 min-w-fit text-xs">
-                    <div className="text-right">
-                      <div className="font-medium">{activity.frequency}</div>
-                      <div className="text-muted-foreground">{activity.duration}</div>
+                  <div className="flex items-center space-x-4">
+                    <div className="text-right text-sm">
+                      <div className="font-medium">{protocol.progress}% Complete</div>
+                      <div className="text-muted-foreground">
+                        {protocol.completedActivities}/{protocol.totalActivities} activities
+                      </div>
                     </div>
                     
-                    <div className="text-right">
-                      <div className="text-muted-foreground">Due</div>
-                      <div className="font-medium">{activity.dueDate}</div>
+                    <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingProtocol(isEditing ? null : protocol.id)}
+                      >
+                        <Settings size={14} className="mr-1" />
+                        {isEditing ? 'Done' : 'Edit'}
+                      </Button>
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                
+                <div className="mt-3">
+                  <Progress value={protocol.progress} className="h-1.5" />
+                </div>
+              </div>
+
+              {/* Protocol Content */}
+              <Collapsible open={isOpen}>
+                <CollapsibleContent>
+                  <CardContent className="p-4 pt-0">
+                    <div className="space-y-4">
+                      {/* Quick Stats */}
+                      <div className="grid grid-cols-4 gap-4 p-3 bg-muted/30 rounded-lg">
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-success">{protocol.completedActivities}</div>
+                          <div className="text-xs text-muted-foreground">Completed</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-primary">
+                            {protocol.totalActivities - protocol.completedActivities}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Remaining</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-primary">{protocol.currentWeek}</div>
+                          <div className="text-xs text-muted-foreground">Current Week</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-primary">{protocol.totalWeeks}</div>
+                          <div className="text-xs text-muted-foreground">Total Weeks</div>
+                        </div>
+                      </div>
+
+                      {/* Activities Header */}
+                      <div className="flex items-center justify-between">
+                        <h5 className="font-semibold">Activities</h5>
+                        {isEditing && (
+                          <Button onClick={() => addNewActivity(protocol.id)} size="sm">
+                            <Plus size={16} className="mr-2" />
+                            Add Activity
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {/* Activities List */}
+                      <div className="space-y-2">
+                        {protocol.activities.map((activity, index) => {
+                          if (isEditing) {
+                            return (
+                              <EventBlock
+                                key={activity.id}
+                                event={{
+                                  id: activity.id.toString(),
+                                  activity: activity.activity || activity.type,
+                                  subActivity: activity.subActivity || activity.name,
+                                  frequency: activity.frequency,
+                                  duration: activity.duration.replace(' min', ''),
+                                  description: activity.description,
+                                  instructions: activity.instructions || '',
+                                  patientAction: activity.patientAction || '',
+                                  doctorAction: activity.doctorAction || '',
+                                  videoUrl: activity.videoUrl
+                                }}
+                                index={index}
+                                isEditing={editingEvent === activity.id.toString()}
+                                onUpdate={(updatedEvent) => updateActivity(protocol.id, activity.id, {
+                                  activity: updatedEvent.activity,
+                                  subActivity: updatedEvent.subActivity,
+                                  name: updatedEvent.subActivity,
+                                  type: updatedEvent.activity,
+                                  frequency: updatedEvent.frequency,
+                                  duration: updatedEvent.duration + ' min',
+                                  description: updatedEvent.description,
+                                  instructions: updatedEvent.instructions,
+                                  patientAction: updatedEvent.patientAction,
+                                  doctorAction: updatedEvent.doctorAction,
+                                  videoUrl: updatedEvent.videoUrl
+                                })}
+                                onDelete={() => deleteActivity(protocol.id, activity.id)}
+                                onEdit={() => setEditingEvent(activity.id.toString())}
+                                onSave={() => setEditingEvent(null)}
+                                onReorder={(fromIndex, toIndex) => reorderActivities(protocol.id, fromIndex, toIndex)}
+                                activityOptions={activityOptions}
+                                subActivityOptions={subActivityOptions}
+                                frequencyOptions={frequencyOptions}
+                              />
+                            );
+                          }
+
+                          return (
+                            <div
+                              key={activity.id}
+                              className={`flex items-center justify-between p-3 rounded-lg border ${
+                                activity.completed ? 'bg-success/5 border-success/20' : 'bg-muted/50'
+                              }`}
+                            >
+                              <div className="flex items-center space-x-3">
+                                {activity.completed ? (
+                                  <CheckCircle2 size={18} className="text-success" />
+                                ) : (
+                                  <Circle size={18} className="text-muted-foreground" />
+                                )}
+                                
+                                <div className="flex items-center space-x-2">
+                                  {getActivityIcon(activity.type)}
+                                  <Badge variant="outline" className="text-xs">
+                                    {activity.type}
+                                  </Badge>
+                                </div>
+
+                                <div className="flex-1">
+                                  <h5 className="font-medium text-sm">{activity.name}</h5>
+                                  <p className="text-xs text-muted-foreground line-clamp-1">
+                                    {activity.description}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center space-x-3 min-w-fit text-xs">
+                                <div className="text-right">
+                                  <div className="font-medium">{activity.frequency}</div>
+                                  <div className="text-muted-foreground">{activity.duration}</div>
+                                </div>
+                                
+                                <div className="text-right">
+                                  <div className="text-muted-foreground">Due</div>
+                                  <div className="font-medium">{activity.dueDate}</div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }
