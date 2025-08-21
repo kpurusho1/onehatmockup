@@ -115,6 +115,156 @@ const patients = [
       }
     ],
     healthRecords: []
+  },
+  {
+    id: 4,
+    name: "Sarah Johnson",
+    phone: "7845692301",
+    adherence: 78,
+    diagnosis: "Hypertension Management",
+    avatar: patientGenericAvatar,
+    lastVisit: "Aug 10, 2025",
+    prescriptions: [
+      {
+        id: "P009",
+        medicine: "Lisinopril",
+        dosage: "10mg",
+        duration: "30 days",
+        hospital: "Cardiac Care Center"
+      },
+      {
+        id: "P010",
+        medicine: "Amlodipine",
+        dosage: "5mg",
+        duration: "30 days",
+        hospital: "Heart Health Clinic"
+      }
+    ],
+    healthRecords: [
+      { id: "H003", type: "pdf", name: "ECG Report - 2025-08-01", date: "Aug 1, 2025" }
+    ]
+  },
+  {
+    id: 5,
+    name: "Michael Chen",
+    phone: "5123478906",
+    adherence: 94,
+    diagnosis: "Diabetes Type 2",
+    avatar: patientGenericAvatar,
+    lastVisit: "Aug 15, 2025",
+    prescriptions: [
+      {
+        id: "P011",
+        medicine: "Metformin",
+        dosage: "500mg",
+        duration: "60 days",
+        hospital: "Endocrine Clinic"
+      },
+      {
+        id: "P012",
+        medicine: "Glipizide",
+        dosage: "5mg",
+        duration: "30 days",
+        hospital: "Diabetes Center"
+      },
+      {
+        id: "P013",
+        medicine: "Insulin Glargine",
+        dosage: "20 units",
+        duration: "30 days",
+        hospital: "Diabetes Center"
+      }
+    ],
+    healthRecords: []
+  },
+  {
+    id: 6,
+    name: "Emily Rodriguez",
+    phone: "3216549870",
+    adherence: 67,
+    diagnosis: "Asthma Management",
+    avatar: patientGenericAvatar,
+    lastVisit: "Aug 12, 2025",
+    prescriptions: [
+      {
+        id: "P014",
+        medicine: "Albuterol Inhaler",
+        dosage: "2 puffs",
+        duration: "30 days",
+        hospital: "Respiratory Care Center"
+      },
+      {
+        id: "P015",
+        medicine: "Fluticasone",
+        dosage: "110mcg",
+        duration: "30 days",
+        hospital: "Allergy & Asthma Clinic"
+      }
+    ],
+    healthRecords: [
+      { id: "H004", type: "image", name: "Chest X-Ray", date: "Aug 5, 2025" }
+    ]
+  },
+  {
+    id: 7,
+    name: "David Thompson",
+    phone: "9087456321",
+    adherence: 45,
+    diagnosis: "Post-Surgical Recovery",
+    avatar: patientGenericAvatar,
+    lastVisit: "Aug 18, 2025",
+    prescriptions: [
+      {
+        id: "P016",
+        medicine: "Oxycodone",
+        dosage: "5mg",
+        duration: "7 days",
+        hospital: "General Surgery Center"
+      },
+      {
+        id: "P017",
+        medicine: "Cephalexin",
+        dosage: "500mg",
+        duration: "10 days",
+        hospital: "Post-Op Care Unit"
+      },
+      {
+        id: "P018",
+        medicine: "Ibuprofen",
+        dosage: "600mg",
+        duration: "14 days",
+        hospital: "Pain Management Clinic"
+      }
+    ],
+    healthRecords: []
+  },
+  {
+    id: 8,
+    name: "Lisa Wang",
+    phone: "6547893210",
+    adherence: 88,
+    diagnosis: "Mental Health Support",
+    avatar: patientGenericAvatar,
+    lastVisit: "Aug 20, 2025",
+    prescriptions: [
+      {
+        id: "P019",
+        medicine: "Sertraline",
+        dosage: "50mg",
+        duration: "90 days",
+        hospital: "Mental Health Center"
+      },
+      {
+        id: "P020",
+        medicine: "Lorazepam",
+        dosage: "0.5mg",
+        duration: "30 days",
+        hospital: "Anxiety Clinic"
+      }
+    ],
+    healthRecords: [
+      { id: "H005", type: "pdf", name: "Psychological Assessment", date: "Aug 10, 2025" }
+    ]
   }
 ];
 
