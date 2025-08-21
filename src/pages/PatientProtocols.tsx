@@ -23,7 +23,7 @@ import patientGenericAvatar from "@/assets/patient-generic-avatar.jpg";
 const patients = [
   {
     id: 1,
-    name: "Parivel",
+    name: "Arjun Patel",
     phone: "8954229999",
     adherence: 85,
     avatar: patientGenericAvatar,
@@ -59,33 +59,18 @@ const patients = [
   },
   {
     id: 2,
-    name: "Ashwin",
+    name: "Priya Sharma",
     phone: "6382214165",
-    adherence: 33,
+    adherence: 0,
     avatar: patientGenericAvatar,
     lastVisit: "Jul 25, 2025",
     diagnosis: "Knee Surgery Recovery",
-    prescriptions: [
-      {
-        id: "P004",
-        medicine: "Ibuprofen",
-        dosage: "400mg",
-        duration: "5 days",
-        hospital: "Orthopedic Clinic"
-      },
-      {
-        id: "P005",
-        medicine: "Physiotherapy",
-        dosage: "Daily session",
-        duration: "2 weeks",
-        hospital: "Rehab Center"
-      }
-    ],
+    prescriptions: [],
     healthRecords: []
   },
   {
     id: 3,
-    name: "Visveshwar",
+    name: "Rahul Gupta",
     phone: "9488091926",
     adherence: 92,
     avatar: patientGenericAvatar,
@@ -118,35 +103,20 @@ const patients = [
   },
   {
     id: 4,
-    name: "Sarah Johnson",
+    name: "Aisha Khan",
     phone: "7845692301",
-    adherence: 78,
+    adherence: 0,
     diagnosis: "Hypertension Management",
     avatar: patientGenericAvatar,
     lastVisit: "Aug 10, 2025",
-    prescriptions: [
-      {
-        id: "P009",
-        medicine: "Lisinopril",
-        dosage: "10mg",
-        duration: "30 days",
-        hospital: "Cardiac Care Center"
-      },
-      {
-        id: "P010",
-        medicine: "Amlodipine",
-        dosage: "5mg",
-        duration: "30 days",
-        hospital: "Heart Health Clinic"
-      }
-    ],
+    prescriptions: [],
     healthRecords: [
       { id: "H003", type: "pdf", name: "ECG Report - 2025-08-01", date: "Aug 1, 2025" }
     ]
   },
   {
     id: 5,
-    name: "Michael Chen",
+    name: "Vikram Singh",
     phone: "5123478906",
     adherence: 94,
     diagnosis: "Diabetes Type 2",
@@ -179,35 +149,20 @@ const patients = [
   },
   {
     id: 6,
-    name: "Emily Rodriguez",
+    name: "Kavya Reddy",
     phone: "3216549870",
-    adherence: 67,
+    adherence: 0,
     diagnosis: "Asthma Management",
     avatar: patientGenericAvatar,
     lastVisit: "Aug 12, 2025",
-    prescriptions: [
-      {
-        id: "P014",
-        medicine: "Albuterol Inhaler",
-        dosage: "2 puffs",
-        duration: "30 days",
-        hospital: "Respiratory Care Center"
-      },
-      {
-        id: "P015",
-        medicine: "Fluticasone",
-        dosage: "110mcg",
-        duration: "30 days",
-        hospital: "Allergy & Asthma Clinic"
-      }
-    ],
+    prescriptions: [],
     healthRecords: [
       { id: "H004", type: "image", name: "Chest X-Ray", date: "Aug 5, 2025" }
     ]
   },
   {
     id: 7,
-    name: "David Thompson",
+    name: "Deepak Joshi",
     phone: "9087456321",
     adherence: 45,
     diagnosis: "Post-Surgical Recovery",
@@ -240,28 +195,13 @@ const patients = [
   },
   {
     id: 8,
-    name: "Lisa Wang",
+    name: "Sneha Iyer",
     phone: "6547893210",
-    adherence: 88,
+    adherence: 0,
     diagnosis: "Mental Health Support",
     avatar: patientGenericAvatar,
     lastVisit: "Aug 20, 2025",
-    prescriptions: [
-      {
-        id: "P019",
-        medicine: "Sertraline",
-        dosage: "50mg",
-        duration: "90 days",
-        hospital: "Mental Health Center"
-      },
-      {
-        id: "P020",
-        medicine: "Lorazepam",
-        dosage: "0.5mg",
-        duration: "30 days",
-        hospital: "Anxiety Clinic"
-      }
-    ],
+    prescriptions: [],
     healthRecords: [
       { id: "H005", type: "pdf", name: "Psychological Assessment", date: "Aug 10, 2025" }
     ]
@@ -351,7 +291,6 @@ export default function PatientProtocols() {
                       </Avatar>
                       <div>
                         <h3 className="font-medium">{patient.name}</h3>
-                        <p className="text-sm text-muted-foreground">{patient.diagnosis}</p>
                       </div>
                     </div>
                   </div>
