@@ -113,7 +113,7 @@ export default function PatientProtocols() {
 
       <div className="grid grid-cols-12 gap-6">
         {/* Patient List */}
-        <div className="col-span-4">
+        <div className="col-span-3">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -170,7 +170,7 @@ export default function PatientProtocols() {
         </div>
 
         {/* Patient Details */}
-        <div className="col-span-8">
+        <div className="col-span-9">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">

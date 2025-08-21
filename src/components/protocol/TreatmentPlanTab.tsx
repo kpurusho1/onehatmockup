@@ -511,19 +511,32 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                                     </div>
                                   </div>
 
-                                  <div className="flex items-center space-x-3 min-w-fit text-xs">
-                                    <div className="text-right">
-                                      <div className="font-medium">{activity.frequency}</div>
-                                      <div className="text-muted-foreground">{activity.duration}</div>
-                                    </div>
-                                    
-                                    <div className="text-right">
-                                      <div className="text-muted-foreground">Due</div>
-                                      <div className="font-medium">{activity.dueDate}</div>
-                                    </div>
+                                   <div className="flex items-center space-x-3 min-w-fit text-xs">
+                                     <div className="text-right">
+                                       <div className="font-medium">{activity.frequency}</div>
+                                       <div className="text-muted-foreground">{activity.duration}</div>
+                                     </div>
+                                     
+                                     <div className="text-right">
+                                       <div className="text-muted-foreground">
+                                         {(() => {
+                                           const today = new Date();
+                                           const due = new Date(activity.dueDate);
+                                           const diffTime = due.getTime() - today.getTime();
+                                           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                           
+                                           if (diffDays === 0) return "Due today";
+                                           if (diffDays === 1) return "Due in 1 day";
+                                           if (diffDays > 1) return `Due in ${diffDays} days`;
+                                           if (diffDays === -1) return "1 day overdue";
+                                           return `${Math.abs(diffDays)} days overdue`;
+                                         })()}
+                                       </div>
+                                       <div className="font-medium">{activity.dueDate}</div>
+                                     </div>
 
-                                    <Circle size={18} className="text-muted-foreground ml-2" />
-                                  </div>
+                                     <Circle size={18} className="text-muted-foreground ml-2" />
+                                   </div>
                                 </div>
                               ))}
                             </div>
