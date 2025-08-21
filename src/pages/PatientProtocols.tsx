@@ -18,6 +18,9 @@ import {
   Edit,
   Eye
 } from "lucide-react";
+import patientAvatar1 from "@/assets/patient-avatar-1.jpg";
+import patientAvatar2 from "@/assets/patient-avatar-2.jpg";
+import patientAvatar3 from "@/assets/patient-avatar-3.jpg";
 
 const patients = [
   {
@@ -25,7 +28,7 @@ const patients = [
     name: "Parivel",
     phone: "8954229999",
     adherence: 85,
-    avatar: "/placeholder.svg",
+    avatar: patientAvatar1,
     lastVisit: "Aug 4, 2025",
     diagnosis: "Fever",
     prescriptions: [
@@ -35,6 +38,20 @@ const patients = [
         dosage: "1 Morning, 1 Night",
         duration: "4 days",
         hospital: "Guru Hospital"
+      },
+      {
+        id: "P002",
+        medicine: "Paracetamol",
+        dosage: "500mg",
+        duration: "3 days",
+        hospital: "City General Hospital"
+      },
+      {
+        id: "P003",
+        medicine: "Amoxicillin",
+        dosage: "250mg",
+        duration: "7 days",
+        hospital: "Metro Medical Center"
       }
     ],
     healthRecords: [
@@ -47,10 +64,25 @@ const patients = [
     name: "Ashwin",
     phone: "6382214165",
     adherence: 33,
-    avatar: "/placeholder.svg",
+    avatar: patientAvatar2,
     lastVisit: "Jul 25, 2025",
     diagnosis: "Knee Surgery Recovery",
-    prescriptions: [],
+    prescriptions: [
+      {
+        id: "P004",
+        medicine: "Ibuprofen",
+        dosage: "400mg",
+        duration: "5 days",
+        hospital: "Orthopedic Clinic"
+      },
+      {
+        id: "P005",
+        medicine: "Physiotherapy",
+        dosage: "Daily session",
+        duration: "2 weeks",
+        hospital: "Rehab Center"
+      }
+    ],
     healthRecords: []
   },
   {
@@ -58,10 +90,32 @@ const patients = [
     name: "Visveshwar",
     phone: "9488091926",
     adherence: 92,
-    avatar: "/placeholder.svg",
+    avatar: patientAvatar3,
     lastVisit: "Aug 1, 2025",
     diagnosis: "Physiotherapy",
-    prescriptions: [],
+    prescriptions: [
+      {
+        id: "P006",
+        medicine: "Muscle Relaxant",
+        dosage: "10mg",
+        duration: "10 days",
+        hospital: "Sports Medicine Clinic"
+      },
+      {
+        id: "P007",
+        medicine: "Calcium Supplement",
+        dosage: "500mg",
+        duration: "1 month",
+        hospital: "Wellness Center"
+      },
+      {
+        id: "P008",
+        medicine: "Vitamin D3",
+        dosage: "1000 IU",
+        duration: "3 months",
+        hospital: "Nutrition Clinic"
+      }
+    ],
     healthRecords: []
   }
 ];
@@ -142,25 +196,14 @@ export default function PatientProtocols() {
                     }`}
                     onClick={() => setSelectedPatient(patient)}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-3">
-                        <Avatar>
-                          <AvatarImage src={patient.avatar} />
-                          <AvatarFallback>{patient.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h3 className="font-medium">{patient.name}</h3>
-                          <div className="flex items-center space-x-1 text-sm text-muted-foreground">
-                            <Phone size={12} />
-                            <span>{patient.phone}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-2 h-2 rounded-full ${getAdherenceColor(patient.adherence)}`} />
-                        <span className="text-xs font-medium">{patient.adherence}%</span>
+                    <div className="flex items-center space-x-3">
+                      <Avatar>
+                        <AvatarImage src={patient.avatar} />
+                        <AvatarFallback>{patient.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-medium">{patient.name}</h3>
+                        <p className="text-sm text-muted-foreground">{patient.diagnosis}</p>
                       </div>
                     </div>
                   </div>
@@ -228,26 +271,24 @@ export default function PatientProtocols() {
                   </div>
                   
                   <PrescriptionTimeline 
-                    prescriptions={[
-                      {
-                        id: "1",
-                        date: "Dec 15, 2024",
-                        time: "2:30 PM",
-                        hospital: selectedPatient.prescriptions[0]?.hospital || "City General Hospital",
-                        location: "Downtown Medical Center",
-                        diagnosis: "Acute Bronchitis",
-                        medications: [
-                          {
-                            id: "m1",
-                            name: selectedPatient.prescriptions[0]?.medicine || "Amoxicillin",
-                            dosage: selectedPatient.prescriptions[0]?.dosage || "500mg",
-                            frequency: "3 times daily",
-                            duration: selectedPatient.prescriptions[0]?.duration || "7 days",
-                            instructions: "Take with food"
-                          }
-                        ]
-                      }
-                    ]} 
+                    prescriptions={selectedPatient.prescriptions.map((prescription, index) => ({
+                      id: prescription.id,
+                      date: `Dec ${15 - index}, 2024`,
+                      time: `${2 + index}:30 PM`,
+                      hospital: prescription.hospital,
+                      location: "Medical Center",
+                      diagnosis: selectedPatient.diagnosis,
+                      medications: [
+                        {
+                          id: `m${index + 1}`,
+                          name: prescription.medicine,
+                          dosage: prescription.dosage,
+                          frequency: "As prescribed",
+                          duration: prescription.duration,
+                          instructions: "Take as directed"
+                        }
+                      ]
+                    }))} 
                   />
                 </TabsContent>
                 
