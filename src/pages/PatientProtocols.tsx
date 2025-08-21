@@ -1,0 +1,324 @@
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { 
+  Search, 
+  Phone, 
+  Plus, 
+  Calendar,
+  FileText,
+  Image,
+  Edit,
+  Eye
+} from "lucide-react";
+
+const patients = [
+  {
+    id: 1,
+    name: "Parivel",
+    phone: "8954229999",
+    adherence: 85,
+    avatar: "/placeholder.svg",
+    lastVisit: "Aug 4, 2025",
+    diagnosis: "Fever",
+    prescriptions: [
+      {
+        id: "P001",
+        medicine: "Dolo",
+        dosage: "1 Morning, 1 Night",
+        duration: "4 days",
+        hospital: "Guru Hospital"
+      }
+    ],
+    healthRecords: [
+      { id: "H001", type: "pdf", name: "Medical Record - 2025-07-12", date: "Jun 17, 2025" },
+      { id: "H002", type: "image", name: "X-Ray Report", date: "Jun 17, 2025" }
+    ]
+  },
+  {
+    id: 2,
+    name: "Ashwin",
+    phone: "6382214165",
+    adherence: 33,
+    avatar: "/placeholder.svg",
+    lastVisit: "Jul 25, 2025",
+    diagnosis: "Knee Surgery Recovery",
+    prescriptions: [],
+    healthRecords: []
+  },
+  {
+    id: 3,
+    name: "Visveshwar",
+    phone: "9488091926",
+    adherence: 92,
+    avatar: "/placeholder.svg",
+    lastVisit: "Aug 1, 2025",
+    diagnosis: "Physiotherapy",
+    prescriptions: [],
+    healthRecords: []
+  }
+];
+
+export default function PatientProtocols() {
+  const [selectedPatient, setSelectedPatient] = useState(patients[0]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredPatients = patients.filter(patient =>
+    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.phone.includes(searchTerm)
+  );
+
+  const getAdherenceColor = (adherence: number) => {
+    if (adherence >= 80) return "bg-success";
+    if (adherence >= 50) return "bg-warning";
+    return "bg-destructive";
+  };
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Patient Protocols</h1>
+          <p className="text-muted-foreground">Manage patient treatment plans and prescriptions</p>
+        </div>
+        <Button className="flex items-center space-x-2">
+          <Plus size={16} />
+          <span>Add Patient</span>
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-12 gap-6">
+        {/* Patient List */}
+        <div className="col-span-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Patients ({patients.length})</span>
+              </CardTitle>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or mobile number"
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="space-y-1">
+                {filteredPatients.map((patient) => (
+                  <div
+                    key={patient.id}
+                    className={`p-4 cursor-pointer transition-colors border-l-4 ${
+                      selectedPatient.id === patient.id
+                        ? "bg-primary/10 border-l-primary"
+                        : "hover:bg-muted border-l-transparent"
+                    }`}
+                    onClick={() => setSelectedPatient(patient)}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarImage src={patient.avatar} />
+                          <AvatarFallback>{patient.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="font-medium">{patient.name}</h3>
+                          <div className="flex items-center space-x-1 text-sm text-muted-foreground">
+                            <Phone size={12} />
+                            <span>{patient.phone}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline" className="text-xs">
+                        {patient.diagnosis}
+                      </Badge>
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-2 h-2 rounded-full ${getAdherenceColor(patient.adherence)}`} />
+                        <span className="text-xs font-medium">{patient.adherence}%</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Patient Details */}
+        <div className="col-span-8">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={selectedPatient.avatar} />
+                    <AvatarFallback>{selectedPatient.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
+                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                      <div className="flex items-center space-x-1">
+                        <Phone size={12} />
+                        <span>{selectedPatient.phone}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Calendar size={12} />
+                        <span>Last visit: {selectedPatient.lastVisit}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  <Button variant="outline">Assign Protocol</Button>
+                  <Button>Create e-prescription</Button>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-6 mt-4 p-4 bg-muted rounded-lg">
+                <div>
+                  <p className="text-sm font-medium">Protocol Adherence</p>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <div className={`w-3 h-3 rounded-full ${getAdherenceColor(selectedPatient.adherence)}`} />
+                    <span className="font-bold">{selectedPatient.adherence}% Score</span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Diagnosis</p>
+                  <p className="text-sm text-muted-foreground mt-1">{selectedPatient.diagnosis}</p>
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent>
+              <Tabs defaultValue="prescriptions" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
+                  <TabsTrigger value="treatment-plan">Treatment Plan</TabsTrigger>
+                  <TabsTrigger value="health-records">Shared Health Records</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="prescriptions" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">My Prescriptions</h3>
+                    <Button variant="outline" size="sm">
+                      <Plus size={16} className="mr-2" />
+                      New Prescription
+                    </Button>
+                  </div>
+                  
+                  {selectedPatient.prescriptions.length > 0 ? (
+                    <div className="space-y-3">
+                      {selectedPatient.prescriptions.map((prescription) => (
+                        <Card key={prescription.id} className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <h4 className="font-medium">{prescription.medicine}</h4>
+                                <Badge variant="secondary">{prescription.hospital}</Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                Dosage: {prescription.dosage}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                Duration: {prescription.duration}
+                              </p>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button variant="outline" size="sm">
+                                <Eye size={14} className="mr-1" />
+                                View
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <Edit size={14} className="mr-1" />
+                                Edit
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">No prescriptions available</p>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="treatment-plan" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Treatment Plan Progress</h3>
+                    <Button variant="outline" size="sm">
+                      <Plus size={16} className="mr-2" />
+                      Create Treatment Plan
+                    </Button>
+                  </div>
+                  
+                  <div className="text-center py-8">
+                    <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">No treatment plan assigned</p>
+                    <Button className="mt-4">Create from Template</Button>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="health-records" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Shared Health Records</h3>
+                    <Button variant="outline" size="sm">
+                      <Plus size={16} className="mr-2" />
+                      Upload Record
+                    </Button>
+                  </div>
+                  
+                  {selectedPatient.healthRecords.length > 0 ? (
+                    <div className="space-y-3">
+                      {selectedPatient.healthRecords.map((record) => (
+                        <Card key={record.id} className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div className="p-2 bg-muted rounded-lg">
+                                {record.type === "pdf" ? (
+                                  <FileText size={20} className="text-primary" />
+                                ) : (
+                                  <Image size={20} className="text-primary" />
+                                )}
+                              </div>
+                              <div>
+                                <h4 className="font-medium">{record.name}</h4>
+                                <p className="text-sm text-muted-foreground">{record.date}</p>
+                              </div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button variant="outline" size="sm">
+                                <Eye size={14} className="mr-1" />
+                                View
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">No health records shared</p>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

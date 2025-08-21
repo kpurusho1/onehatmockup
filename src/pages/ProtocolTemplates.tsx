@@ -1,0 +1,260 @@
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Search, 
+  Plus, 
+  Calendar,
+  Edit,
+  Trash2,
+  Copy,
+  Activity,
+  Clock
+} from "lucide-react";
+import doctorConsultation from "@/assets/doctor-consultation.jpg";
+import physiotherapy from "@/assets/physiotherapy.jpg";
+import medicalEquipment from "@/assets/medical-equipment.jpg";
+
+const protocols = [
+  {
+    id: 1,
+    name: "Knee Surgery Recovery",
+    description: "Comprehensive rehabilitation protocol for post-knee surgery patients",
+    activities: 3,
+    duration: "6 weeks",
+    createdBy: "Dr. Mithra",
+    createdOn: "18/04/2025",
+    updatedOn: "13/05/2025",
+    image: physiotherapy,
+    activities_list: [
+      { type: "Exercise", subtype: "Jog", frequency: "Daily", duration: 15 },
+      { type: "Consultation", subtype: "Follow-up", frequency: "Weekly", duration: 1 },
+      { type: "Physiotherapy", subtype: "Knee Exercises", frequency: "Twice weekly", duration: 5 }
+    ]
+  },
+  {
+    id: 2,
+    name: "Diabetes Management",
+    description: "Complete diabetes care protocol with diet and exercise guidance",
+    activities: 4,
+    duration: "12 weeks",
+    createdBy: "Dr. Mithra",
+    createdOn: "12/05/2025",
+    updatedOn: "12/05/2025",
+    image: medicalEquipment,
+    activities_list: [
+      { type: "Consultation", subtype: "Blood Sugar Check", frequency: "Weekly", duration: 1 },
+      { type: "Exercise", subtype: "Walking", frequency: "Daily", duration: 30 },
+      { type: "Diet", subtype: "Meal Planning", frequency: "Daily", duration: 1 },
+      { type: "Medication", subtype: "Insulin", frequency: "Twice daily", duration: 1 }
+    ]
+  },
+  {
+    id: 3,
+    name: "Hypertension Protocol",
+    description: "Blood pressure management with lifestyle modifications",
+    activities: 2,
+    duration: "8 weeks",
+    createdBy: "Dr. Mithra",
+    createdOn: "13/05/2025",
+    updatedOn: "13/05/2025",
+    image: doctorConsultation,
+    activities_list: [
+      { type: "Exercise", subtype: "Light Cardio", frequency: "Daily", duration: 20 },
+      { type: "Consultation", subtype: "BP Monitoring", frequency: "Bi-weekly", duration: 1 }
+    ]
+  }
+];
+
+export default function ProtocolTemplates() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProtocol, setSelectedProtocol] = useState(protocols[0]);
+
+  const filteredProtocols = protocols.filter(protocol =>
+    protocol.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    protocol.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Protocol Templates</h1>
+          <p className="text-muted-foreground">Create and manage reusable treatment protocols</p>
+        </div>
+        <Button className="flex items-center space-x-2">
+          <Plus size={16} />
+          <span>Create Protocol</span>
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-12 gap-6">
+        {/* Protocol List */}
+        <div className="col-span-5">
+          <Card>
+            <CardHeader>
+              <CardTitle>Protocol List</CardTitle>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search protocols..."
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="space-y-2">
+                {filteredProtocols.map((protocol) => (
+                  <div
+                    key={protocol.id}
+                    className={`p-4 cursor-pointer transition-colors border-l-4 ${
+                      selectedProtocol.id === protocol.id
+                        ? "bg-primary/10 border-l-primary"
+                        : "hover:bg-muted border-l-transparent"
+                    }`}
+                    onClick={() => setSelectedProtocol(protocol)}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <h3 className="font-medium mb-1">{protocol.name}</h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {protocol.description}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mt-3">
+                      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                        <div className="flex items-center space-x-1">
+                          <Activity size={12} />
+                          <span>{protocol.activities} activities</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Clock size={12} />
+                          <span>{protocol.duration}</span>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {protocol.createdBy}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Protocol Details */}
+        <div className="col-span-7">
+          <Card>
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <h2 className="text-xl font-bold">{selectedProtocol.name}</h2>
+                    <Badge variant="secondary">{selectedProtocol.duration}</Badge>
+                  </div>
+                  <p className="text-muted-foreground mb-4">
+                    {selectedProtocol.description}
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="font-medium">Created By</p>
+                      <p className="text-muted-foreground">{selectedProtocol.createdBy}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Created On</p>
+                      <p className="text-muted-foreground">{selectedProtocol.createdOn}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Last Updated</p>
+                      <p className="text-muted-foreground">{selectedProtocol.updatedOn}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Total Activities</p>
+                      <p className="text-muted-foreground">{selectedProtocol.activities}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-2">
+                  <Button variant="outline" size="sm">
+                    <Copy size={14} className="mr-1" />
+                    Duplicate
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Edit size={14} className="mr-1" />
+                    Edit
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Trash2 size={14} className="mr-1" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              {/* Protocol Image */}
+              <div className="rounded-lg overflow-hidden">
+                <img 
+                  src={selectedProtocol.image} 
+                  alt={selectedProtocol.name}
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+
+              {/* Activities List */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Protocol Activities</h3>
+                <div className="space-y-3">
+                  {selectedProtocol.activities_list.map((activity, index) => (
+                    <Card key={index} className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <Badge variant="outline">{activity.type}</Badge>
+                            <span className="font-medium">{activity.subtype}</span>
+                          </div>
+                          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                            <div className="flex items-center space-x-1">
+                              <Calendar size={12} />
+                              <span>{activity.frequency}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Clock size={12} />
+                              <span>
+                                {activity.duration} {activity.type === "Consultation" ? "session" : "min"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          <Edit size={14} />
+                        </Button>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t">
+                <Button className="w-full">
+                  <Plus size={16} className="mr-2" />
+                  Add Activity
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
