@@ -76,29 +76,7 @@ const patients = [
     avatar: patientGenericAvatar,
     lastVisit: "Aug 1, 2025",
     diagnosis: "Physiotherapy",
-    prescriptions: [
-      {
-        id: "P006",
-        medicine: "Muscle Relaxant",
-        dosage: "10mg",
-        duration: "10 days",
-        hospital: "Sports Medicine Clinic"
-      },
-      {
-        id: "P007",
-        medicine: "Calcium Supplement",
-        dosage: "500mg",
-        duration: "1 month",
-        hospital: "Wellness Center"
-      },
-      {
-        id: "P008",
-        medicine: "Vitamin D3",
-        dosage: "1000 IU",
-        duration: "3 months",
-        hospital: "Nutrition Clinic"
-      }
-    ],
+    prescriptions: [],
     healthRecords: []
   },
   {
@@ -122,29 +100,7 @@ const patients = [
     diagnosis: "Diabetes Type 2",
     avatar: patientGenericAvatar,
     lastVisit: "Aug 15, 2025",
-    prescriptions: [
-      {
-        id: "P011",
-        medicine: "Metformin",
-        dosage: "500mg",
-        duration: "60 days",
-        hospital: "Endocrine Clinic"
-      },
-      {
-        id: "P012",
-        medicine: "Glipizide",
-        dosage: "5mg",
-        duration: "30 days",
-        hospital: "Diabetes Center"
-      },
-      {
-        id: "P013",
-        medicine: "Insulin Glargine",
-        dosage: "20 units",
-        duration: "30 days",
-        hospital: "Diabetes Center"
-      }
-    ],
+    prescriptions: [],
     healthRecords: []
   },
   {
@@ -168,29 +124,7 @@ const patients = [
     diagnosis: "Post-Surgical Recovery",
     avatar: patientGenericAvatar,
     lastVisit: "Aug 18, 2025",
-    prescriptions: [
-      {
-        id: "P016",
-        medicine: "Oxycodone",
-        dosage: "5mg",
-        duration: "7 days",
-        hospital: "General Surgery Center"
-      },
-      {
-        id: "P017",
-        medicine: "Cephalexin",
-        dosage: "500mg",
-        duration: "10 days",
-        hospital: "Post-Op Care Unit"
-      },
-      {
-        id: "P018",
-        medicine: "Ibuprofen",
-        dosage: "600mg",
-        duration: "14 days",
-        hospital: "Pain Management Clinic"
-      }
-    ],
+    prescriptions: [],
     healthRecords: []
   },
   {
