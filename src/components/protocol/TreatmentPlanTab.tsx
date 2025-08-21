@@ -6,20 +6,19 @@ import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { 
   Plus, 
-  Calendar,
   Clock,
   CheckCircle2,
   Circle,
   Edit,
   Play,
   FileText,
-  GripVertical,
-  Trash2,
   Settings,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Calendar
 } from "lucide-react";
 import { EventBlock } from "./EventBlock";
+import { TemplateDropdown } from "./TemplateDropdown";
 
 interface Patient {
   id: number;
@@ -212,6 +211,18 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
     onCreateProtocol();
   };
 
+  const handleTemplateSelect = (template: any) => {
+    // Create new protocol from template
+    console.log("Creating protocol from template:", template);
+    onCreateProtocol();
+  };
+
+  const handleCreateFromScratch = () => {
+    // Create empty protocol
+    console.log("Creating protocol from scratch");
+    onCreateProtocol();
+  };
+
   const addNewActivity = (protocolId: number) => {
     const newActivity = {
       id: Date.now(),
@@ -331,10 +342,10 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Treatment Protocols ({treatmentPlans.length})</h3>
-        <Button onClick={addNewProtocol} size="sm">
-          <Plus size={16} className="mr-2" />
-          Add New Protocol
-        </Button>
+        <TemplateDropdown 
+          onSelectTemplate={handleTemplateSelect}
+          onCreateFromScratch={handleCreateFromScratch}
+        />
       </div>
 
       {/* Protocols List */}
@@ -432,92 +443,144 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                       
                       {/* Activities List */}
                       <div className="space-y-2">
-                        {protocol.activities.map((activity, index) => {
-                          if (isEditing) {
-                            return (
-                              <EventBlock
-                                key={activity.id}
-                                event={{
-                                  id: activity.id.toString(),
-                                  activity: activity.activity || activity.type,
-                                  subActivity: activity.subActivity || activity.name,
-                                  frequency: activity.frequency,
-                                  duration: activity.duration.replace(' min', ''),
-                                  description: activity.description,
-                                  instructions: activity.instructions || '',
-                                  patientAction: activity.patientAction || '',
-                                  doctorAction: activity.doctorAction || '',
-                                  videoUrl: activity.videoUrl
-                                }}
-                                index={index}
-                                isEditing={editingEvent === activity.id.toString()}
-                                onUpdate={(updatedEvent) => updateActivity(protocol.id, activity.id, {
-                                  activity: updatedEvent.activity,
-                                  subActivity: updatedEvent.subActivity,
-                                  name: updatedEvent.subActivity,
-                                  type: updatedEvent.activity,
-                                  frequency: updatedEvent.frequency,
-                                  duration: updatedEvent.duration + ' min',
-                                  description: updatedEvent.description,
-                                  instructions: updatedEvent.instructions,
-                                  patientAction: updatedEvent.patientAction,
-                                  doctorAction: updatedEvent.doctorAction,
-                                  videoUrl: updatedEvent.videoUrl
-                                })}
-                                onDelete={() => deleteActivity(protocol.id, activity.id)}
-                                onEdit={() => setEditingEvent(activity.id.toString())}
-                                onSave={() => setEditingEvent(null)}
-                                onReorder={(fromIndex, toIndex) => reorderActivities(protocol.id, fromIndex, toIndex)}
-                                activityOptions={activityOptions}
-                                subActivityOptions={subActivityOptions}
-                                frequencyOptions={frequencyOptions}
-                              />
-                            );
-                          }
-
-                          return (
-                            <div
+                        {isEditing ? (
+                          // Edit view: Show all activities in EventBlock format
+                          protocol.activities.map((activity, index) => (
+                            <EventBlock
                               key={activity.id}
-                              className={`flex items-center justify-between p-3 rounded-lg border ${
-                                activity.completed ? 'bg-success/5 border-success/20' : 'bg-muted/50'
-                              }`}
-                            >
-                              <div className="flex items-center space-x-3">
-                                {activity.completed ? (
-                                  <CheckCircle2 size={18} className="text-success" />
-                                ) : (
-                                  <Circle size={18} className="text-muted-foreground" />
-                                )}
-                                
-                                <div className="flex items-center space-x-2">
-                                  {getActivityIcon(activity.type)}
-                                  <Badge variant="outline" className="text-xs">
-                                    {activity.type}
-                                  </Badge>
-                                </div>
+                              event={{
+                                id: activity.id.toString(),
+                                activity: activity.activity || activity.type,
+                                subActivity: activity.subActivity || activity.name,
+                                frequency: activity.frequency,
+                                duration: activity.duration.replace(' min', ''),
+                                description: activity.description,
+                                instructions: activity.instructions || '',
+                                patientAction: activity.patientAction || '',
+                                doctorAction: activity.doctorAction || '',
+                                videoUrl: activity.videoUrl
+                              }}
+                              index={index}
+                              isEditing={editingEvent === activity.id.toString()}
+                              onUpdate={(updatedEvent) => updateActivity(protocol.id, activity.id, {
+                                activity: updatedEvent.activity,
+                                subActivity: updatedEvent.subActivity,
+                                name: updatedEvent.subActivity,
+                                type: updatedEvent.activity,
+                                frequency: updatedEvent.frequency,
+                                duration: updatedEvent.duration + ' min',
+                                description: updatedEvent.description,
+                                instructions: updatedEvent.instructions,
+                                patientAction: updatedEvent.patientAction,
+                                doctorAction: updatedEvent.doctorAction,
+                                videoUrl: updatedEvent.videoUrl
+                              })}
+                              onDelete={() => deleteActivity(protocol.id, activity.id)}
+                              onEdit={() => setEditingEvent(activity.id.toString())}
+                              onSave={() => setEditingEvent(null)}
+                              onReorder={(fromIndex, toIndex) => reorderActivities(protocol.id, fromIndex, toIndex)}
+                              activityOptions={activityOptions}
+                              subActivityOptions={subActivityOptions}
+                              frequencyOptions={frequencyOptions}
+                            />
+                          ))
+                        ) : (
+                          // Timeline view: Show upcoming activities and completed activities collapsed
+                          <>
+                            {/* Upcoming Activities */}
+                            <div className="space-y-2">
+                              <h6 className="text-sm font-medium text-muted-foreground mb-2">Upcoming Activities</h6>
+                              {protocol.activities.filter(activity => !activity.completed).map((activity) => (
+                                <div
+                                  key={activity.id}
+                                  className="flex items-center justify-between p-3 rounded-lg border bg-muted/50"
+                                >
+                                  <div className="flex items-center space-x-3">
+                                    <div className="flex items-center space-x-2">
+                                      {getActivityIcon(activity.type)}
+                                      <Badge variant="outline" className="text-xs">
+                                        {activity.type}
+                                      </Badge>
+                                    </div>
 
-                                <div className="flex-1">
-                                  <h5 className="font-medium text-sm">{activity.name}</h5>
-                                  <p className="text-xs text-muted-foreground line-clamp-1">
-                                    {activity.description}
-                                  </p>
-                                </div>
-                              </div>
+                                    <div className="flex-1">
+                                      <h5 className="font-medium text-sm">{activity.name}</h5>
+                                      <p className="text-xs text-muted-foreground line-clamp-1">
+                                        {activity.description}
+                                      </p>
+                                    </div>
+                                  </div>
 
-                              <div className="flex items-center space-x-3 min-w-fit text-xs">
-                                <div className="text-right">
-                                  <div className="font-medium">{activity.frequency}</div>
-                                  <div className="text-muted-foreground">{activity.duration}</div>
+                                  <div className="flex items-center space-x-3 min-w-fit text-xs">
+                                    <div className="text-right">
+                                      <div className="font-medium">{activity.frequency}</div>
+                                      <div className="text-muted-foreground">{activity.duration}</div>
+                                    </div>
+                                    
+                                    <div className="text-right">
+                                      <div className="text-muted-foreground">Due</div>
+                                      <div className="font-medium">{activity.dueDate}</div>
+                                    </div>
+
+                                    <Circle size={18} className="text-muted-foreground ml-2" />
+                                  </div>
                                 </div>
-                                
-                                <div className="text-right">
-                                  <div className="text-muted-foreground">Due</div>
-                                  <div className="font-medium">{activity.dueDate}</div>
-                                </div>
-                              </div>
+                              ))}
                             </div>
-                          );
-                        })}
+
+                            {/* Completed Activities - Collapsed */}
+                            {protocol.activities.some(activity => activity.completed) && (
+                              <Collapsible>
+                                <div className="flex items-center justify-between py-2">
+                                  <h6 className="text-sm font-medium text-muted-foreground">
+                                    Completed Activities ({protocol.activities.filter(a => a.completed).length})
+                                  </h6>
+                                  <ChevronDown size={16} className="text-muted-foreground" />
+                                </div>
+                                <CollapsibleContent>
+                                  <div className="space-y-2">
+                                    {protocol.activities.filter(activity => activity.completed).map((activity) => (
+                                      <div
+                                        key={activity.id}
+                                        className="flex items-center justify-between p-3 rounded-lg border bg-success/5 border-success/20"
+                                      >
+                                        <div className="flex items-center space-x-3">
+                                          <div className="flex items-center space-x-2">
+                                            {getActivityIcon(activity.type)}
+                                            <Badge variant="outline" className="text-xs">
+                                              {activity.type}
+                                            </Badge>
+                                          </div>
+
+                                          <div className="flex-1">
+                                            <h5 className="font-medium text-sm">{activity.name}</h5>
+                                            <p className="text-xs text-muted-foreground line-clamp-1">
+                                              {activity.description}
+                                            </p>
+                                          </div>
+                                        </div>
+
+                                        <div className="flex items-center space-x-3 min-w-fit text-xs">
+                                          <div className="text-right">
+                                            <div className="font-medium">{activity.frequency}</div>
+                                            <div className="text-muted-foreground">{activity.duration}</div>
+                                          </div>
+                                          
+                                          <div className="text-right">
+                                            <div className="text-muted-foreground">Completed</div>
+                                            <div className="font-medium">{activity.dueDate}</div>
+                                          </div>
+
+                                          <CheckCircle2 size={18} className="text-success ml-2" />
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </CollapsibleContent>
+                              </Collapsible>
+                            )}
+                          </>
+                        )}
                       </div>
                     </div>
                   </CardContent>

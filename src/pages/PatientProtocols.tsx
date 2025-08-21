@@ -102,7 +102,7 @@ export default function PatientProtocols() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Patient Protocols</h1>
+          <h1 className="text-3xl font-bold">Patient Details</h1>
           <p className="text-muted-foreground">Manage patient treatment plans and prescriptions</p>
         </div>
         <Button className="flex items-center space-x-2">
@@ -156,10 +156,7 @@ export default function PatientProtocols() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs">
-                        {patient.diagnosis}
-                      </Badge>
+                    <div className="flex justify-end">
                       <div className="flex items-center space-x-2">
                         <div className={`w-2 h-2 rounded-full ${getAdherenceColor(patient.adherence)}`} />
                         <span className="text-xs font-medium">{patient.adherence}%</span>
@@ -201,17 +198,13 @@ export default function PatientProtocols() {
                 </div>
               </div>
               
-              <div className="flex items-center space-x-6 mt-4 p-4 bg-muted rounded-lg">
+              <div className="flex items-center mt-4 p-4 bg-muted rounded-lg">
                 <div>
                   <p className="text-sm font-medium">Protocol Adherence</p>
                   <div className="flex items-center space-x-2 mt-1">
                     <div className={`w-3 h-3 rounded-full ${getAdherenceColor(selectedPatient.adherence)}`} />
                     <span className="font-bold">{selectedPatient.adherence}% Score</span>
                   </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Diagnosis</p>
-                  <p className="text-sm text-muted-foreground mt-1">{selectedPatient.diagnosis}</p>
                 </div>
               </div>
             </CardHeader>

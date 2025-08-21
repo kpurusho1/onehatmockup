@@ -186,10 +186,6 @@ export default function ProtocolTemplates() {
                 
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm">
-                    <Copy size={14} className="mr-1" />
-                    Duplicate
-                  </Button>
-                  <Button variant="outline" size="sm">
                     <Edit size={14} className="mr-1" />
                     Edit
                   </Button>
@@ -203,15 +199,6 @@ export default function ProtocolTemplates() {
             
             <CardContent className="space-y-4">
               {/* Protocol Image */}
-              <div className="rounded-lg overflow-hidden">
-                <img 
-                  src={selectedProtocol.image} 
-                  alt={selectedProtocol.name}
-                  className="w-full h-48 object-cover"
-                />
-              </div>
-
-              {/* Activities List */}
               <div>
                 <h3 className="text-lg font-semibold mb-3">Protocol Activities</h3>
                 <div className="space-y-3">
@@ -225,7 +212,7 @@ export default function ProtocolTemplates() {
                           </div>
                           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                             <div className="flex items-center space-x-1">
-                              <Calendar size={12} />
+                              <Clock size={12} />
                               <span>{activity.frequency}</span>
                             </div>
                             <div className="flex items-center space-x-1">
@@ -236,20 +223,38 @@ export default function ProtocolTemplates() {
                             </div>
                           </div>
                         </div>
-                        <Button variant="ghost" size="sm">
-                          <Edit size={14} />
-                        </Button>
+                        <div className="flex space-x-2">
+                          <Button variant="ghost" size="sm">
+                            <Edit size={14} />
+                          </Button>
+                        </div>
                       </div>
                     </Card>
                   ))}
                 </div>
               </div>
               
-              <div className="pt-4 border-t">
-                <Button className="w-full">
+              <div className="pt-4 border-t flex space-x-2">
+                <Button variant="outline" className="flex-1">
+                  View All Events
+                </Button>
+                <Button className="flex-1">
                   <Plus size={16} className="mr-2" />
                   Add Activity
                 </Button>
+              </div>
+              
+              <div className="pt-4 border-t">
+                <div className="flex space-x-2">
+                  <Button variant="outline" size="sm">
+                    <Copy size={14} className="mr-1" />
+                    Create from Existing
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Plus size={14} className="mr-1" />
+                    Create from Scratch
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
