@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ProtocolBuilder } from "@/components/protocol/ProtocolBuilder";
 import { TreatmentPlanTab } from "@/components/protocol/TreatmentPlanTab";
+import { PrescriptionTimeline } from "@/components/prescription/PrescriptionTimeline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -226,43 +227,28 @@ export default function PatientProtocols() {
                     </Button>
                   </div>
                   
-                  {selectedPatient.prescriptions.length > 0 ? (
-                    <div className="space-y-3">
-                      {selectedPatient.prescriptions.map((prescription) => (
-                        <Card key={prescription.id} className="p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-2">
-                                <h4 className="font-medium">{prescription.medicine}</h4>
-                                <Badge variant="secondary">{prescription.hospital}</Badge>
-                              </div>
-                              <p className="text-sm text-muted-foreground">
-                                Dosage: {prescription.dosage}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                Duration: {prescription.duration}
-                              </p>
-                            </div>
-                            <div className="flex space-x-2">
-                              <Button variant="outline" size="sm">
-                                <Eye size={14} className="mr-1" />
-                                View
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <Edit size={14} className="mr-1" />
-                                Edit
-                              </Button>
-                            </div>
-                          </div>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">No prescriptions available</p>
-                    </div>
-                  )}
+                  <PrescriptionTimeline 
+                    prescriptions={[
+                      {
+                        id: "1",
+                        date: "Dec 15, 2024",
+                        time: "2:30 PM",
+                        hospital: selectedPatient.prescriptions[0]?.hospital || "City General Hospital",
+                        location: "Downtown Medical Center",
+                        diagnosis: "Acute Bronchitis",
+                        medications: [
+                          {
+                            id: "m1",
+                            name: selectedPatient.prescriptions[0]?.medicine || "Amoxicillin",
+                            dosage: selectedPatient.prescriptions[0]?.dosage || "500mg",
+                            frequency: "3 times daily",
+                            duration: selectedPatient.prescriptions[0]?.duration || "7 days",
+                            instructions: "Take with food"
+                          }
+                        ]
+                      }
+                    ]} 
+                  />
                 </TabsContent>
                 
                 <TabsContent value="treatment-plan" className="space-y-4">
