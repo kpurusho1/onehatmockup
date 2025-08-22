@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Camera } from "lucide-react";
 
 interface Medication {
   medicine: string;
@@ -25,10 +25,11 @@ interface PrescriptionData {
 
 interface PrescriptionRowProps {
   prescription: PrescriptionData;
+  defaultOpen?: boolean;
 }
 
-export function PrescriptionRow({ prescription }: PrescriptionRowProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function PrescriptionRow({ prescription, defaultOpen = false }: PrescriptionRowProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   
   const getIntakeScoreColor = (score: number) => {
     if (score >= 80) return 'bg-green-500';
@@ -55,12 +56,25 @@ export function PrescriptionRow({ prescription }: PrescriptionRowProps) {
             
             <div className="flex items-center space-x-3">
               <div className="text-right">
-                <p className="text-sm font-medium">Intake Score</p>
-                <div className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${getIntakeScoreColor(prescription.intakeScore)} text-white text-xs font-bold`}>
+                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                  prescription.intakeScore >= 80 
+                    ? 'border-green-500 bg-green-500/10' 
+                    : prescription.intakeScore >= 60 
+                    ? 'border-yellow-500 bg-yellow-500/10' 
+                    : 'border-red-500 bg-red-500/10'
+                } ${
+                  prescription.intakeScore >= 80 
+                    ? 'text-green-600' 
+                    : prescription.intakeScore >= 60 
+                    ? 'text-yellow-600' 
+                    : 'text-red-600'
+                } text-sm font-bold`}>
                   {prescription.intakeScore}%
                 </div>
               </div>
-              <Badge variant="outline">View Details</Badge>
+              <div className="p-2 bg-muted rounded-lg hover:bg-muted/80 cursor-pointer" title="View Scanned Prescription">
+                <Camera size={16} className="text-muted-foreground" />
+              </div>
             </div>
           </div>
         </CollapsibleTrigger>

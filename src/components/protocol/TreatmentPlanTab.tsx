@@ -414,6 +414,10 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                             <RefreshCw className="mr-2 h-4 w-4" />
                             Override
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log('Archive protocol', protocol.id)}>
+                            <FileText className="mr-2 h-4 w-4" />
+                            Archive
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -531,17 +535,6 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                           </CollapsibleContent>
                         </Collapsible>
                       )}
-
-                      {/* Activities Header */}
-                      <div className="flex items-center justify-between">
-                        <h5 className="font-semibold">Activities</h5>
-                        {isEditing && (
-                          <Button onClick={() => addNewActivity(protocol.id)} size="sm">
-                            <Plus size={16} className="mr-2" />
-                            Add Activity
-                          </Button>
-                        )}
-                      </div>
                     </div>
                   </CardContent>
                 </CollapsibleContent>

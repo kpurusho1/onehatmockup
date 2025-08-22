@@ -264,6 +264,9 @@ export default function PatientProtocols() {
                   const adherenceColor = patient.adherence >= 80 ? 'bg-green-500' : 
                                        patient.adherence >= 60 ? 'bg-yellow-500' : 'bg-red-500';
                   
+                  const adherenceTextColor = patient.adherence >= 80 ? 'text-green-600' : 
+                                        patient.adherence >= 60 ? 'text-yellow-600' : 'text-red-600';
+                  
                   return (
                     <div
                       key={patient.id}
@@ -283,7 +286,7 @@ export default function PatientProtocols() {
                           <h3 className="font-medium">{patient.name}</h3>
                           <p className="text-sm text-muted-foreground">{patient.phone}</p>
                         </div>
-                        <div className={`w-8 h-8 rounded-full ${adherenceColor} flex items-center justify-center text-white text-xs font-bold`}>
+                        <div className={`text-xs font-bold ${adherenceTextColor}`}>
                           {patient.adherence}%
                         </div>
                       </div>
@@ -324,38 +327,26 @@ export default function PatientProtocols() {
                 </div>
                 
                 <div className="flex items-center space-x-6">
-                  {/* Adherence Scores - Right Aligned */}
+                  {/* Adherence Scores and Action Buttons - Right Aligned */}
                   <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-12 h-12 rounded-full border-4 border-primary flex items-center justify-center bg-primary/10">
-                        <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Treatment Adherence</p>
-                        <p className="text-xs text-muted-foreground">Protocol compliance</p>
-                      </div>
+                    <div className="w-12 h-12 rounded-full border-4 border-primary flex items-center justify-center bg-primary/10">
+                      <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
                     </div>
                     
-                    <div className="flex items-center space-x-2">
-                      <div className="w-12 h-12 rounded-full border-4 border-green-500 flex items-center justify-center bg-green-500/10">
-                        <span className="text-sm font-bold text-green-600">85%</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Rx Intake Score</p>
-                        <p className="text-xs text-muted-foreground">Medication adherence</p>
-                      </div>
+                    <div className="w-12 h-12 rounded-full border-4 border-green-500 flex items-center justify-center bg-green-500/10">
+                      <span className="text-sm font-bold text-green-600">85%</span>
                     </div>
-                  </div>
-                  
-                  <div className="flex space-x-2">
-                    <Button onClick={() => setShowProtocolBuilder(true)}>
-                      <Plus size={16} className="mr-2" />
-                      Create Treatment Plan
-                    </Button>
-                    <Button variant="outline">
-                      <Plus size={16} className="mr-2" />
-                      Create Rx
-                    </Button>
+                    
+                    <div className="flex flex-col space-y-2">
+                      <Button variant="outline" size="sm">
+                        <Plus size={14} className="mr-2" />
+                        Create Rx
+                      </Button>
+                      <Button onClick={() => setShowProtocolBuilder(true)} size="sm">
+                        <Plus size={14} className="mr-2" />
+                        Create Treatment Plan
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -372,15 +363,15 @@ export default function PatientProtocols() {
                 <TabsContent value="prescriptions" className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">Prescriptions</h3>
-                    <Button variant="outline" size="sm">
-                      <Plus size={16} className="mr-2" />
-                      New Prescription
-                    </Button>
                   </div>
                   
                   <div className="space-y-2">
-                    {mockPrescriptions.map((prescription) => (
-                      <PrescriptionRow key={prescription.id} prescription={prescription} />
+                    {mockPrescriptions.map((prescription, index) => (
+                      <PrescriptionRow 
+                        key={prescription.id} 
+                        prescription={prescription} 
+                        defaultOpen={index === 0}
+                      />
                     ))}
                   </div>
                 </TabsContent>
