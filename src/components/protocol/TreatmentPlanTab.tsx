@@ -17,7 +17,8 @@ import {
   ChevronRight,
   Calendar
 } from "lucide-react";
-import { EventBlock } from "./EventBlock";
+import { ScheduleView } from "./ScheduleView";
+import { BlockEditor } from "./BlockEditor";
 import { TemplateDropdown } from "./TemplateDropdown";
 
 interface Patient {
@@ -442,157 +443,69 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                       </div>
                       
                       {/* Activities List */}
-                      <div className="space-y-2">
+                      <div className="space-y-4">
                         {isEditing ? (
-                          // Edit view: Show all activities in EventBlock format
-                          protocol.activities.map((activity, index) => (
-                            <EventBlock
-                              key={activity.id}
-                              event={{
-                                id: activity.id.toString(),
-                                activity: activity.activity || activity.type,
-                                subActivity: activity.subActivity || activity.name,
-                                frequency: activity.frequency,
-                                duration: activity.duration.replace(' min', ''),
-                                description: activity.description,
-                                instructions: activity.instructions || '',
-                                patientAction: activity.patientAction || '',
-                                doctorAction: activity.doctorAction || '',
-                                videoUrl: activity.videoUrl
-                              }}
-                              index={index}
-                              isEditing={editingEvent === activity.id.toString()}
-                              onUpdate={(updatedEvent) => updateActivity(protocol.id, activity.id, {
-                                activity: updatedEvent.activity,
-                                subActivity: updatedEvent.subActivity,
-                                name: updatedEvent.subActivity,
-                                type: updatedEvent.activity,
-                                frequency: updatedEvent.frequency,
-                                duration: updatedEvent.duration + ' min',
-                                description: updatedEvent.description,
-                                instructions: updatedEvent.instructions,
-                                patientAction: updatedEvent.patientAction,
-                                doctorAction: updatedEvent.doctorAction,
-                                videoUrl: updatedEvent.videoUrl
-                              })}
-                              onDelete={() => deleteActivity(protocol.id, activity.id)}
-                              onEdit={() => setEditingEvent(activity.id.toString())}
-                              onSave={() => setEditingEvent(null)}
-                              onReorder={(fromIndex, toIndex) => reorderActivities(protocol.id, fromIndex, toIndex)}
-                              activityOptions={activityOptions}
-                              subActivityOptions={subActivityOptions}
-                              frequencyOptions={frequencyOptions}
-                            />
-                          ))
+                          // Edit view: Show activities in BlockEditor format
+                          <BlockEditor
+                            events={protocol.activities.map(activity => ({
+                              id: activity.id.toString(),
+                              activity: activity.activity || activity.type,
+                              instructions: activity.instructions || activity.description,
+                              frequency: activity.frequency,
+                              duration: parseInt(activity.duration.replace(/\D/g, '')) || 0,
+                              videoUrl: activity.videoUrl
+                            }))}
+                            onEventsChange={(events) => {
+                              // Convert back to protocol activities format and update
+                              const updatedActivities = events.map((event, index) => {
+                                const originalActivity = protocol.activities[index] || {
+                                  completed: false,
+                                  dueDate: new Date().toISOString().split('T')[0],
+                                  patientAction: 'complete-task',
+                                  doctorAction: 'review-progress'
+                                };
+                                return {
+                                  ...originalActivity,
+                                  id: parseInt(event.id) || Date.now() + index,
+                                  activity: event.activity,
+                                  type: event.activity,
+                                  name: event.activity,
+                                  subActivity: event.activity,
+                                  instructions: event.instructions,
+                                  description: event.instructions,
+                                  frequency: event.frequency,
+                                  duration: `${event.duration} min`,
+                                  videoUrl: event.videoUrl,
+                                  completed: originalActivity.completed,
+                                  dueDate: originalActivity.dueDate,
+                                  patientAction: originalActivity.patientAction,
+                                  doctorAction: originalActivity.doctorAction
+                                };
+                              });
+                              
+                              setTreatmentPlans(prev => prev.map(p => 
+                                p.id === protocol.id 
+                                  ? { ...p, activities: updatedActivities, totalActivities: updatedActivities.length }
+                                  : p
+                              ));
+                            }}
+                            activityOptions={activityOptions}
+                            frequencyOptions={frequencyOptions}
+                          />
                         ) : (
-                          // Timeline view: Show upcoming activities and completed activities collapsed
-                          <>
-                            {/* Upcoming Activities */}
-                            <div className="space-y-2">
-                              <h6 className="text-sm font-medium text-muted-foreground mb-2">Upcoming Activities</h6>
-                              {protocol.activities.filter(activity => !activity.completed).map((activity) => (
-                                <div
-                                  key={activity.id}
-                                  className="flex items-center justify-between p-3 rounded-lg border bg-muted/50"
-                                >
-                                  <div className="flex items-center space-x-3">
-                                    <div className="flex items-center space-x-2">
-                                      {getActivityIcon(activity.type)}
-                                      <Badge variant="outline" className="text-xs">
-                                        {activity.type}
-                                      </Badge>
-                                    </div>
-
-                                    <div className="flex-1">
-                                      <h5 className="font-medium text-sm">{activity.name}</h5>
-                                      <p className="text-xs text-muted-foreground line-clamp-1">
-                                        {activity.description}
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                   <div className="flex items-center space-x-3 min-w-fit text-xs">
-                                     <div className="text-right">
-                                       <div className="font-medium">{activity.frequency}</div>
-                                       <div className="text-muted-foreground">{activity.duration}</div>
-                                     </div>
-                                     
-                                     <div className="text-right">
-                                       <div className="text-muted-foreground">
-                                         {(() => {
-                                           const today = new Date();
-                                           const due = new Date(activity.dueDate);
-                                           const diffTime = due.getTime() - today.getTime();
-                                           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                                           
-                                           if (diffDays === 0) return "Due today";
-                                           if (diffDays === 1) return "Due in 1 day";
-                                           if (diffDays > 1) return `Due in ${diffDays} days`;
-                                           if (diffDays === -1) return "1 day overdue";
-                                           return `${Math.abs(diffDays)} days overdue`;
-                                         })()}
-                                       </div>
-                                       <div className="font-medium">{activity.dueDate}</div>
-                                     </div>
-
-                                     <Circle size={18} className="text-muted-foreground ml-2" />
-                                   </div>
-                                </div>
-                              ))}
-                            </div>
-
-                            {/* Completed Activities - Collapsed */}
-                            {protocol.activities.some(activity => activity.completed) && (
-                              <Collapsible>
-                                <div className="flex items-center justify-between py-2">
-                                  <h6 className="text-sm font-medium text-muted-foreground">
-                                    Completed Activities ({protocol.activities.filter(a => a.completed).length})
-                                  </h6>
-                                  <ChevronDown size={16} className="text-muted-foreground" />
-                                </div>
-                                <CollapsibleContent>
-                                  <div className="space-y-2">
-                                    {protocol.activities.filter(activity => activity.completed).map((activity) => (
-                                      <div
-                                        key={activity.id}
-                                        className="flex items-center justify-between p-3 rounded-lg border bg-success/5 border-success/20"
-                                      >
-                                        <div className="flex items-center space-x-3">
-                                          <div className="flex items-center space-x-2">
-                                            {getActivityIcon(activity.type)}
-                                            <Badge variant="outline" className="text-xs">
-                                              {activity.type}
-                                            </Badge>
-                                          </div>
-
-                                          <div className="flex-1">
-                                            <h5 className="font-medium text-sm">{activity.name}</h5>
-                                            <p className="text-xs text-muted-foreground line-clamp-1">
-                                              {activity.description}
-                                            </p>
-                                          </div>
-                                        </div>
-
-                                        <div className="flex items-center space-x-3 min-w-fit text-xs">
-                                          <div className="text-right">
-                                            <div className="font-medium">{activity.frequency}</div>
-                                            <div className="text-muted-foreground">{activity.duration}</div>
-                                          </div>
-                                          
-                                          <div className="text-right">
-                                            <div className="text-muted-foreground">Completed</div>
-                                            <div className="font-medium">{activity.dueDate}</div>
-                                          </div>
-
-                                          <CheckCircle2 size={18} className="text-success ml-2" />
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </CollapsibleContent>
-                              </Collapsible>
-                            )}
-                          </>
+                          // Schedule view: Show activities in schedule format
+                          <ScheduleView
+                            events={protocol.activities.map(activity => ({
+                              id: activity.id,
+                              date: activity.dueDate,
+                              day: new Date(activity.dueDate).toLocaleDateString('en-US', { weekday: 'long' }),
+                              activity: activity.activity || activity.type,
+                              instructions: activity.instructions || activity.description,
+                              videoUrl: activity.videoUrl,
+                              status: activity.completed ? 'completed' : 
+                                      new Date(activity.dueDate) < new Date() ? 'overdue' : 'assigned'
+                            }))}
+                          />
                         )}
                       </div>
                     </div>

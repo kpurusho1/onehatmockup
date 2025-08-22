@@ -15,19 +15,15 @@ import {
   Save,
   ArrowLeft
 } from "lucide-react";
-import { EventBlock } from "./EventBlock";
+import { BlockEditor } from "./BlockEditor";
 import { TemplateSelector } from "./TemplateSelector";
 
 interface ProtocolEvent {
   id: string;
   activity: string;
-  subActivity: string;
-  frequency: string;
-  duration: string;
-  description: string;
   instructions: string;
-  patientAction: string;
-  doctorAction: string;
+  frequency: string;
+  duration: number;
   videoUrl?: string;
 }
 
@@ -60,46 +56,28 @@ const frequencyOptions = ["Daily", "Twice Daily", "Weekly", "Twice Weekly", "Cho
 
 export function ProtocolBuilder({ patientName, onSave, onCancel, initialProtocol }: ProtocolBuilderProps) {
   const [protocolName, setProtocolName] = useState(initialProtocol?.name || "");
-  const [events, setEvents] = useState<ProtocolEvent[]>(initialProtocol?.events || []);
+  const [events, setEvents] = useState<ProtocolEvent[]>(
+    initialProtocol?.events?.map((event: any) => ({
+      id: event.id || Date.now().toString(),
+      activity: event.activity || "",
+      instructions: event.instructions || event.description || "",
+      frequency: event.frequency || "",
+      duration: parseInt(event.duration?.replace(/\D/g, '')) || 0,
+      videoUrl: event.videoUrl || ""
+    })) || []
+  );
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<string | null>(null);
-
-  const addNewEvent = () => {
-    const newEvent: ProtocolEvent = {
-      id: Date.now().toString(),
-      activity: "",
-      subActivity: "",
-      frequency: "",
-      duration: "",
-      description: "",
-      instructions: "",
-      patientAction: "",
-      doctorAction: ""
-    };
-    setEvents([...events, newEvent]);
-    setEditingEvent(newEvent.id);
-  };
-
-  const updateEvent = (id: string, updatedEvent: Partial<ProtocolEvent>) => {
-    setEvents(events.map(event => 
-      event.id === id ? { ...event, ...updatedEvent } : event
-    ));
-  };
-
-  const deleteEvent = (id: string) => {
-    setEvents(events.filter(event => event.id !== id));
-  };
-
-  const reorderEvents = (fromIndex: number, toIndex: number) => {
-    const newEvents = [...events];
-    const [removed] = newEvents.splice(fromIndex, 1);
-    newEvents.splice(toIndex, 0, removed);
-    setEvents(newEvents);
-  };
 
   const handleTemplateSelect = (template: any) => {
     setProtocolName(template.name);
-    setEvents(template.events || []);
+    setEvents(template.events?.map((event: any) => ({
+      id: event.id || Date.now().toString(),
+      activity: event.activity || "",
+      instructions: event.instructions || event.description || "",
+      frequency: event.frequency || "",
+      duration: parseInt(event.duration?.replace(/\D/g, '')) || 0,
+      videoUrl: event.videoUrl || ""
+    })) || []);
     setShowTemplateSelector(false);
   };
 
@@ -172,43 +150,15 @@ export function ProtocolBuilder({ patientName, onSave, onCancel, initialProtocol
       {/* Protocol Events */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Protocol Events</CardTitle>
-            <Button onClick={addNewEvent}>
-              <Plus size={16} className="mr-2" />
-              Add Activity
-            </Button>
-          </div>
+          <CardTitle>Protocol Events</CardTitle>
         </CardHeader>
         <CardContent>
-          {events.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground mb-4">No activities added yet</p>
-              <Button onClick={addNewEvent} variant="outline">
-                <Plus size={16} className="mr-2" />
-                Add First Activity
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {events.map((event, index) => (
-                <EventBlock
-                  key={event.id}
-                  event={event}
-                  index={index}
-                  isEditing={editingEvent === event.id}
-                  onUpdate={(updatedEvent) => updateEvent(event.id, updatedEvent)}
-                  onDelete={() => deleteEvent(event.id)}
-                  onEdit={() => setEditingEvent(event.id)}
-                  onSave={() => setEditingEvent(null)}
-                  onReorder={reorderEvents}
-                  activityOptions={activityOptions}
-                  subActivityOptions={subActivityOptions}
-                  frequencyOptions={frequencyOptions}
-                />
-              ))}
-            </div>
-          )}
+          <BlockEditor
+            events={events}
+            onEventsChange={setEvents}
+            activityOptions={activityOptions}
+            frequencyOptions={frequencyOptions}
+          />
         </CardContent>
       </Card>
     </div>
