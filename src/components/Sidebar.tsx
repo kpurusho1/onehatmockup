@@ -20,7 +20,7 @@ const sidebarItems = [
   },
   {
     id: "patient-protocols",
-    label: "Patient Protocols",
+    label: "Patient Management",
     icon: Users,
     path: "/patient-protocols",
   },
@@ -69,8 +69,8 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
             className="w-10 h-10 object-contain"
           />
           <div className="text-left">
-            <h2 className="text-lg font-bold">Dr. Abhishant, Urologist</h2>
-            <p className="text-sm text-muted-foreground">Nishant Hospital</p>
+            <h2 className="text-lg font-bold">Dr. Mithra, Obstetrician</h2>
+            <p className="text-sm text-muted-foreground">Guru Hospital</p>
           </div>
         </div>
             </div>
@@ -106,16 +106,16 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
         ))}
       </nav>
 
-      {/* User Info */}
+      {/* Support */}
       <div className="p-4 border-t border-border">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
-            <span className="text-accent-foreground font-medium text-sm">M</span>
+            <span className="text-accent-foreground font-medium text-sm">?</span>
           </div>
           {!collapsed && (
             <div className="flex-1">
-              <p className="text-sm font-medium">Dr. Mithra</p>
-              <p className="text-xs text-muted-foreground">DOCTOR</p>
+              <p className="text-sm font-medium">Support</p>
+              <p className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">Get Help</p>
             </div>
           )}
         </div>
