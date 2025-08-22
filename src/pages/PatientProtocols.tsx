@@ -231,15 +231,9 @@ export default function PatientProtocols() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Patient Details</h1>
-          <p className="text-muted-foreground">Manage patient treatment plans and prescriptions</p>
-        </div>
-        <Button className="flex items-center space-x-2">
-          <Plus size={16} />
-          <span>Add Patient</span>
-        </Button>
+      <div>
+        <h1 className="text-3xl font-bold">Patient Details</h1>
+        <p className="text-muted-foreground">Manage patient treatment plans and prescriptions</p>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
@@ -247,6 +241,12 @@ export default function PatientProtocols() {
         <div className="col-span-3">
           <Card>
             <CardHeader>
+              <div className="flex items-center justify-between mb-3">
+                <Button className="flex items-center space-x-2 w-full">
+                  <Plus size={16} />
+                  <span>Add Patient</span>
+                </Button>
+              </div>
               <CardTitle className="flex items-center justify-between">
                 <span>Patients ({patients.length})</span>
               </CardTitle>
@@ -280,11 +280,15 @@ export default function PatientProtocols() {
                       onClick={() => setSelectedPatient(patient)}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium ${
-                          patient.adherence >= 80 ? 'bg-green-500' : 
-                          patient.adherence >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                        }`}>
-                          {patient.name.charAt(0).toUpperCase()}
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-full bg-[hsl(var(--brand-primary))]/10 flex items-center justify-center">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-xs ${
+                              patient.adherence >= 80 ? 'bg-green-500' : 
+                              patient.adherence >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                            }`}>
+                              {patient.name.charAt(0).toUpperCase()}
+                            </div>
+                          </div>
                         </div>
                         <div className="flex-1">
                           <h3 className="font-medium">{patient.name}</h3>
@@ -309,11 +313,13 @@ export default function PatientProtocols() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6">
                   <div className="w-20 h-20 rounded-full bg-[hsl(var(--brand-primary))]/10 flex items-center justify-center">
-                    <img 
-                      src="/src/assets/patient-avatar-modern.png" 
-                      alt="Patient" 
-                      className="w-16 h-16 object-cover rounded-full"
-                    />
+                    <div className="w-16 h-16 rounded-full bg-[hsl(var(--brand-primary))]/20 flex items-center justify-center">
+                      <img 
+                        src="/src/assets/patient-avatar-modern.png" 
+                        alt="Patient" 
+                        className="w-12 h-12 object-cover rounded-full"
+                      />
+                    </div>
                   </div>
                   <div>
                     <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
@@ -333,18 +339,18 @@ export default function PatientProtocols() {
                 <div className="flex items-center space-x-6">
                   {/* Adherence Scores and Action Buttons - Right Aligned */}
                   <div className="flex items-center space-x-6">
-                    <div className="text-center">
+                    <div className="flex flex-col items-center text-center">
                       <div className="w-12 h-12 rounded-full border-4 border-primary flex items-center justify-center bg-primary/10">
                         <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">Treatment Adherence</p>
+                      <p className="text-xs text-muted-foreground mt-1 text-center">Treatment<br/>Adherence</p>
                     </div>
                     
-                    <div className="text-center">
+                    <div className="flex flex-col items-center text-center">
                       <div className="w-12 h-12 rounded-full border-4 border-green-500 flex items-center justify-center bg-green-500/10">
                         <span className="text-sm font-bold text-green-600">85%</span>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">Rx Intake</p>
+                      <p className="text-xs text-muted-foreground mt-1 text-center">Rx Intake</p>
                     </div>
                     
                     <div className="flex flex-col space-y-2">
