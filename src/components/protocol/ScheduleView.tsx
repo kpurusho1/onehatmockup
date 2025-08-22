@@ -49,91 +49,84 @@ export function ScheduleView({ events, onUpdateEvent, editable = false }: Schedu
   };
 
   return (
-    <div className="space-y-6">
-      {/* Timeline Events */}
-      <div className="relative">
-        {events.map((event, index) => (
-          <div key={event.id} className="relative flex items-start space-x-4 pb-6">
-            {/* Timeline Line */}
-            {index < events.length - 1 && (
-              <div className="absolute left-4 top-8 bottom-0 w-px bg-border"></div>
-            )}
-            
-            {/* Date Circle */}
-            <div className="relative flex-shrink-0">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-xs font-medium text-primary-foreground">
-                {new Date(event.date).getDate()}
+    <div className="space-y-2">
+      {/* Header */}
+      <div className="grid grid-cols-12 gap-4 px-4 py-2 text-sm font-medium text-muted-foreground border-b">
+        <div className="col-span-3">Date & Due</div>
+        <div className="col-span-3">Activity</div>
+        <div className="col-span-4">Instructions</div>
+        <div className="col-span-1">Video</div>
+        <div className="col-span-1">Status</div>
+      </div>
+
+      {/* Events */}
+      <div className="space-y-1">
+        {events.map((event) => (
+          <div key={event.id} className="grid grid-cols-12 gap-4 px-4 py-3 rounded-lg border hover:bg-muted/50 transition-colors">
+            {/* Date & Due */}
+            <div className="col-span-3">
+              <div className="font-medium text-sm">{event.date}</div>
+              <div className="text-xs text-muted-foreground">{event.day}</div>
+              <div className="text-xs text-primary font-medium mt-1">
+                {calculateDueDate(event.date)}
               </div>
             </div>
-            
-            {/* Event Content */}
-            <div className="flex-1 min-w-0">
-              <div className="bg-card border rounded-lg p-4 space-y-3">
-                {/* Date & Status Header */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium text-sm">{event.date}</div>
-                    <div className="text-xs text-muted-foreground">{event.day}</div>
-                    <div className="text-xs text-primary font-medium mt-1">
-                      {calculateDueDate(event.date)}
-                    </div>
-                  </div>
-                  <Badge 
-                    className={`text-xs px-2 py-1 ${getStatusColor(event.status)}`}
-                  >
-                    {event.status}
-                  </Badge>
-                </div>
-                
-                {/* Activity */}
-                <div className="space-y-2">
-                  <div className="text-xs text-muted-foreground">Activity</div>
-                  {editable && onUpdateEvent ? (
-                    <Select 
-                      value={event.activity} 
-                      onValueChange={(value) => onUpdateEvent(event.id, { activity: value })}
-                    >
-                      <SelectTrigger className="h-8 text-sm">
-                        <SelectValue placeholder="Select activity" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {activityOptions.map((option) => (
-                          <SelectItem key={option} value={option}>{option}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <Badge variant="secondary" className="text-xs">
-                      {event.activity}
-                    </Badge>
-                  )}
-                </div>
-                
-                {/* Instructions */}
-                <div className="space-y-2">
-                  <div className="text-xs text-muted-foreground">Instructions</div>
-                  {editable && onUpdateEvent ? (
-                    <Input
-                      value={event.instructions}
-                      onChange={(e) => onUpdateEvent(event.id, { instructions: e.target.value })}
-                      className="h-8 text-sm"
-                      placeholder="Enter instructions"
-                    />
-                  ) : (
-                    <p className="text-sm">{event.instructions}</p>
-                  )}
-                </div>
-                
-                {/* Video Link */}
-                {event.videoUrl && (
-                  <div className="pt-2">
-                    <Button size="sm" variant="ghost" className="h-8 text-xs">
-                      <ExternalLink size={12} className="mr-1" />
-                      Watch Video
-                    </Button>
-                  </div>
-                )}
-              </div>
+
+            {/* Activity */}
+            <div className="col-span-3">
+              {editable && onUpdateEvent ? (
+                <Select 
+                  value={event.activity} 
+                  onValueChange={(value) => onUpdateEvent(event.id, { activity: value })}
+                >
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Select activity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {activityOptions.map((option) => (
+                      <SelectItem key={option} value={option}>{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Badge variant="secondary" className="text-xs">
+                  {event.activity}
+                </Badge>
+              )}
+            </div>
+
+            {/* Instructions */}
+            <div className="col-span-4">
+              {editable && onUpdateEvent ? (
+                <Input
+                  value={event.instructions}
+                  onChange={(e) => onUpdateEvent(event.id, { instructions: e.target.value })}
+                  className="h-8 text-sm"
+                  placeholder="Enter instructions"
+                />
+              ) : (
+                <p className="text-sm line-clamp-2">{event.instructions}</p>
+              )}
+            </div>
+
+            {/* Video Link */}
+            <div className="col-span-1 flex justify-center">
+              {event.videoUrl ? (
+                <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                  <ExternalLink size={14} />
+                </Button>
+              ) : (
+                <div className="text-xs text-muted-foreground">-</div>
+              )}
+            </div>
+
+            {/* Status */}
+            <div className="col-span-1 flex justify-center">
+              <Badge 
+                className={`text-xs px-2 py-1 ${getStatusColor(event.status)}`}
+              >
+                {event.status}
+              </Badge>
             </div>
           </div>
         ))}
