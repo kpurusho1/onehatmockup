@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ProtocolBuilder } from "@/components/protocol/ProtocolBuilder";
 import { TreatmentPlanTab } from "@/components/protocol/TreatmentPlanTab";
 import { PrescriptionTimeline } from "@/components/prescription/PrescriptionTimeline";
+import { PrescriptionRow } from "@/components/prescription/PrescriptionRow";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,57 @@ import {
   Eye
 } from "lucide-react";
 import patientGenericAvatar from "@/assets/patient-generic-avatar.jpg";
+import patientClipart from "@/assets/patient-clipart.png";
+
+// Mock prescription data
+const mockPrescriptions = [
+  {
+    id: "rx-001",
+    diagnosis: "Post-operative knee surgery",
+    intakeScore: 85,
+    date: "2025-08-15",
+    medications: [
+      {
+        medicine: "Ibuprofen 400mg",
+        morning: "1 tab",
+        noon: "0",
+        evening: "1 tab",
+        night: "0",
+        duration: 7,
+        timeToTake: "After food",
+        remarks: "With meals to prevent stomach upset"
+      },
+      {
+        medicine: "Paracetamol 500mg",
+        morning: "1 tab",
+        noon: "1 tab",
+        evening: "1 tab",
+        night: "1 tab",
+        duration: 10,
+        timeToTake: "Before food",
+        remarks: "For pain management"
+      }
+    ]
+  },
+  {
+    id: "rx-002", 
+    diagnosis: "Hypertension management",
+    intakeScore: 92,
+    date: "2025-08-10",
+    medications: [
+      {
+        medicine: "Amlodipine 5mg",
+        morning: "1 tab",
+        noon: "0",
+        evening: "0",
+        night: "0",
+        duration: 30,
+        timeToTake: "Before food",
+        remarks: "Monitor blood pressure daily"
+      }
+    ]
+  }
+];
 
 const patients = [
   {
@@ -208,27 +260,36 @@ export default function PatientProtocols() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="space-y-1">
-                {filteredPatients.map((patient) => (
-                  <div
-                    key={patient.id}
-                    className={`p-4 cursor-pointer transition-colors border-l-4 ${
-                      selectedPatient.id === patient.id
-                        ? "bg-primary/10 border-l-primary"
-                        : "hover:bg-muted border-l-transparent"
-                    }`}
-                    onClick={() => setSelectedPatient(patient)}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Avatar>
-                        <AvatarImage src={patient.avatar} />
-                        <AvatarFallback>{patient.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-medium">{patient.name}</h3>
+                {filteredPatients.map((patient) => {
+                  const adherenceColor = patient.adherence >= 80 ? 'bg-green-500' : 
+                                       patient.adherence >= 60 ? 'bg-yellow-500' : 'bg-red-500';
+                  
+                  return (
+                    <div
+                      key={patient.id}
+                      className={`p-4 cursor-pointer transition-colors border-l-4 ${
+                        selectedPatient.id === patient.id
+                          ? "bg-primary/10 border-l-primary"
+                          : "hover:bg-muted border-l-transparent"
+                      }`}
+                      onClick={() => setSelectedPatient(patient)}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Avatar>
+                          <AvatarImage src={patient.avatar} />
+                          <AvatarFallback>{patient.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <h3 className="font-medium">{patient.name}</h3>
+                          <p className="text-sm text-muted-foreground">{patient.phone}</p>
+                        </div>
+                        <div className={`w-8 h-8 rounded-full ${adherenceColor} flex items-center justify-center text-white text-xs font-bold`}>
+                          {patient.adherence}%
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -240,10 +301,13 @@ export default function PatientProtocols() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6">
-                  <Avatar className="w-12 h-12">
-                    <AvatarImage src={selectedPatient.avatar} />
-                    <AvatarFallback>{selectedPatient.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
+                  <div className="w-20 h-20 rounded-full bg-[hsl(var(--medical-primary))]/10 flex items-center justify-center">
+                    <img 
+                      src={patientClipart} 
+                      alt="Patient" 
+                      className="w-12 h-12"
+                    />
+                  </div>
                   <div>
                     <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
                     <div className="flex items-center space-x-4 text-sm text-muted-foreground">
@@ -257,35 +321,44 @@ export default function PatientProtocols() {
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Adherence Scores */}
+                </div>
+                
+                <div className="flex items-center space-x-6">
+                  {/* Adherence Scores - Right Aligned */}
                   <div className="flex items-center space-x-4">
-                    <div className="flex flex-col items-center">
-                      <div className="w-16 h-16 rounded-full border-4 border-primary/20 bg-primary/10 flex items-center justify-center">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-12 h-12 rounded-full border-4 border-primary flex items-center justify-center bg-primary/10">
                         <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
                       </div>
-                      <span className="text-xs text-muted-foreground mt-1">Treatment</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <div className="w-16 h-16 rounded-full border-4 border-success/20 bg-success/10 flex items-center justify-center">
-                        <span className="text-sm font-bold text-success">{Math.max(0, selectedPatient.adherence - 10)}%</span>
+                      <div>
+                        <p className="text-sm font-medium">Treatment Adherence</p>
+                        <p className="text-xs text-muted-foreground">Protocol compliance</p>
                       </div>
-                      <span className="text-xs text-muted-foreground mt-1">Rx Intake</span>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <div className="w-12 h-12 rounded-full border-4 border-green-500 flex items-center justify-center bg-green-500/10">
+                        <span className="text-sm font-bold text-green-600">85%</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">Rx Intake Score</p>
+                        <p className="text-xs text-muted-foreground">Medication adherence</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex space-x-2">
-                  <Button onClick={() => setShowProtocolBuilder(true)}>
-                    <Plus size={16} className="mr-2" />
-                    Create Treatment Plan
-                  </Button>
-                  <Button variant="outline">
-                    <Plus size={16} className="mr-2" />
-                    Create Rx
-                  </Button>
+                  
+                  <div className="flex space-x-2">
+                    <Button onClick={() => setShowProtocolBuilder(true)}>
+                      <Plus size={16} className="mr-2" />
+                      Create Treatment Plan
+                    </Button>
+                    <Button variant="outline">
+                      <Plus size={16} className="mr-2" />
+                      Create Rx
+                    </Button>
+                  </div>
                 </div>
               </div>
-              
             </CardHeader>
             
             <CardContent>
@@ -298,33 +371,18 @@ export default function PatientProtocols() {
                 
                 <TabsContent value="prescriptions" className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">My Prescriptions</h3>
+                    <h3 className="text-lg font-semibold">Prescriptions</h3>
                     <Button variant="outline" size="sm">
                       <Plus size={16} className="mr-2" />
                       New Prescription
                     </Button>
                   </div>
                   
-                  <PrescriptionTimeline 
-                    prescriptions={selectedPatient.prescriptions.map((prescription, index) => ({
-                      id: prescription.id,
-                      date: `Dec ${15 - index}, 2024`,
-                      time: `${2 + index}:30 PM`,
-                      hospital: prescription.hospital,
-                      location: "Medical Center",
-                      diagnosis: selectedPatient.diagnosis,
-                      medications: [
-                        {
-                          id: `m${index + 1}`,
-                          name: prescription.medicine,
-                          dosage: prescription.dosage,
-                          frequency: "As prescribed",
-                          duration: prescription.duration,
-                          instructions: "Take as directed"
-                        }
-                      ]
-                    }))} 
-                  />
+                  <div className="space-y-2">
+                    {mockPrescriptions.map((prescription) => (
+                      <PrescriptionRow key={prescription.id} prescription={prescription} />
+                    ))}
+                  </div>
                 </TabsContent>
                 
                 <TabsContent value="treatment-plan" className="space-y-4">

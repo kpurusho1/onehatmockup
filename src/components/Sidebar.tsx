@@ -61,11 +61,17 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
           {!collapsed && (
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">1h</span>
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-sm">1h</span>
+                </div>
+                <span className="font-semibold text-lg">1hat</span>
               </div>
-              <span className="font-semibold text-lg">1hat</span>
+              <div className="text-sm text-muted-foreground">
+                <p className="font-medium">Dr. Abhishant, Urologist</p>
+                <p>Nishant Hospital</p>
+              </div>
             </div>
           )}
           <button

@@ -3,7 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { 
   Plus, 
   Clock,
@@ -15,7 +16,10 @@ import {
   Settings,
   ChevronDown,
   ChevronRight,
-  Calendar
+  Calendar,
+  MoreVertical,
+  Trash2,
+  RefreshCw
 } from "lucide-react";
 import { ScheduleView } from "./ScheduleView";
 import { BlockEditor } from "./BlockEditor";
@@ -395,6 +399,23 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                         <Settings size={14} className="mr-1" />
                         {isEditing ? 'Done' : 'Edit'}
                       </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <MoreVertical size={14} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => console.log('Delete protocol', protocol.id)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log('Override protocol', protocol.id)}>
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Override
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </div>
@@ -486,12 +507,12 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                       {/* Completed Activities - Collapsible */}
                       {protocol.activities.some(activity => activity.completed) && (
                         <Collapsible>
-                          <div className="flex items-center justify-between py-2 border-t">
+                          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 border-t hover:bg-muted/50 rounded">
                             <h5 className="font-semibold text-sm text-muted-foreground">
                               Completed Activities ({protocol.activities.filter(a => a.completed).length})
                             </h5>
                             <ChevronDown size={16} className="text-muted-foreground" />
-                          </div>
+                          </CollapsibleTrigger>
                           <CollapsibleContent>
                             <ScheduleView
                               events={protocol.activities
