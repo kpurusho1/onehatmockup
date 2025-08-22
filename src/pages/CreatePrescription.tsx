@@ -24,12 +24,24 @@ interface Medication {
 }
 
 interface CreatePrescriptionProps {
-  patientName: string;
-  patientPhone: string;
+  patientName?: string;
+  patientPhone?: string;
   onBack: () => void;
+  mode?: 'create' | 'view' | 'edit';
+  prescriptionData?: {
+    id: string;
+    date: string;
+    doctorAssigned: string;
+  };
 }
 
-export function CreatePrescription({ patientName, patientPhone, onBack }: CreatePrescriptionProps) {
+export function CreatePrescription({ 
+  patientName = "Parivel", 
+  patientPhone = "8954229999", 
+  onBack, 
+  mode = 'create',
+  prescriptionData 
+}: CreatePrescriptionProps) {
   const [prescriptionDate, setPrescriptionDate] = useState<Date>(new Date());
   const [validityDate, setValidityDate] = useState<Date | undefined>();
   const [requiresFollowUp, setRequiresFollowUp] = useState(false);
@@ -69,8 +81,12 @@ export function CreatePrescription({ patientName, patientPhone, onBack }: Create
           Back
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">Create E-Prescription</h1>
-          <p className="text-muted-foreground">Generate prescription for {patientName}</p>
+          <h1 className="text-2xl font-bold">
+            {mode === 'view' ? 'View Prescription' : mode === 'edit' ? 'Edit Prescription' : 'Create E-Prescription'}
+          </h1>
+          <p className="text-muted-foreground">
+            {mode === 'view' || mode === 'edit' ? `Prescription ID: ${prescriptionData?.id}` : `Generate prescription for ${patientName}`}
+          </p>
         </div>
       </div>
 
@@ -300,21 +316,14 @@ export function CreatePrescription({ patientName, patientPhone, onBack }: Create
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-center space-x-4 pt-6 border-t">
-        <Button 
-          size="lg"
-          style={{ backgroundColor: '#26bc9f' }}
-          className="px-8 hover:opacity-90 text-white"
-        >
-          Generate E-Rx and Send to Pharmacy
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={onBack}>
+          Back
         </Button>
-        <Button 
-          variant="outline" 
-          size="lg"
-          className="px-8"
-        >
-          Create E-Prescription
-        </Button>
+        <div className="space-x-2">
+          <Button variant="outline">Save Draft</Button>
+          <Button className="bg-primary">Create Rx</Button>
+        </div>
       </div>
     </div>
   );

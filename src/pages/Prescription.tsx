@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye, Edit, ChevronRight } from "lucide-react";
+import { CreatePrescription } from "./CreatePrescription";
 
 interface PrescriptionRecord {
   id: string;
@@ -89,6 +91,40 @@ const prescriptionRecords: PrescriptionRecord[] = [
 ];
 
 export default function Prescription() {
+  const [viewMode, setViewMode] = useState<'list' | 'view' | 'edit'>('list');
+  const [selectedPrescription, setSelectedPrescription] = useState<PrescriptionRecord | null>(null);
+
+  const handleView = (record: PrescriptionRecord) => {
+    setSelectedPrescription(record);
+    setViewMode('view');
+  };
+
+  const handleEdit = (record: PrescriptionRecord) => {
+    setSelectedPrescription(record);
+    setViewMode('edit');
+  };
+
+  const handleBack = () => {
+    setViewMode('list');
+    setSelectedPrescription(null);
+  };
+
+  if (viewMode !== 'list' && selectedPrescription) {
+    return (
+      <CreatePrescription
+        patientName={selectedPrescription.patientName}
+        patientPhone={selectedPrescription.mobile}
+        onBack={handleBack}
+        mode={viewMode}
+        prescriptionData={{
+          id: selectedPrescription.id,
+          date: selectedPrescription.date,
+          doctorAssigned: selectedPrescription.doctorAssigned
+        }}
+      />
+    );
+  }
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -144,11 +180,19 @@ export default function Prescription() {
                   <TableCell>{record.doctorAssigned}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button size="sm" className="bg-green-500 hover:bg-green-600 text-white">
+                      <Button 
+                        size="sm" 
+                        className="bg-green-500 hover:bg-green-600 text-white"
+                        onClick={() => handleView(record)}
+                      >
                         <Eye size={14} className="mr-1" />
                         View
                       </Button>
-                      <Button size="sm" className="bg-green-500 hover:bg-green-600 text-white">
+                      <Button 
+                        size="sm" 
+                        className="bg-green-500 hover:bg-green-600 text-white"
+                        onClick={() => handleEdit(record)}
+                      >
                         <Edit size={14} className="mr-1" />
                         Edit
                       </Button>

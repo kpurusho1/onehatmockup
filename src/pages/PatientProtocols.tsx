@@ -4,6 +4,7 @@ import { TreatmentPlanTab } from "@/components/protocol/TreatmentPlanTab";
 import { PrescriptionTimeline } from "@/components/prescription/PrescriptionTimeline";
 import { PrescriptionRow } from "@/components/prescription/PrescriptionRow";
 import { CreatePrescription } from "./CreatePrescription";
+import { AddPatientDialog } from "@/components/AddPatientDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -202,6 +203,7 @@ export default function PatientProtocols() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showProtocolBuilder, setShowProtocolBuilder] = useState(false);
   const [showCreateRx, setShowCreateRx] = useState(false);
+  const [showAddPatient, setShowAddPatient] = useState(false);
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -254,7 +256,11 @@ export default function PatientProtocols() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between mb-3">
-                <Button className="flex items-center space-x-2 w-full" style={{backgroundColor: '#1c2f7f'}} >
+                <Button 
+                  className="flex items-center space-x-2 w-full" 
+                  style={{backgroundColor: '#1c2f7f'}}
+                  onClick={() => setShowAddPatient(true)}
+                >
                   <Plus size={16} />
                   <span>Add Patient</span>
                 </Button>
@@ -494,6 +500,11 @@ export default function PatientProtocols() {
           </Card>
         </div>
       </div>
+      
+      <AddPatientDialog
+        open={showAddPatient}
+        onOpenChange={setShowAddPatient}
+      />
     </div>
   );
 }
