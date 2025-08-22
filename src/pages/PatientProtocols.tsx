@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ProtocolBuilder } from "@/components/protocol/ProtocolBuilder";
 import { TreatmentPlanTab } from "@/components/protocol/TreatmentPlanTab";
-import { PrescriptionTimelineNew } from "@/components/prescription/PrescriptionTimelineNew";
-import { TreatmentTimelineNew } from "@/components/protocol/TreatmentTimelineNew";
 import { PrescriptionRow } from "@/components/prescription/PrescriptionRow";
 import { CreatePrescription } from "./CreatePrescription";
 import { AddPatientDialog } from "@/components/AddPatientDialog";
@@ -27,87 +25,7 @@ import {
 import patientGenericAvatar from "@/assets/patient-generic-avatar.jpg";
 import patientClipart from "@/assets/patient-clipart.png";
 
-// Mock treatment plan data for timeline
-const mockTreatmentPlans = [
-  {
-    id: 1,
-    name: "Knee Surgery Recovery Protocol",
-    startDate: "2025-08-15",
-    endDate: "2025-10-15",
-    progress: 65,
-    totalActivities: 4,
-    completedActivities: 2,
-    currentWeek: 4,
-    totalWeeks: 8,
-    status: "active",
-    activities: [
-      {
-        id: 1,
-        name: "Physiotherapy Knee Exercises",
-        type: "Physiotherapy",
-        activity: "Physiotherapy",
-        subActivity: "Physiotherapy Knee Exercises",
-        frequency: "Daily",
-        duration: "30 min",
-        completed: true,
-        dueDate: "2025-08-21",
-        description: "Range of motion exercises to improve knee flexibility",
-        instructions: "Perform 3 sets of 10 repetitions, hold each position for 5 seconds",
-        patientAction: "complete-exercise",
-        doctorAction: "review-report",
-        videoUrl: ""
-      },
-      {
-        id: 2,
-        name: "Follow-up Consultation",
-        type: "Consultation",
-        activity: "Consultation",
-        subActivity: "Follow-up",
-        frequency: "Weekly",
-        duration: "30 min",
-        completed: true,
-        dueDate: "2025-08-20",
-        description: "Regular check-up to monitor recovery progress",
-        instructions: "Come prepared with any concerns or questions",
-        patientAction: "book-appointment",
-        doctorAction: "provide-feedback",
-        videoUrl: ""
-      },
-      {
-        id: 3,
-        name: "Pain Management",
-        type: "Medication",
-        activity: "Medication",
-        subActivity: "Oral Medication",
-        frequency: "As needed",
-        duration: "5 min",
-        completed: false,
-        dueDate: "2025-08-23",
-        description: "Take prescribed medication for pain relief",
-        instructions: "Take medication with food to prevent stomach upset",
-        patientAction: "take-medication",
-        doctorAction: "adjust-medication",
-        videoUrl: ""
-      },
-      {
-        id: 4,
-        name: "Strength Building Exercises",
-        type: "Exercise",
-        activity: "Exercise",
-        subActivity: "Strength Training",
-        frequency: "3x per week",
-        duration: "45 min",
-        completed: false,
-        dueDate: "2025-08-24",
-        description: "Progressive strength training for leg muscles",
-        instructions: "Start with light weights and gradually increase intensity",
-        patientAction: "complete-exercise",
-        doctorAction: "review-report",
-        videoUrl: ""
-      }
-    ]
-  }
-];
+// Mock prescription data
 const mockPrescriptions = [
   {
     id: "rx-001",
@@ -537,11 +455,26 @@ export default function PatientProtocols() {
                 </TabsList>
                 
                 <TabsContent value="prescriptions" className="space-y-4">
-                  <PrescriptionTimelineNew prescriptions={mockPrescriptions} />
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Rx</h3>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {mockPrescriptions.map((prescription, index) => (
+                      <PrescriptionRow 
+                        key={prescription.id} 
+                        prescription={prescription} 
+                        defaultOpen={index === 0}
+                      />
+                    ))}
+                  </div>
                 </TabsContent>
                 
                 <TabsContent value="treatment-plan" className="space-y-4">
-                  <TreatmentTimelineNew protocols={mockTreatmentPlans} />
+                  <TreatmentPlanTab 
+                    patient={selectedPatient}
+                    onCreateProtocol={() => setShowProtocolBuilder(true)}
+                  />
                 </TabsContent>
                 
                 <TabsContent value="health-records" className="space-y-4">
