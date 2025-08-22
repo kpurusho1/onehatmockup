@@ -32,7 +32,7 @@ const sidebarItems = [
   },
   {
     id: "prescription",
-    label: "Prescription",
+    label: "All Prescriptions",
     icon: Pill,
     path: "/prescription",
   },

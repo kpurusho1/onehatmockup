@@ -423,14 +423,14 @@ export default function PatientProtocols() {
             <CardContent>
               <Tabs defaultValue="prescriptions" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
+                  <TabsTrigger value="prescriptions">Rx</TabsTrigger>
                   <TabsTrigger value="treatment-plan">Treatment Plan</TabsTrigger>
                   <TabsTrigger value="health-records">Shared Health Records</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="prescriptions" className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Prescriptions</h3>
+                    <h3 className="text-lg font-semibold">Rx</h3>
                   </div>
                   
                   <div className="space-y-2">
