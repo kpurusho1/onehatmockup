@@ -246,10 +246,22 @@ export default function ProtocolTemplates() {
             <CardContent className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold mb-3">Protocol Activities</h3>
-                <BlockEditor 
-                  events={selectedProtocol.activities_list} 
-                  onEventsChange={() => {}}
-                />
+                <div className="space-y-2">
+                  {selectedProtocol.activities_list.map((event, index) => (
+                    <div key={event.id} className="p-4 border rounded-lg bg-muted/20">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium">{event.activity}</h4>
+                          <p className="text-sm text-muted-foreground">{event.instructions}</p>
+                        </div>
+                        <div className="text-right text-sm">
+                          <div className="font-medium">{event.frequency}</div>
+                          <div className="text-muted-foreground">{event.duration} min</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
               
               <div className="pt-4 border-t">

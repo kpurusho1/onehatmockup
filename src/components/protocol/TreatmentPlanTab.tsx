@@ -309,36 +309,22 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
 
   if (!hasProtocols) {
     return (
-      <div>
-        <div className="flex items-center justify-between mb-6">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Treatment Protocols</h3>
-          <div className="flex space-x-2">
-            <Button variant="outline" size="sm" onClick={onCreateProtocol}>
-              <Plus size={16} className="mr-2" />
-              Create from Template
-            </Button>
-            <Button size="sm" onClick={onCreateProtocol}>
-              <Plus size={16} className="mr-2" />
-              Create from Scratch
-            </Button>
-          </div>
+          <TemplateDropdown 
+            onSelectTemplate={handleTemplateSelect}
+            onCreateFromScratch={handleCreateFromScratch}
+          />
         </div>
         
-        <div className="text-center py-12">
-          <Calendar className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+        <Card className="p-6 text-center">
+          <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
           <h4 className="text-lg font-medium mb-2">No treatment protocols assigned</h4>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-muted-foreground">
             Create a personalized treatment protocol to track {patient.name}'s recovery progress
           </p>
-          <div className="flex justify-center space-x-3">
-            <Button onClick={onCreateProtocol}>
-              Create from Template
-            </Button>
-            <Button variant="outline" onClick={onCreateProtocol}>
-              Create from Scratch
-            </Button>
-          </div>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -383,12 +369,22 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                   </div>
 
                   <div className="flex items-center space-x-4">
-                    <div className="text-right text-sm">
-                      <div className="font-medium">{protocol.progress}% Complete</div>
-                      <div className="text-muted-foreground">
-                        {protocol.completedActivities}/{protocol.totalActivities} activities
-                      </div>
-                    </div>
+                     <div className="flex items-center space-x-3">
+                       <div className="text-right text-sm">
+                         <div className="text-muted-foreground">
+                           {protocol.completedActivities}/{protocol.totalActivities} activities
+                         </div>
+                       </div>
+                       <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                         protocol.progress >= 80 
+                           ? 'border-green-500 bg-green-500/10 text-green-600' 
+                           : protocol.progress >= 60 
+                           ? 'border-yellow-500 bg-yellow-500/10 text-yellow-600' 
+                           : 'border-red-500 bg-red-500/10 text-red-600'
+                       } text-sm font-bold`}>
+                         {protocol.progress}%
+                       </div>
+                     </div>
                     
                     <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
                       <Button
