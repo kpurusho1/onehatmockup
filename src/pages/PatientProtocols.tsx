@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { ProtocolBuilder } from "@/components/protocol/ProtocolBuilder";
 import { TreatmentPlanTab } from "@/components/protocol/TreatmentPlanTab";
-import { PrescriptionTimeline } from "@/components/prescription/PrescriptionTimeline";
+import { PrescriptionTimelineNew } from "@/components/prescription/PrescriptionTimelineNew";
+import { TreatmentTimelineNew } from "@/components/protocol/TreatmentTimelineNew";
 import { PrescriptionRow } from "@/components/prescription/PrescriptionRow";
 import { CreatePrescription } from "./CreatePrescription";
 import { AddPatientDialog } from "@/components/AddPatientDialog";
@@ -19,12 +21,93 @@ import {
   FileText,
   Image,
   Edit,
-  Eye
+  Eye,
+  ArrowLeft
 } from "lucide-react";
 import patientGenericAvatar from "@/assets/patient-generic-avatar.jpg";
 import patientClipart from "@/assets/patient-clipart.png";
 
-// Mock prescription data
+// Mock treatment plan data for timeline
+const mockTreatmentPlans = [
+  {
+    id: 1,
+    name: "Knee Surgery Recovery Protocol",
+    startDate: "2025-08-15",
+    endDate: "2025-10-15",
+    progress: 65,
+    totalActivities: 4,
+    completedActivities: 2,
+    currentWeek: 4,
+    totalWeeks: 8,
+    status: "active",
+    activities: [
+      {
+        id: 1,
+        name: "Physiotherapy Knee Exercises",
+        type: "Physiotherapy",
+        activity: "Physiotherapy",
+        subActivity: "Physiotherapy Knee Exercises",
+        frequency: "Daily",
+        duration: "30 min",
+        completed: true,
+        dueDate: "2025-08-21",
+        description: "Range of motion exercises to improve knee flexibility",
+        instructions: "Perform 3 sets of 10 repetitions, hold each position for 5 seconds",
+        patientAction: "complete-exercise",
+        doctorAction: "review-report",
+        videoUrl: ""
+      },
+      {
+        id: 2,
+        name: "Follow-up Consultation",
+        type: "Consultation",
+        activity: "Consultation",
+        subActivity: "Follow-up",
+        frequency: "Weekly",
+        duration: "30 min",
+        completed: true,
+        dueDate: "2025-08-20",
+        description: "Regular check-up to monitor recovery progress",
+        instructions: "Come prepared with any concerns or questions",
+        patientAction: "book-appointment",
+        doctorAction: "provide-feedback",
+        videoUrl: ""
+      },
+      {
+        id: 3,
+        name: "Pain Management",
+        type: "Medication",
+        activity: "Medication",
+        subActivity: "Oral Medication",
+        frequency: "As needed",
+        duration: "5 min",
+        completed: false,
+        dueDate: "2025-08-23",
+        description: "Take prescribed medication for pain relief",
+        instructions: "Take medication with food to prevent stomach upset",
+        patientAction: "take-medication",
+        doctorAction: "adjust-medication",
+        videoUrl: ""
+      },
+      {
+        id: 4,
+        name: "Strength Building Exercises",
+        type: "Exercise",
+        activity: "Exercise",
+        subActivity: "Strength Training",
+        frequency: "3x per week",
+        duration: "45 min",
+        completed: false,
+        dueDate: "2025-08-24",
+        description: "Progressive strength training for leg muscles",
+        instructions: "Start with light weights and gradually increase intensity",
+        patientAction: "complete-exercise",
+        doctorAction: "review-report",
+        videoUrl: ""
+      }
+    ]
+  }
+];
 const mockPrescriptions = [
   {
     id: "rx-001",
@@ -199,7 +282,13 @@ const patients = [
 ];
 
 export default function PatientProtocols() {
-  const [selectedPatient, setSelectedPatient] = useState(patients[0]);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const isPatientProfile = !!id;
+  
+  const [selectedPatient, setSelectedPatient] = useState(
+    isPatientProfile ? patients.find(p => p.id.toString() === id) || patients[0] : patients[0]
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [showProtocolBuilder, setShowProtocolBuilder] = useState(false);
   const [showCreateRx, setShowCreateRx] = useState(false);
@@ -252,6 +341,7 @@ export default function PatientProtocols() {
 
       <div className="grid grid-cols-12 gap-6">
         {/* Patient List */}
+        {!isPatientProfile && (
         <div className="col-span-3">
           <Card>
             <CardHeader>
@@ -295,7 +385,13 @@ export default function PatientProtocols() {
                           ? "bg-primary/10 border-l-primary"
                           : "hover:bg-muted border-l-transparent"
                       }`}
-                      onClick={() => setSelectedPatient(patient)}
+                      onClick={() => {
+                        if (isPatientProfile) {
+                          setSelectedPatient(patient);
+                        } else {
+                          navigate(`/patient/${patient.id}`);
+                        }
+                      }}
                     >
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 rounded-full bg-[#26bc9f] flex items-center justify-center text-white font-medium text-sm">
@@ -316,11 +412,23 @@ export default function PatientProtocols() {
             </CardContent>
           </Card>
         </div>
+        )}
 
         {/* Patient Details */}
-        <div className="col-span-9">
+        <div className={isPatientProfile ? "col-span-12" : "col-span-9"}>
           <Card>
             <CardHeader>
+              {isPatientProfile && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate('/patient-protocols')}
+                  className="w-fit mb-4"
+                >
+                  <ArrowLeft size={16} className="mr-2" />
+                  Back to Patient List
+                </Button>
+              )}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6">
                   <div className="w-20 h-20 rounded-full bg-[#26bc9f] flex items-center justify-center text-white font-bold text-2xl">
@@ -360,16 +468,16 @@ export default function PatientProtocols() {
                               a 15.9155 15.9155 0 0 1 0 31.831
                               a 15.9155 15.9155 0 0 1 0 -31.831"
                             fill="none"
-                            stroke="hsl(var(--primary))"
+                            stroke="#22c55e"
                             strokeWidth="2"
-                            strokeDasharray={`${selectedPatient.adherence}, 100`}
+                            strokeDasharray="85, 100"
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
+                          <span className="text-sm font-bold text-green-600">85%</span>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1 text-center">Treatment<br/>Adherence</p>
+                      <p className="text-xs text-muted-foreground mt-1 text-center">Rx Intake</p>
                     </div>
                     
                     <div className="flex flex-col items-center text-center">
@@ -388,16 +496,16 @@ export default function PatientProtocols() {
                               a 15.9155 15.9155 0 0 1 0 31.831
                               a 15.9155 15.9155 0 0 1 0 -31.831"
                             fill="none"
-                            stroke="#22c55e"
+                            stroke="hsl(var(--primary))"
                             strokeWidth="2"
-                            strokeDasharray="85, 100"
+                            strokeDasharray={`${selectedPatient.adherence}, 100`}
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-sm font-bold text-green-600">85%</span>
+                          <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1 text-center">Rx Intake</p>
+                      <p className="text-xs text-muted-foreground mt-1 text-center">Treatment<br/>Adherence</p>
                     </div>
                     
                     <div className="flex flex-col space-y-2">
@@ -429,26 +537,11 @@ export default function PatientProtocols() {
                 </TabsList>
                 
                 <TabsContent value="prescriptions" className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Rx</h3>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    {mockPrescriptions.map((prescription, index) => (
-                      <PrescriptionRow 
-                        key={prescription.id} 
-                        prescription={prescription} 
-                        defaultOpen={index === 0}
-                      />
-                    ))}
-                  </div>
+                  <PrescriptionTimelineNew prescriptions={mockPrescriptions} />
                 </TabsContent>
                 
                 <TabsContent value="treatment-plan" className="space-y-4">
-                  <TreatmentPlanTab 
-                    patient={selectedPatient}
-                    onCreateProtocol={() => setShowProtocolBuilder(true)}
-                  />
+                  <TreatmentTimelineNew protocols={mockTreatmentPlans} />
                 </TabsContent>
                 
                 <TabsContent value="health-records" className="space-y-4">
