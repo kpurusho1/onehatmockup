@@ -3,13 +3,13 @@ import { ProtocolBuilder } from "@/components/protocol/ProtocolBuilder";
 import { TreatmentPlanTab } from "@/components/protocol/TreatmentPlanTab";
 import { PrescriptionTimeline } from "@/components/prescription/PrescriptionTimeline";
 import { PrescriptionRow } from "@/components/prescription/PrescriptionRow";
+import { CreatePrescription } from "./CreatePrescription";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Progress } from "@/components/ui/progress";
 import { 
   Search, 
   Phone, 
@@ -201,6 +201,7 @@ export default function PatientProtocols() {
   const [selectedPatient, setSelectedPatient] = useState(patients[0]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showProtocolBuilder, setShowProtocolBuilder] = useState(false);
+  const [showCreateRx, setShowCreateRx] = useState(false);
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -218,6 +219,16 @@ export default function PatientProtocols() {
     console.log("Saving protocol:", protocol);
     setShowProtocolBuilder(false);
   };
+
+  if (showCreateRx) {
+    return (
+      <CreatePrescription
+        patientName={selectedPatient.name}
+        patientPhone={selectedPatient.phone}
+        onBack={() => setShowCreateRx(false)}
+      />
+    );
+  }
 
   if (showProtocolBuilder) {
     return (
@@ -328,11 +339,26 @@ export default function PatientProtocols() {
                   {/* Adherence Scores and Action Buttons - Right Aligned */}
                   <div className="flex items-center space-x-6">
                     <div className="flex flex-col items-center text-center">
-                      <div className="relative w-14 h-14">
-                        <Progress 
-                          value={selectedPatient.adherence} 
-                          className="w-14 h-14 rounded-full [&>div]:rounded-full [&>div]:bg-primary rotate-[-90deg]" 
-                        />
+                      <div className="relative w-16 h-16">
+                        <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+                          <path
+                            d="M18 2.0845
+                              a 15.9155 15.9155 0 0 1 0 31.831
+                              a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="hsl(var(--muted))"
+                            strokeWidth="2"
+                          />
+                          <path
+                            d="M18 2.0845
+                              a 15.9155 15.9155 0 0 1 0 31.831
+                              a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="hsl(var(--primary))"
+                            strokeWidth="2"
+                            strokeDasharray={`${selectedPatient.adherence}, 100`}
+                          />
+                        </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
                         </div>
@@ -341,11 +367,26 @@ export default function PatientProtocols() {
                     </div>
                     
                     <div className="flex flex-col items-center text-center">
-                      <div className="relative w-14 h-14">
-                        <Progress 
-                          value={85} 
-                          className="w-14 h-14 rounded-full [&>div]:rounded-full [&>div]:bg-green-500 rotate-[-90deg]" 
-                        />
+                      <div className="relative w-16 h-16">
+                        <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
+                          <path
+                            d="M18 2.0845
+                              a 15.9155 15.9155 0 0 1 0 31.831
+                              a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="hsl(var(--muted))"
+                            strokeWidth="2"
+                          />
+                          <path
+                            d="M18 2.0845
+                              a 15.9155 15.9155 0 0 1 0 31.831
+                              a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="#22c55e"
+                            strokeWidth="2"
+                            strokeDasharray="85, 100"
+                          />
+                        </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-sm font-bold text-green-600">85%</span>
                         </div>
@@ -354,7 +395,12 @@ export default function PatientProtocols() {
                     </div>
                     
                     <div className="flex flex-col space-y-2">
-                      <Button size="sm" style={{backgroundColor: '#1c2f7f'}} className="hover:opacity-90">
+                      <Button 
+                        size="sm" 
+                        style={{backgroundColor: '#1c2f7f'}} 
+                        className="hover:opacity-90"
+                        onClick={() => setShowCreateRx(true)}
+                      >
                         <Plus size={14} className="mr-2" />
                         Create Rx
                       </Button>
