@@ -13,6 +13,7 @@ import {
   Activity,
   Clock
 } from "lucide-react";
+import { BlockEditor } from "@/components/protocol/BlockEditor";
 import doctorConsultation from "@/assets/doctor-consultation.jpg";
 import physiotherapy from "@/assets/physiotherapy.jpg";
 import medicalEquipment from "@/assets/medical-equipment.jpg";
@@ -29,9 +30,9 @@ const protocols = [
     updatedOn: "13/05/2025",
     image: physiotherapy,
     activities_list: [
-      { type: "Exercise", subtype: "Jog", frequency: "Daily", duration: 15 },
-      { type: "Consultation", subtype: "Follow-up", frequency: "Weekly", duration: 1 },
-      { type: "Physiotherapy", subtype: "Knee Exercises", frequency: "Twice weekly", duration: 5 }
+      { id: "1", activity: "Exercise", instructions: "Jog in the morning", frequency: "Daily", duration: 15 },
+      { id: "2", activity: "Consultation", instructions: "Follow-up visit", frequency: "Weekly", duration: 1 },
+      { id: "3", activity: "Physiotherapy", instructions: "Knee strengthening exercises", frequency: "Twice weekly", duration: 5 }
     ]
   },
   {
@@ -45,10 +46,10 @@ const protocols = [
     updatedOn: "12/05/2025",
     image: medicalEquipment,
     activities_list: [
-      { type: "Consultation", subtype: "Blood Sugar Check", frequency: "Weekly", duration: 1 },
-      { type: "Exercise", subtype: "Walking", frequency: "Daily", duration: 30 },
-      { type: "Diet", subtype: "Meal Planning", frequency: "Daily", duration: 1 },
-      { type: "Medication", subtype: "Insulin", frequency: "Twice daily", duration: 1 }
+      { id: "1", activity: "Consultation", instructions: "Blood Sugar Check", frequency: "Weekly", duration: 1 },
+      { id: "2", activity: "Exercise", instructions: "Walking", frequency: "Daily", duration: 30 },
+      { id: "3", activity: "Diet", instructions: "Meal Planning", frequency: "Daily", duration: 1 },
+      { id: "4", activity: "Medication", instructions: "Insulin", frequency: "Twice daily", duration: 1 }
     ]
   },
   {
@@ -62,8 +63,8 @@ const protocols = [
     updatedOn: "13/05/2025",
     image: doctorConsultation,
     activities_list: [
-      { type: "Exercise", subtype: "Light Cardio", frequency: "Daily", duration: 20 },
-      { type: "Consultation", subtype: "BP Monitoring", frequency: "Bi-weekly", duration: 1 }
+      { id: "1", activity: "Exercise", instructions: "Light Cardio", frequency: "Daily", duration: 20 },
+      { id: "2", activity: "Consultation", instructions: "BP Monitoring", frequency: "Bi-weekly", duration: 1 }
     ]
   }
 ];
@@ -71,11 +72,56 @@ const protocols = [
 export default function ProtocolTemplates() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProtocol, setSelectedProtocol] = useState(protocols[0]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [events, setEvents] = useState(selectedProtocol.activities_list);
 
   const filteredProtocols = protocols.filter(protocol =>
     protocol.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     protocol.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleEditProtocol = () => {
+    setEvents(selectedProtocol.activities_list);
+    setIsEditing(true);
+  };
+
+  const handleSaveChanges = () => {
+    // Update protocol with new events
+    setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Edit Protocol: {selectedProtocol.name}</h1>
+            <p className="text-muted-foreground">Edit the protocol template activities</p>
+          </div>
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={() => setIsEditing(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveChanges}>
+              Save Changes
+            </Button>
+          </div>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Protocol Activities</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BlockEditor 
+              events={events} 
+              onEventsChange={setEvents}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -185,7 +231,7 @@ export default function ProtocolTemplates() {
                 </div>
                 
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={handleEditProtocol}>
                     <Edit size={14} className="mr-1" />
                     Edit
                   </Button>
@@ -198,50 +244,12 @@ export default function ProtocolTemplates() {
             </CardHeader>
             
             <CardContent className="space-y-4">
-              {/* Protocol Image */}
               <div>
                 <h3 className="text-lg font-semibold mb-3">Protocol Activities</h3>
-                <div className="space-y-3">
-                  {selectedProtocol.activities_list.map((activity, index) => (
-                    <Card key={index} className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <Badge variant="outline">{activity.type}</Badge>
-                            <span className="font-medium">{activity.subtype}</span>
-                          </div>
-                          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                            <div className="flex items-center space-x-1">
-                              <Clock size={12} />
-                              <span>{activity.frequency}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Clock size={12} />
-                              <span>
-                                {activity.duration} {activity.type === "Consultation" ? "session" : "min"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button variant="ghost" size="sm">
-                            <Edit size={14} />
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="pt-4 border-t flex space-x-2">
-                <Button variant="outline" className="flex-1">
-                  View All Events
-                </Button>
-                <Button className="flex-1">
-                  <Plus size={16} className="mr-2" />
-                  Add Activity
-                </Button>
+                <BlockEditor 
+                  events={selectedProtocol.activities_list} 
+                  onEventsChange={() => {}}
+                />
               </div>
               
               <div className="pt-4 border-t">

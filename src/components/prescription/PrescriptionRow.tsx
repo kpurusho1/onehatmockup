@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronRight, Camera } from "lucide-react";
+import { ChevronDown, ChevronRight, FileText } from "lucide-react";
 
 interface Medication {
   medicine: string;
@@ -21,6 +21,7 @@ interface PrescriptionData {
   intakeScore: number;
   date: string;
   medications: Medication[];
+  hasScannedCopy?: boolean;
 }
 
 interface PrescriptionRowProps {
@@ -72,9 +73,11 @@ export function PrescriptionRow({ prescription, defaultOpen = false }: Prescript
                   {prescription.intakeScore}%
                 </div>
               </div>
-              <div className="p-2 bg-muted rounded-lg hover:bg-muted/80 cursor-pointer" title="View Scanned Prescription">
-                <Camera size={16} className="text-muted-foreground" />
-              </div>
+              {prescription.hasScannedCopy && (
+                <div className="p-2 bg-muted rounded-lg hover:bg-muted/80 cursor-pointer" title="View Scanned Prescription">
+                  <FileText size={16} className="text-muted-foreground" />
+                </div>
+              )}
             </div>
           </div>
         </CollapsibleTrigger>

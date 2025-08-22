@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Link, GripVertical } from "lucide-react";
+import { Plus, Trash2, Link } from "lucide-react";
 
 interface BlockEvent {
   id: string;
@@ -32,8 +32,6 @@ export function BlockEditor({
   activityOptions = defaultActivityOptions,
   frequencyOptions = defaultFrequencyOptions
 }: BlockEditorProps) {
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-
   const addNewEvent = () => {
     const newEvent: BlockEvent = {
       id: Date.now().toString(),
@@ -58,31 +56,6 @@ export function BlockEditor({
     onEventsChange(updatedEvents);
   };
 
-  const reorderEvents = (fromIndex: number, toIndex: number) => {
-    const newEvents = [...events];
-    const [removed] = newEvents.splice(fromIndex, 1);
-    newEvents.splice(toIndex, 0, removed);
-    onEventsChange(newEvents);
-  };
-
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
-    e.preventDefault();
-    if (draggedIndex !== null && draggedIndex !== dropIndex) {
-      reorderEvents(draggedIndex, dropIndex);
-    }
-    setDraggedIndex(null);
-  };
-
   const addVideoLink = (index: number) => {
     const videoUrl = prompt("Enter video URL:");
     if (videoUrl) {
@@ -93,8 +66,7 @@ export function BlockEditor({
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="grid grid-cols-12 gap-4 px-4 py-2 text-sm font-medium text-muted-foreground border-b">
-        <div className="col-span-1"></div> {/* Drag handle */}
+      <div className="grid grid-cols-11 gap-4 px-4 py-2 text-sm font-medium text-muted-foreground border-b">
         <div className="col-span-2">Activity</div>
         <div className="col-span-4">Instructions</div>
         <div className="col-span-2">Frequency</div>
@@ -107,18 +79,7 @@ export function BlockEditor({
       <div className="space-y-2">
         {events.map((event, index) => (
           <Card key={event.id} className="p-4">
-            <div 
-              className="grid grid-cols-12 gap-4 items-center"
-              draggable
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, index)}
-            >
-              {/* Drag Handle */}
-              <div className="col-span-1 flex justify-center">
-                <GripVertical size={16} className="text-muted-foreground cursor-grab" />
-              </div>
-
+            <div className="grid grid-cols-11 gap-4 items-center">
               {/* Activity */}
               <div className="col-span-2">
                 <Select 

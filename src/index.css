@@ -14,7 +14,9 @@ All colors MUST be HSL.
 :root {
     --background: 248 250 252;
     --foreground: 215 25% 27%;
-    --medical-primary: 224 66% 30%; /* #1c2f7f */
+    --medical-blue: #1c2f7f;
+    --brand-primary: 224 66% 30%; /* #1c2f7f */
+    --brand-secondary: 47 79 127;
 
     --card: 255 255 255;
     --card-foreground: 215 25% 27%;

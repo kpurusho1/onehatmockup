@@ -29,12 +29,13 @@ const mockPrescriptions = [
     diagnosis: "Post-operative knee surgery",
     intakeScore: 85,
     date: "2025-08-15",
+    hasScannedCopy: true,
     medications: [
       {
         medicine: "Ibuprofen 400mg",
-        morning: "1 tab",
+        morning: "1",
         noon: "0",
-        evening: "1 tab",
+        evening: "1", 
         night: "0",
         duration: 7,
         timeToTake: "After food",
@@ -42,10 +43,10 @@ const mockPrescriptions = [
       },
       {
         medicine: "Paracetamol 500mg",
-        morning: "1 tab",
-        noon: "1 tab",
-        evening: "1 tab",
-        night: "1 tab",
+        morning: "1",
+        noon: "1",
+        evening: "1",
+        night: "1",
         duration: 10,
         timeToTake: "Before food",
         remarks: "For pain management"
@@ -57,10 +58,11 @@ const mockPrescriptions = [
     diagnosis: "Hypertension management",
     intakeScore: 92,
     date: "2025-08-10",
+    hasScannedCopy: false,
     medications: [
       {
         medicine: "Amlodipine 5mg",
-        morning: "1 tab",
+        morning: "1",
         noon: "0",
         evening: "0",
         night: "0",
@@ -304,11 +306,11 @@ export default function PatientProtocols() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6">
-                  <div className="w-20 h-20 rounded-full bg-[hsl(var(--medical-primary))]/10 flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-full bg-[hsl(var(--brand-primary))]/10 flex items-center justify-center">
                     <img 
-                      src={patientClipart} 
+                      src="/src/assets/patient-avatar-modern.png" 
                       alt="Patient" 
-                      className="w-12 h-12"
+                      className="w-16 h-16 object-cover rounded-full"
                     />
                   </div>
                   <div>
