@@ -360,16 +360,16 @@ export default function PatientProtocols() {
                               a 15.9155 15.9155 0 0 1 0 31.831
                               a 15.9155 15.9155 0 0 1 0 -31.831"
                             fill="none"
-                            stroke="hsl(var(--primary))"
+                            stroke="#22c55e"
                             strokeWidth="2"
-                            strokeDasharray={`${selectedPatient.adherence}, 100`}
+                            strokeDasharray="85, 100"
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
+                          <span className="text-sm font-bold text-green-600">85%</span>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1 text-center">Treatment<br/>Adherence</p>
+                      <p className="text-xs text-muted-foreground mt-1 text-center">Rx Intake</p>
                     </div>
                     
                     <div className="flex flex-col items-center text-center">
@@ -388,16 +388,16 @@ export default function PatientProtocols() {
                               a 15.9155 15.9155 0 0 1 0 31.831
                               a 15.9155 15.9155 0 0 1 0 -31.831"
                             fill="none"
-                            stroke="#22c55e"
+                            stroke="hsl(var(--primary))"
                             strokeWidth="2"
-                            strokeDasharray="85, 100"
+                            strokeDasharray={`${selectedPatient.adherence}, 100`}
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-sm font-bold text-green-600">85%</span>
+                          <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1 text-center">Rx Intake</p>
+                      <p className="text-xs text-muted-foreground mt-1 text-center">Treatment<br/>Adherence</p>
                     </div>
                     
                     <div className="flex flex-col space-y-2">

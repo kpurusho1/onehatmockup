@@ -23,15 +23,34 @@ interface ScheduleViewProps {
 const activityOptions = ["Exercise", "Consultation", "Physiotherapy", "Medication", "Diet", "Rest"];
 
 export function ScheduleView({ events, onUpdateEvent, editable = false }: ScheduleViewProps) {
+  const getActivityColor = (activity: string) => {
+    switch (activity) {
+      case "Exercise":
+        return "bg-info/20 text-info border border-info/30";
+      case "Consultation":
+        return "bg-primary/20 text-primary border border-primary/30";
+      case "Physiotherapy":
+        return "bg-warning/20 text-warning border border-warning/30";
+      case "Medication":
+        return "bg-success/20 text-success border border-success/30";
+      case "Diet":
+        return "bg-accent/20 text-accent border border-accent/30";
+      case "Rest":
+        return "bg-muted text-muted-foreground border border-muted-foreground/30";
+      default:
+        return "bg-secondary text-secondary-foreground";
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-success text-success-foreground";
+        return "bg-success text-success-foreground rounded-lg px-3 py-1.5 font-medium";
       case "overdue":
-        return "bg-destructive text-destructive-foreground";
+        return "bg-destructive text-destructive-foreground rounded-lg px-3 py-1.5 font-medium";
       case "assigned":
       default:
-        return "bg-muted text-muted-foreground";
+        return "bg-primary text-primary-foreground rounded-lg px-3 py-1.5 font-medium";
     }
   };
 
@@ -89,9 +108,9 @@ export function ScheduleView({ events, onUpdateEvent, editable = false }: Schedu
                   </SelectContent>
                 </Select>
               ) : (
-                <Badge variant="secondary" className="text-xs">
+                <div className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium ${getActivityColor(event.activity)}`}>
                   {event.activity}
-                </Badge>
+                </div>
               )}
             </div>
 
@@ -122,11 +141,9 @@ export function ScheduleView({ events, onUpdateEvent, editable = false }: Schedu
 
             {/* Status */}
             <div className="col-span-1 flex justify-center">
-              <Badge 
-                className={`text-xs px-2 py-1 ${getStatusColor(event.status)}`}
-              >
+              <div className={`text-xs ${getStatusColor(event.status)}`}>
                 {event.status}
-              </Badge>
+              </div>
             </div>
           </div>
         ))}
