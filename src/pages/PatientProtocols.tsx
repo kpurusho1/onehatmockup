@@ -331,7 +331,7 @@ export default function PatientProtocols() {
 
         {/* Patient Details */}
         <div className={isPatientProfile ? "col-span-9" : "col-span-9"}>
-          <Card>
+          <Card className={isPatientProfile ? "border-l-4 border-l-primary bg-primary/5 shadow-lg" : ""}>
             <CardHeader>
               {isPatientProfile && (
                 <div className="mb-4 pb-4 border-b border-border">
