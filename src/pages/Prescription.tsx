@@ -183,6 +183,14 @@ export default function Prescription() {
                       <Button 
                         size="sm" 
                         className="bg-green-500 hover:bg-green-600 text-white"
+                        onClick={() => handleView(record)}
+                      >
+                        <Eye size={14} className="mr-1" />
+                        View
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-green-500 hover:bg-green-600 text-white"
                         onClick={() => handleEdit(record)}
                       >
                         <Edit size={14} className="mr-1" />

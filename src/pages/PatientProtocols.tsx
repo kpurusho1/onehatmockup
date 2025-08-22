@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { ProtocolBuilder } from "@/components/protocol/ProtocolBuilder";
 import { TreatmentPlanTab } from "@/components/protocol/TreatmentPlanTab";
+import { PrescriptionTimeline } from "@/components/prescription/PrescriptionTimeline";
 import { PrescriptionRow } from "@/components/prescription/PrescriptionRow";
 import { CreatePrescription } from "./CreatePrescription";
 import { AddPatientDialog } from "@/components/AddPatientDialog";
@@ -19,8 +19,7 @@ import {
   FileText,
   Image,
   Edit,
-  Eye,
-  ArrowLeft
+  Eye
 } from "lucide-react";
 import patientGenericAvatar from "@/assets/patient-generic-avatar.jpg";
 import patientClipart from "@/assets/patient-clipart.png";
@@ -200,13 +199,7 @@ const patients = [
 ];
 
 export default function PatientProtocols() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const isPatientProfile = !!id;
-  
-  const [selectedPatient, setSelectedPatient] = useState(
-    isPatientProfile ? patients.find(p => p.id.toString() === id) || patients[0] : patients[0]
-  );
+  const [selectedPatient, setSelectedPatient] = useState(patients[0]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showProtocolBuilder, setShowProtocolBuilder] = useState(false);
   const [showCreateRx, setShowCreateRx] = useState(false);
@@ -259,7 +252,6 @@ export default function PatientProtocols() {
 
       <div className="grid grid-cols-12 gap-6">
         {/* Patient List */}
-        {!isPatientProfile && (
         <div className="col-span-3">
           <Card>
             <CardHeader>
@@ -303,13 +295,7 @@ export default function PatientProtocols() {
                           ? "bg-primary/10 border-l-primary"
                           : "hover:bg-muted border-l-transparent"
                       }`}
-                      onClick={() => {
-                        if (isPatientProfile) {
-                          setSelectedPatient(patient);
-                        } else {
-                          navigate(`/patient/${patient.id}`);
-                        }
-                      }}
+                      onClick={() => setSelectedPatient(patient)}
                     >
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 rounded-full bg-[#26bc9f] flex items-center justify-center text-white font-medium text-sm">
@@ -330,23 +316,11 @@ export default function PatientProtocols() {
             </CardContent>
           </Card>
         </div>
-        )}
 
         {/* Patient Details */}
-        <div className={isPatientProfile ? "col-span-12" : "col-span-9"}>
+        <div className="col-span-9">
           <Card>
             <CardHeader>
-              {isPatientProfile && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => navigate('/patient-protocols')}
-                  className="w-fit mb-4"
-                >
-                  <ArrowLeft size={16} className="mr-2" />
-                  Back to Patient List
-                </Button>
-              )}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6">
                   <div className="w-20 h-20 rounded-full bg-[#26bc9f] flex items-center justify-center text-white font-bold text-2xl">
@@ -386,16 +360,16 @@ export default function PatientProtocols() {
                               a 15.9155 15.9155 0 0 1 0 31.831
                               a 15.9155 15.9155 0 0 1 0 -31.831"
                             fill="none"
-                            stroke="#22c55e"
+                            stroke="hsl(var(--primary))"
                             strokeWidth="2"
-                            strokeDasharray="85, 100"
+                            strokeDasharray={`${selectedPatient.adherence}, 100`}
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-sm font-bold text-green-600">85%</span>
+                          <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1 text-center">Rx Intake</p>
+                      <p className="text-xs text-muted-foreground mt-1 text-center">Treatment<br/>Adherence</p>
                     </div>
                     
                     <div className="flex flex-col items-center text-center">
@@ -414,16 +388,16 @@ export default function PatientProtocols() {
                               a 15.9155 15.9155 0 0 1 0 31.831
                               a 15.9155 15.9155 0 0 1 0 -31.831"
                             fill="none"
-                            stroke="hsl(var(--primary))"
+                            stroke="#22c55e"
                             strokeWidth="2"
-                            strokeDasharray={`${selectedPatient.adherence}, 100`}
+                            strokeDasharray="85, 100"
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
+                          <span className="text-sm font-bold text-green-600">85%</span>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1 text-center">Treatment<br/>Adherence</p>
+                      <p className="text-xs text-muted-foreground mt-1 text-center">Rx Intake</p>
                     </div>
                     
                     <div className="flex flex-col space-y-2">

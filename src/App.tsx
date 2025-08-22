@@ -22,7 +22,6 @@ const App = () => (
           <Route index element={<Navigate to="/patient-protocols" replace />} />
           <Route path="voice-health" element={<VoiceHealthRecord />} />
           <Route path="patient-protocols" element={<PatientProtocols />} />
-          <Route path="patient/:id" element={<PatientProtocols />} />
           <Route path="protocol-templates" element={<ProtocolTemplates />} />
           <Route path="prescription" element={<Prescription />} />
           <Route path="profile" element={<Profile />} />
