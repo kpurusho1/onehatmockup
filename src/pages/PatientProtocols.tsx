@@ -260,7 +260,7 @@ export default function PatientProtocols() {
       <div className="grid grid-cols-12 gap-6">
         {/* Patient List */}
         <div className={`${isPatientProfile ? "col-span-3" : "col-span-3"} transition-all duration-300`}>
-          <Card className={isPatientProfile ? "border-l-4 border-l-primary bg-primary/5" : ""}>
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between mb-3">
                 <Button 
@@ -331,7 +331,7 @@ export default function PatientProtocols() {
 
         {/* Patient Details */}
         <div className={isPatientProfile ? "col-span-9" : "col-span-9"}>
-          <Card className={isPatientProfile ? "border-l-4 border-l-primary bg-primary/5" : ""}>
+          <Card>
             <CardHeader>
               {isPatientProfile && (
                 <div className="mb-4 pb-4 border-b border-border">
