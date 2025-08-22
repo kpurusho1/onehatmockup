@@ -259,7 +259,8 @@ export default function PatientProtocols() {
 
       <div className="grid grid-cols-12 gap-6">
         {/* Patient List */}
-        <div className={`${isPatientProfile ? "col-span-3" : "col-span-3"} transition-all duration-300`}>
+        {!isPatientProfile && (
+        <div className="col-span-3">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between mb-3">
@@ -294,21 +295,22 @@ export default function PatientProtocols() {
                   const adherenceTextColor = patient.adherence >= 80 ? 'text-green-600' : 
                                         patient.adherence >= 60 ? 'text-yellow-600' : 'text-red-600';
                   
-                  const isSelected = selectedPatient.id === patient.id;
-                  
                   return (
                     <div
                       key={patient.id}
-                      className={`p-4 cursor-pointer transition-all duration-200 border-l-4 relative ${
-                        isSelected
-                          ? "bg-primary/15 border-l-primary shadow-md"
-                          : "hover:bg-muted/50 border-l-transparent hover:border-l-muted-foreground/30"
+                      className={`p-4 cursor-pointer transition-colors border-l-4 ${
+                        selectedPatient.id === patient.id
+                          ? "bg-primary/10 border-l-primary"
+                          : "hover:bg-muted border-l-transparent"
                       }`}
-                      onClick={() => navigate(`/patient/${patient.id}`)}
+                      onClick={() => {
+                        if (isPatientProfile) {
+                          setSelectedPatient(patient);
+                        } else {
+                          navigate(`/patient/${patient.id}`);
+                        }
+                      }}
                     >
-                      {isSelected && (
-                        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-0 h-0 border-l-8 border-l-primary border-t-8 border-t-transparent border-b-8 border-b-transparent"></div>
-                      )}
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 rounded-full bg-[#26bc9f] flex items-center justify-center text-white font-medium text-sm">
                           {patient.name.charAt(0).toUpperCase()}
@@ -328,28 +330,22 @@ export default function PatientProtocols() {
             </CardContent>
           </Card>
         </div>
+        )}
 
         {/* Patient Details */}
-        <div className={isPatientProfile ? "col-span-9" : "col-span-9"}>
-          <Card className={isPatientProfile ? "border-l-4 border-l-primary bg-primary/5 shadow-lg" : ""}>
+        <div className={isPatientProfile ? "col-span-12" : "col-span-9"}>
+          <Card>
             <CardHeader>
               {isPatientProfile && (
-                <div className="mb-4 pb-4 border-b border-border">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => navigate('/patient-protocols')}
-                    className="w-fit"
-                  >
-                    <ArrowLeft size={16} className="mr-2" />
-                    Back to Patient List
-                  </Button>
-                  <div className="mt-2">
-                    <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                      Patient Profile
-                    </Badge>
-                  </div>
-                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate('/patient-protocols')}
+                  className="w-fit mb-4"
+                >
+                  <ArrowLeft size={16} className="mr-2" />
+                  Back to Patient List
+                </Button>
               )}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6">
