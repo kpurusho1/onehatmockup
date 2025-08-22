@@ -144,6 +144,14 @@ export function ProtocolBuilder({ patientName, onSave, onCancel, initialProtocol
               placeholder="e.g., Knee Surgery Recovery Protocol"
             />
           </div>
+          <div>
+            <Label htmlFor="protocolInstructions">Protocol Instructions</Label>
+            <Textarea
+              id="protocolInstructions"
+              placeholder="General instructions and guidelines for this protocol..."
+              className="min-h-20"
+            />
+          </div>
         </CardContent>
       </Card>
 

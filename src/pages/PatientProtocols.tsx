@@ -239,7 +239,7 @@ export default function PatientProtocols() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-6">
                   <Avatar className="w-12 h-12">
                     <AvatarImage src={selectedPatient.avatar} />
                     <AvatarFallback>{selectedPatient.name.charAt(0)}</AvatarFallback>
@@ -257,21 +257,35 @@ export default function PatientProtocols() {
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Adherence Scores */}
+                  <div className="flex items-center space-x-4">
+                    <div className="flex flex-col items-center">
+                      <div className="w-16 h-16 rounded-full border-4 border-primary/20 bg-primary/10 flex items-center justify-center">
+                        <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground mt-1">Treatment</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <div className="w-16 h-16 rounded-full border-4 border-success/20 bg-success/10 flex items-center justify-center">
+                        <span className="text-sm font-bold text-success">{Math.max(0, selectedPatient.adherence - 10)}%</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground mt-1">Rx Intake</span>
+                    </div>
+                  </div>
                 </div>
                 <div className="flex space-x-2">
-                  <Button>Create e-prescription</Button>
+                  <Button onClick={() => setShowProtocolBuilder(true)}>
+                    <Plus size={16} className="mr-2" />
+                    Create Treatment Plan
+                  </Button>
+                  <Button variant="outline">
+                    <Plus size={16} className="mr-2" />
+                    Create Rx
+                  </Button>
                 </div>
               </div>
               
-              <div className="flex items-center mt-4 p-4 bg-muted rounded-lg">
-                <div>
-                  <p className="text-sm font-medium">Protocol Adherence</p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <div className={`w-3 h-3 rounded-full ${getAdherenceColor(selectedPatient.adherence)}`} />
-                    <span className="font-bold">{selectedPatient.adherence}% Score</span>
-                  </div>
-                </div>
-              </div>
             </CardHeader>
             
             <CardContent>

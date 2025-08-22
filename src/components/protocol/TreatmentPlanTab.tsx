@@ -409,79 +409,52 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                 <CollapsibleContent>
                   <CardContent className="p-4 pt-0">
                     <div className="space-y-4">
-                      {/* Quick Stats */}
-                      <div className="grid grid-cols-4 gap-4 p-3 bg-muted/30 rounded-lg">
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-success">{protocol.completedActivities}</div>
-                          <div className="text-xs text-muted-foreground">Completed</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-primary">
-                            {protocol.totalActivities - protocol.completedActivities}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Remaining</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-primary">{protocol.currentWeek}</div>
-                          <div className="text-xs text-muted-foreground">Current Week</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-primary">{protocol.totalWeeks}</div>
-                          <div className="text-xs text-muted-foreground">Total Weeks</div>
-                        </div>
-                      </div>
-
-                      {/* Activities Header */}
-                      <div className="flex items-center justify-between">
-                        <h5 className="font-semibold">Activities</h5>
-                        {isEditing && (
-                          <Button onClick={() => addNewActivity(protocol.id)} size="sm">
-                            <Plus size={16} className="mr-2" />
-                            Add Activity
-                          </Button>
-                        )}
-                      </div>
-                      
-                      {/* Activities List */}
+                      {/* Pending Activities */}
                       <div className="space-y-4">
                         {isEditing ? (
                           // Edit view: Show activities in BlockEditor format
                           <BlockEditor
-                            events={protocol.activities.map(activity => ({
-                              id: activity.id.toString(),
-                              activity: activity.activity || activity.type,
-                              instructions: activity.instructions || activity.description,
-                              frequency: activity.frequency,
-                              duration: parseInt(activity.duration.replace(/\D/g, '')) || 0,
-                              videoUrl: activity.videoUrl
-                            }))}
+                            events={protocol.activities
+                              .filter(activity => !activity.completed)
+                              .map(activity => ({
+                                id: activity.id.toString(),
+                                activity: activity.activity || activity.type,
+                                instructions: activity.instructions || activity.description,
+                                frequency: activity.frequency,
+                                duration: parseInt(activity.duration.replace(/\D/g, '')) || 0,
+                                videoUrl: activity.videoUrl
+                              }))}
                             onEventsChange={(events) => {
                               // Convert back to protocol activities format and update
-                              const updatedActivities = events.map((event, index) => {
-                                const originalActivity = protocol.activities[index] || {
-                                  completed: false,
-                                  dueDate: new Date().toISOString().split('T')[0],
-                                  patientAction: 'complete-task',
-                                  doctorAction: 'review-progress'
-                                };
-                                return {
-                                  ...originalActivity,
-                                  id: parseInt(event.id) || Date.now() + index,
-                                  activity: event.activity,
-                                  type: event.activity,
-                                  name: event.activity,
-                                  subActivity: event.activity,
-                                  instructions: event.instructions,
-                                  description: event.instructions,
-                                  frequency: event.frequency,
-                                  duration: `${event.duration} min`,
-                                  videoUrl: event.videoUrl,
-                                  completed: originalActivity.completed,
-                                  dueDate: originalActivity.dueDate,
-                                  patientAction: originalActivity.patientAction,
-                                  doctorAction: originalActivity.doctorAction
-                                };
-                              });
+                              const completedActivities = protocol.activities.filter(activity => activity.completed);
+                              const updatedActivities = [
+                                ...events.map((event, index) => {
+                                  const originalActivity = protocol.activities.find(a => !a.completed && protocol.activities.indexOf(a) === index) || {
+                                    completed: false,
+                                    dueDate: new Date().toISOString().split('T')[0],
+                                    patientAction: 'complete-task',
+                                    doctorAction: 'review-progress'
+                                  };
+                                  return {
+                                    ...originalActivity,
+                                    id: parseInt(event.id) || Date.now() + index,
+                                    activity: event.activity,
+                                    type: event.activity,
+                                    name: event.activity,
+                                    subActivity: event.activity,
+                                    instructions: event.instructions,
+                                    description: event.instructions,
+                                    frequency: event.frequency,
+                                    duration: `${event.duration} min`,
+                                    videoUrl: event.videoUrl,
+                                    completed: false,
+                                    dueDate: originalActivity.dueDate,
+                                    patientAction: originalActivity.patientAction,
+                                    doctorAction: originalActivity.doctorAction
+                                  };
+                                }),
+                                ...completedActivities
+                              ];
                               
                               setTreatmentPlans(prev => prev.map(p => 
                                 p.id === protocol.id 
@@ -493,19 +466,59 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                             frequencyOptions={frequencyOptions}
                           />
                         ) : (
-                          // Schedule view: Show activities in schedule format
+                          // Schedule view: Show pending activities in schedule format
                           <ScheduleView
-                            events={protocol.activities.map(activity => ({
-                              id: activity.id,
-                              date: activity.dueDate,
-                              day: new Date(activity.dueDate).toLocaleDateString('en-US', { weekday: 'long' }),
-                              activity: activity.activity || activity.type,
-                              instructions: activity.instructions || activity.description,
-                              videoUrl: activity.videoUrl,
-                              status: activity.completed ? 'completed' : 
-                                      new Date(activity.dueDate) < new Date() ? 'overdue' : 'assigned'
-                            }))}
+                            events={protocol.activities
+                              .filter(activity => !activity.completed)
+                              .map(activity => ({
+                                id: activity.id,
+                                date: activity.dueDate,
+                                day: new Date(activity.dueDate).toLocaleDateString('en-US', { weekday: 'long' }),
+                                activity: activity.activity || activity.type,
+                                instructions: activity.instructions || activity.description,
+                                videoUrl: activity.videoUrl,
+                                status: new Date(activity.dueDate) < new Date() ? 'overdue' : 'assigned'
+                              }))}
                           />
+                        )}
+                      </div>
+
+                      {/* Completed Activities - Collapsible */}
+                      {protocol.activities.some(activity => activity.completed) && (
+                        <Collapsible>
+                          <div className="flex items-center justify-between py-2 border-t">
+                            <h5 className="font-semibold text-sm text-muted-foreground">
+                              Completed Activities ({protocol.activities.filter(a => a.completed).length})
+                            </h5>
+                            <ChevronDown size={16} className="text-muted-foreground" />
+                          </div>
+                          <CollapsibleContent>
+                            <ScheduleView
+                              events={protocol.activities
+                                .filter(activity => activity.completed)
+                                .sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime()) // Recent to earliest
+                                .map(activity => ({
+                                  id: activity.id,
+                                  date: activity.dueDate,
+                                  day: new Date(activity.dueDate).toLocaleDateString('en-US', { weekday: 'long' }),
+                                  activity: activity.activity || activity.type,
+                                  instructions: activity.instructions || activity.description,
+                                  videoUrl: activity.videoUrl,
+                                  status: 'completed'
+                                }))}
+                            />
+                          </CollapsibleContent>
+                        </Collapsible>
+                      )}
+
+                      {/* Activities Header */}
+                      <div className="flex items-center justify-between">
+                        <h5 className="font-semibold">Activities</h5>
+                        {isEditing && (
+                          <Button onClick={() => addNewActivity(protocol.id)} size="sm">
+                            <Plus size={16} className="mr-2" />
+                            Add Activity
+                          </Button>
                         )}
                       </div>
                     </div>
