@@ -131,7 +131,7 @@ export default function ProtocolTemplates() {
           <h1 className="text-3xl font-bold">Protocol Templates</h1>
           <p className="text-muted-foreground">Create and manage reusable treatment protocols</p>
         </div>
-        <Button className="flex items-center space-x-2">
+        <Button className="flex items-center space-x-2" style={{backgroundColor: '#1c2f7f'}}>
           <Plus size={16} />
           <span>Create Protocol</span>
         </Button>

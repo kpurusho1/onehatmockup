@@ -242,7 +242,7 @@ export default function PatientProtocols() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between mb-3">
-                <Button className="flex items-center space-x-2 w-full">
+                <Button className="flex items-center space-x-2 w-full" style={{backgroundColor: '#1c2f7f'}} >
                   <Plus size={16} />
                   <span>Add Patient</span>
                 </Button>
@@ -280,15 +280,8 @@ export default function PatientProtocols() {
                       onClick={() => setSelectedPatient(patient)}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="relative">
-                          <div className="w-10 h-10 rounded-full bg-[hsl(var(--brand-primary))]/10 flex items-center justify-center">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-xs ${
-                              patient.adherence >= 80 ? 'bg-green-500' : 
-                              patient.adherence >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                            }`}>
-                              {patient.name.charAt(0).toUpperCase()}
-                            </div>
-                          </div>
+                        <div className="w-10 h-10 rounded-full bg-[#26bc9f] flex items-center justify-center text-white font-medium text-sm">
+                          {patient.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1">
                           <h3 className="font-medium">{patient.name}</h3>
@@ -312,14 +305,8 @@ export default function PatientProtocols() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6">
-                  <div className="w-20 h-20 rounded-full bg-[hsl(var(--brand-primary))]/10 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-[hsl(var(--brand-primary))]/20 flex items-center justify-center">
-                      <img 
-                        src="/src/assets/patient-avatar-modern.png" 
-                        alt="Patient" 
-                        className="w-12 h-12 object-cover rounded-full"
-                      />
-                    </div>
+                  <div className="w-20 h-20 rounded-full bg-[#26bc9f] flex items-center justify-center text-white font-bold text-2xl">
+                    {selectedPatient.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
                     <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
@@ -358,7 +345,7 @@ export default function PatientProtocols() {
                         <Plus size={14} className="mr-2" />
                         Create Rx
                       </Button>
-                      <Button onClick={() => setShowProtocolBuilder(true)} size="sm">
+                      <Button onClick={() => setShowProtocolBuilder(true)} size="sm" style={{backgroundColor: '#1c2f7f'}} className="hover:opacity-90">
                         <Plus size={14} className="mr-2" />
                         Create Treatment Plan
                       </Button>

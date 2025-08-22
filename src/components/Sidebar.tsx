@@ -63,9 +63,11 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
           {!collapsed && (
             <div className="flex flex-col space-y-2">
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden bg-primary">
-            <span className="text-primary-foreground font-bold">1h</span>
-          </div>
+          <img 
+            src="/src/assets/1hat-logo.png" 
+            alt="1HAT Logo" 
+            className="w-10 h-10 object-contain"
+          />
           <div className="text-left">
             <h2 className="text-lg font-bold">Dr. Abhishant, Urologist</h2>
             <p className="text-sm text-muted-foreground">Nishant Hospital</p>
