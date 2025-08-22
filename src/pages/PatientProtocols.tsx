@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 import { 
   Search, 
   Phone, 
@@ -327,21 +328,33 @@ export default function PatientProtocols() {
                   {/* Adherence Scores and Action Buttons - Right Aligned */}
                   <div className="flex items-center space-x-6">
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-12 h-12 rounded-full border-4 border-primary flex items-center justify-center bg-primary/10">
-                        <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
+                      <div className="relative w-14 h-14">
+                        <Progress 
+                          value={selectedPatient.adherence} 
+                          className="w-14 h-14 rounded-full [&>div]:rounded-full [&>div]:bg-primary rotate-[-90deg]" 
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-sm font-bold text-primary">{selectedPatient.adherence}%</span>
+                        </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1 text-center">Treatment<br/>Adherence</p>
                     </div>
                     
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-12 h-12 rounded-full border-4 border-green-500 flex items-center justify-center bg-green-500/10">
-                        <span className="text-sm font-bold text-green-600">85%</span>
+                      <div className="relative w-14 h-14">
+                        <Progress 
+                          value={85} 
+                          className="w-14 h-14 rounded-full [&>div]:rounded-full [&>div]:bg-green-500 rotate-[-90deg]" 
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-sm font-bold text-green-600">85%</span>
+                        </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1 text-center">Rx Intake</p>
                     </div>
                     
                     <div className="flex flex-col space-y-2">
-                      <Button variant="outline" size="sm">
+                      <Button size="sm" style={{backgroundColor: '#1c2f7f'}} className="hover:opacity-90">
                         <Plus size={14} className="mr-2" />
                         Create Rx
                       </Button>

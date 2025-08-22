@@ -247,21 +247,27 @@ export default function ProtocolTemplates() {
               <div>
                 <h3 className="text-lg font-semibold mb-3">Protocol Activities</h3>
                 <div className="space-y-3">
+                  {/* Header Row */}
+                  <div className="grid grid-cols-5 gap-4 text-sm font-medium text-muted-foreground bg-muted p-3 rounded">
+                    <div>#</div>
+                    <div>Activity</div>
+                    <div>Instructions</div>
+                    <div>Frequency</div>
+                    <div>Duration</div>
+                  </div>
+                  
+                  {/* Activity Rows */}
                   {selectedProtocol.activities_list.map((event, index) => (
-                    <div key={event.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/20">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div key={event.id} className="grid grid-cols-5 gap-4 text-sm p-3 border rounded bg-background">
+                      <div className="flex items-center">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
                           <span className="text-xs font-medium text-primary">{index + 1}</span>
                         </div>
-                        <div>
-                          <div className="font-medium">{event.activity}</div>
-                          <div className="text-sm text-muted-foreground">{event.instructions}</div>
-                        </div>
                       </div>
-                      <div className="text-right text-sm">
-                        <div className="font-medium">{event.frequency}</div>
-                        <div className="text-muted-foreground">{event.duration} min</div>
-                      </div>
+                      <div className="font-medium">{event.activity}</div>
+                      <div className="text-muted-foreground">{event.instructions}</div>
+                      <div className="font-medium">{event.frequency}</div>
+                      <div className="text-muted-foreground">{event.duration} min</div>
                     </div>
                   ))}
                 </div>

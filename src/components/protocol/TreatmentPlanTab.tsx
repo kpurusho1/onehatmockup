@@ -318,13 +318,23 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
           />
         </div>
         
-        <Card className="p-6 text-center">
-          <Calendar className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h4 className="text-lg font-medium mb-2">No treatment protocols assigned</h4>
-          <p className="text-muted-foreground">
-            Create a personalized treatment protocol to track {patient.name}'s recovery progress
-          </p>
-        </Card>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Card className="p-8 text-center max-w-md">
+            <Calendar className="mx-auto h-16 w-16 text-muted-foreground mb-6" />
+            <h4 className="text-xl font-medium mb-3">No treatment protocols assigned</h4>
+            <p className="text-muted-foreground mb-6">
+              Create a personalized treatment protocol to track {patient.name}'s recovery progress
+            </p>
+            <Button 
+              onClick={() => onCreateProtocol()} 
+              className="w-full" 
+              style={{backgroundColor: '#1c2f7f'}}
+            >
+              <Plus size={16} className="mr-2" />
+              Add New Protocol
+            </Button>
+          </Card>
+        </div>
       </div>
     );
   }
