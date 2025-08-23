@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Link } from "lucide-react";
 import { CustomActivitySelect } from "./CustomActivitySelect";
 import { ManualFrequencyDialog } from "./ManualFrequencyDialog";
+import { StartDateDialog } from "./StartDateDialog";
 
 interface BlockEvent {
   id: string;
@@ -16,6 +17,7 @@ interface BlockEvent {
   frequency: string;
   duration: number;
   videoUrl?: string;
+  startDate?: string;
 }
 
 interface BlockEditorProps {
@@ -26,7 +28,7 @@ interface BlockEditorProps {
 }
 
 const defaultActivityOptions = ["Exercise", "Consultation", "Physiotherapy", "Medication", "Diet", "Rest"];
-const defaultFrequencyOptions = ["Daily", "Weekly", "Alternate Days", "Alternate Weeks", "Choose Manually"];
+const defaultFrequencyOptions = ["Once", "Daily", "Weekly", "Alternate Days", "Alternate Weeks", "Choose Manually"];
 
 export function BlockEditor({ 
   events, 
@@ -35,7 +37,9 @@ export function BlockEditor({
   frequencyOptions = defaultFrequencyOptions
 }: BlockEditorProps) {
   const [showManualFrequency, setShowManualFrequency] = useState(false);
+  const [showStartDate, setShowStartDate] = useState(false);
   const [editingEventIndex, setEditingEventIndex] = useState<number | null>(null);
+  const [pendingFrequency, setPendingFrequency] = useState<string>("");
   const addNewEvent = () => {
     const newEvent: BlockEvent = {
       id: Date.now().toString(),
@@ -72,7 +76,10 @@ export function BlockEditor({
       setEditingEventIndex(index);
       setShowManualFrequency(true);
     } else {
-      updateEvent(index, { frequency: value });
+      // For any frequency selection, show start date dialog
+      setEditingEventIndex(index);
+      setPendingFrequency(value);
+      setShowStartDate(true);
     }
   };
 
@@ -81,6 +88,18 @@ export function BlockEditor({
       const frequencyText = `Manual: ${data.selectedDates.length} dates, every ${data.dayFrequency} ${data.timeUnit}`;
       updateEvent(editingEventIndex, { frequency: frequencyText });
       setEditingEventIndex(null);
+    }
+  };
+
+  const handleStartDateSave = (startDate: Date) => {
+    if (editingEventIndex !== null && pendingFrequency) {
+      const startDateText = startDate.toLocaleDateString();
+      updateEvent(editingEventIndex, { 
+        frequency: pendingFrequency,
+        startDate: startDateText 
+      });
+      setEditingEventIndex(null);
+      setPendingFrequency("");
     }
   };
 
@@ -136,6 +155,11 @@ export function BlockEditor({
                     ))}
                   </SelectContent>
                 </Select>
+                {event.startDate && (
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Starts: {event.startDate}
+                  </div>
+                )}
               </div>
 
               {/* Duration */}
@@ -208,6 +232,14 @@ export function BlockEditor({
         open={showManualFrequency}
         onOpenChange={setShowManualFrequency}
         onSave={handleManualFrequencySave}
+      />
+
+      {/* Start Date Dialog */}
+      <StartDateDialog
+        open={showStartDate}
+        onOpenChange={setShowStartDate}
+        onSave={handleStartDateSave}
+        frequency={pendingFrequency}
       />
     </div>
   );
