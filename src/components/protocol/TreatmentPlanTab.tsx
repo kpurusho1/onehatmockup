@@ -232,15 +232,22 @@ export function TreatmentPlanTab({ patient, onCreateProtocol, onUpdateInstructio
       // Create protocol with start day configuration
       console.log("Creating protocol from template:", selectedTemplate, "starting from day:", startDay);
       
-      // Adjust durations based on start day
+      // Calculate actual start date based on start day
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() + (startDay - 1));
+      
+      // Adjust durations and dates based on start day
       const adjustedTemplate = {
         ...selectedTemplate,
         startDay,
-        // You can add logic here to adjust durations based on start day
+        startDate: startDate.toISOString().split('T')[0],
+        // Adjust activity durations based on start day
         events: selectedTemplate.events?.map((event: any) => ({
           ...event,
-          // Adjust duration if needed based on start day
-          duration: startDay > 0 ? (parseInt(event.duration) + startDay).toString() : event.duration
+          // Calculate new duration based on remaining days
+          duration: Math.max(1, (parseInt(event.duration) - (startDay - 1))).toString(),
+          // Set start date for each activity
+          startDate: startDate.toLocaleDateString()
         }))
       };
       
@@ -475,17 +482,18 @@ export function TreatmentPlanTab({ patient, onCreateProtocol, onUpdateInstructio
                       <div className="space-y-4">
                         {isEditing ? (
                           // Edit view: Show activities in BlockEditor format
-                          <BlockEditor
-                            events={protocol.activities
-                              .filter(activity => !activity.completed)
-                              .map(activity => ({
-                                id: activity.id.toString(),
-                                activity: activity.activity || activity.type,
-                                instructions: activity.instructions || activity.description,
-                                frequency: activity.frequency,
-                                duration: parseInt(activity.duration.replace(/\D/g, '')) || 0,
-                                videoUrl: activity.videoUrl
-                              }))}
+                           <BlockEditor
+                             events={protocol.activities
+                               .filter(activity => !activity.completed)
+                               .map(activity => ({
+                                 id: activity.id.toString(),
+                                 activity: activity.activity || activity.type,
+                                 instructions: activity.instructions || activity.description,
+                                 frequency: activity.frequency,
+                                 duration: parseInt(activity.duration.replace(/\D/g, '')) || 0,
+                                 videoUrl: activity.videoUrl,
+                                 startDay: 1
+                               }))}
                             onEventsChange={(events) => {
                               // Convert back to protocol activities format and update
                               const completedActivities = protocol.activities.filter(activity => activity.completed);

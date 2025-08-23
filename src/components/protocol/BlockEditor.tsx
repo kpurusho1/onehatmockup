@@ -17,7 +17,7 @@ interface BlockEvent {
   frequency: string;
   duration: number;
   videoUrl?: string;
-  startDate?: string;
+  startDay: number;
 }
 
 interface BlockEditorProps {
@@ -47,7 +47,8 @@ export function BlockEditor({
       instructions: "",
       frequency: "",
       duration: 0,
-      videoUrl: ""
+      videoUrl: "",
+      startDay: 1
     };
     onEventsChange([...events, newEvent]);
   };
@@ -91,12 +92,11 @@ export function BlockEditor({
     }
   };
 
-  const handleStartDateSave = (startDate: Date) => {
+  const handleStartDateSave = (startDay: number) => {
     if (editingEventIndex !== null && pendingFrequency) {
-      const startDateText = startDate.toLocaleDateString();
       updateEvent(editingEventIndex, { 
         frequency: pendingFrequency,
-        startDate: startDateText 
+        startDay: startDay 
       });
       setEditingEventIndex(null);
       setPendingFrequency("");
@@ -155,9 +155,9 @@ export function BlockEditor({
                     ))}
                   </SelectContent>
                 </Select>
-                {event.startDate && (
+                {event.startDay && (
                   <div className="text-xs text-muted-foreground mt-1">
-                    Starts: {event.startDate}
+                    Starts: Day {event.startDay}
                   </div>
                 )}
               </div>
@@ -240,6 +240,7 @@ export function BlockEditor({
         onOpenChange={setShowStartDate}
         onSave={handleStartDateSave}
         frequency={pendingFrequency}
+        mode="day"
       />
     </div>
   );

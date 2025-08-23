@@ -2,26 +2,35 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface StartDateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (startDate: Date) => void;
+  onSave: (startDate: Date | number) => void;
   frequency: string;
+  mode?: 'date' | 'day';
 }
 
 export function StartDateDialog({ 
   open, 
   onOpenChange, 
   onSave,
-  frequency 
+  frequency,
+  mode = 'date'
 }: StartDateDialogProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [startDay, setStartDay] = useState<number>(1);
 
   const handleSave = () => {
-    onSave(selectedDate);
+    if (mode === 'day') {
+      onSave(startDay);
+    } else {
+      onSave(selectedDate);
+    }
     onOpenChange(false);
   };
 
@@ -30,17 +39,31 @@ export function StartDateDialog({
   };
 
   const getTitle = () => {
-    if (frequency.includes("Weekly")) {
-      return "Select Start Week";
+    if (mode === 'day') {
+      if (frequency.includes("Weekly")) {
+        return "Select Start Week";
+      }
+      return "Select Start Day";
+    } else {
+      if (frequency.includes("Weekly")) {
+        return "Select Start Week";
+      }
+      return "Select Start Date";
     }
-    return "Select Start Day";
   };
 
   const getDescription = () => {
-    if (frequency.includes("Weekly")) {
-      return "Choose the week when this activity should start";
+    if (mode === 'day') {
+      if (frequency.includes("Weekly")) {
+        return "Choose which week this activity should start";
+      }
+      return "Choose which day this activity should start";
+    } else {
+      if (frequency.includes("Weekly")) {
+        return "Choose the week when this activity should start";
+      }
+      return "Choose the date when this activity should start";
     }
-    return "Choose the day when this activity should start";
   };
 
   return (
@@ -52,22 +75,48 @@ export function StartDateDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="flex justify-center">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => date && setSelectedDate(date)}
-              className={cn("rounded-md border pointer-events-auto")}
-              initialFocus
-            />
-          </div>
-
-          {selectedDate && (
-            <div className="text-center p-3 bg-muted rounded-md">
-              <p className="text-sm font-medium">
-                Selected: {format(selectedDate, "PPPP")}
+          {mode === 'day' ? (
+            <div className="space-y-2">
+              <Label htmlFor="startDay">
+                {frequency.includes("Weekly") ? "Start Week" : "Start Day"}
+              </Label>
+              <Input
+                id="startDay"
+                type="number"
+                min="1"
+                max="365"
+                value={startDay}
+                onChange={(e) => setStartDay(Math.max(1, parseInt(e.target.value) || 1))}
+                placeholder="1"
+                className="h-12 text-center text-lg font-medium"
+              />
+              <p className="text-xs text-muted-foreground">
+                {frequency.includes("Weekly") 
+                  ? "Week 1 = Start immediately. Week 2+ = Start after specified weeks." 
+                  : "Day 1 = Start immediately. Day 2+ = Start after specified days."
+                }
               </p>
             </div>
+          ) : (
+            <>
+              <div className="flex justify-center">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => date && setSelectedDate(date)}
+                  className={cn("rounded-md border pointer-events-auto")}
+                  initialFocus
+                />
+              </div>
+
+              {selectedDate && (
+                <div className="text-center p-3 bg-muted rounded-md">
+                  <p className="text-sm font-medium">
+                    Selected: {format(selectedDate, "PPPP")}
+                  </p>
+                </div>
+              )}
+            </>
           )}
 
           {/* Action Buttons */}
@@ -76,7 +125,10 @@ export function StartDateDialog({
               Cancel
             </Button>
             <Button onClick={handleSave}>
-              Confirm Start Date
+              {mode === 'day' 
+                ? (frequency.includes("Weekly") ? "Confirm Start Week" : "Confirm Start Day")
+                : "Confirm Start Date"
+              }
             </Button>
           </div>
         </div>

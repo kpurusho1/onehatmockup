@@ -30,9 +30,9 @@ const protocols = [
     updatedOn: "13/05/2025",
     image: physiotherapy,
     activities_list: [
-      { id: "1", activity: "Exercise", instructions: "Jog in the morning", frequency: "Daily", duration: 15 },
-      { id: "2", activity: "Consultation", instructions: "Follow-up visit", frequency: "Weekly", duration: 1 },
-      { id: "3", activity: "Physiotherapy", instructions: "Knee strengthening exercises", frequency: "Twice weekly", duration: 5 }
+      { id: "1", activity: "Exercise", instructions: "Jog in the morning", frequency: "Daily", duration: 15, startDay: 1 },
+      { id: "2", activity: "Consultation", instructions: "Follow-up visit", frequency: "Weekly", duration: 1, startDay: 7 },
+      { id: "3", activity: "Physiotherapy", instructions: "Knee strengthening exercises", frequency: "Twice weekly", duration: 5, startDay: 3 }
     ]
   },
   {
@@ -46,10 +46,10 @@ const protocols = [
     updatedOn: "12/05/2025",
     image: medicalEquipment,
     activities_list: [
-      { id: "1", activity: "Consultation", instructions: "Blood Sugar Check", frequency: "Weekly", duration: 1 },
-      { id: "2", activity: "Exercise", instructions: "Walking", frequency: "Daily", duration: 30 },
-      { id: "3", activity: "Diet", instructions: "Meal Planning", frequency: "Daily", duration: 1 },
-      { id: "4", activity: "Medication", instructions: "Insulin", frequency: "Twice daily", duration: 1 }
+      { id: "1", activity: "Consultation", instructions: "Blood Sugar Check", frequency: "Weekly", duration: 1, startDay: 1 },
+      { id: "2", activity: "Exercise", instructions: "Walking", frequency: "Daily", duration: 30, startDay: 2 },
+      { id: "3", activity: "Diet", instructions: "Meal Planning", frequency: "Daily", duration: 1, startDay: 1 },
+      { id: "4", activity: "Medication", instructions: "Insulin", frequency: "Twice daily", duration: 1, startDay: 1 }
     ]
   },
   {
@@ -63,8 +63,8 @@ const protocols = [
     updatedOn: "13/05/2025",
     image: doctorConsultation,
     activities_list: [
-      { id: "1", activity: "Exercise", instructions: "Light Cardio", frequency: "Daily", duration: 20 },
-      { id: "2", activity: "Consultation", instructions: "BP Monitoring", frequency: "Bi-weekly", duration: 1 }
+      { id: "1", activity: "Exercise", instructions: "Light Cardio", frequency: "Daily", duration: 20, startDay: 1 },
+      { id: "2", activity: "Consultation", instructions: "BP Monitoring", frequency: "Bi-weekly", duration: 1, startDay: 14 }
     ]
   }
 ];
@@ -79,7 +79,10 @@ export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patie
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProtocol, setSelectedProtocol] = useState(protocols[0]);
   const [isEditing, setIsEditing] = useState(false);
-  const [events, setEvents] = useState(selectedProtocol.activities_list);
+  const [events, setEvents] = useState(selectedProtocol.activities_list.map(activity => ({
+    ...activity,
+    startDay: activity.startDay || 1
+  })));
 
   const filteredProtocols = protocols.filter(protocol =>
     protocol.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -87,7 +90,10 @@ export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patie
   );
 
   const handleEditProtocol = () => {
-    setEvents(selectedProtocol.activities_list);
+    setEvents(selectedProtocol.activities_list.map(activity => ({
+      ...activity,
+      startDay: activity.startDay || 1
+    })));
     setIsEditing(true);
   };
 
@@ -259,7 +265,7 @@ export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patie
                     <div>Activity</div>
                     <div>Instructions</div>
                     <div>Frequency</div>
-                    <div>Duration</div>
+                    <div>Duration (Days)</div>
                   </div>
                   
                   {/* Activity Rows */}
@@ -270,10 +276,15 @@ export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patie
                           <span className="text-xs font-medium text-primary">{index + 1}</span>
                         </div>
                       </div>
-                      <div className="font-medium">{event.activity}</div>
+                      <div className="font-medium">
+                        {event.activity}
+                        {event.startDay && (
+                          <div className="text-xs text-muted-foreground">Start Day {event.startDay}</div>
+                        )}
+                      </div>
                       <div className="text-muted-foreground">{event.instructions}</div>
                       <div className="font-medium">{event.frequency}</div>
-                      <div className="text-muted-foreground">{event.duration} min</div>
+                      <div className="text-muted-foreground">{event.duration} days</div>
                     </div>
                   ))}
                 </div>

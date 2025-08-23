@@ -25,6 +25,7 @@ interface ProtocolEvent {
   frequency: string;
   duration: number;
   videoUrl?: string;
+  startDay: number;
 }
 
 interface ProtocolBuilderProps {
@@ -63,7 +64,8 @@ export function ProtocolBuilder({ patientName, onSave, onCancel, initialProtocol
       instructions: event.instructions || event.description || "",
       frequency: event.frequency || "",
       duration: parseInt(event.duration?.replace(/\D/g, '')) || 0,
-      videoUrl: event.videoUrl || ""
+      videoUrl: event.videoUrl || "",
+      startDay: event.startDay || 1
     })) || []
   );
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
@@ -76,7 +78,8 @@ export function ProtocolBuilder({ patientName, onSave, onCancel, initialProtocol
       instructions: event.instructions || event.description || "",
       frequency: event.frequency || "",
       duration: parseInt(event.duration?.replace(/\D/g, '')) || 0,
-      videoUrl: event.videoUrl || ""
+      videoUrl: event.videoUrl || "",
+      startDay: event.startDay || 1
     })) || []);
     setShowTemplateSelector(false);
   };

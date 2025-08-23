@@ -14,6 +14,7 @@ interface ProtocolEvent {
   frequency: string;
   duration: number;
   videoUrl?: string;
+  startDay: number;
 }
 
 interface FullScreenProtocolEditorProps {
@@ -34,7 +35,12 @@ export function FullScreenProtocolEditor({
   mode 
 }: FullScreenProtocolEditorProps) {
   const [protocolName, setProtocolName] = useState(initialProtocolName);
-  const [events, setEvents] = useState<ProtocolEvent[]>(initialEvents);
+  const [events, setEvents] = useState<ProtocolEvent[]>(
+    initialEvents.map(event => ({
+      ...event,
+      startDay: event.startDay || 1
+    }))
+  );
   const [protocolInstructions, setProtocolInstructions] = useState("");
 
   const handleSave = () => {
