@@ -62,7 +62,7 @@ export function FullScreenProtocolEditor({
               <h1 className="text-2xl font-bold">
                 {mode === "create" ? "Create Treatment Plan" : "Assign Treatment Plan"}
               </h1>
-              <p className="text-muted-foreground">Patient: <span className="font-medium">{patientName}</span></p>
+              <p className="text-muted-foreground">Patient: <span className="font-medium text-primary">{patientName}</span></p>
             </div>
           </div>
           <Button 

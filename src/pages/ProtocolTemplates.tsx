@@ -280,13 +280,21 @@ export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patie
               </div>
               
               <div className="pt-4 border-t">
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => onSelect?.(selectedProtocol)}>
-                    <Copy size={14} className="mr-1" />
+                <div className="flex space-x-3">
+                  <Button 
+                    onClick={() => onSelect?.(selectedProtocol)}
+                    className="flex-1 h-12 text-base font-semibold"
+                    size="lg"
+                  >
                     Use This Template
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => onCreateFromScratch?.()}>
-                    <Plus size={14} className="mr-1" />
+                  <Button 
+                    variant="outline" 
+                    onClick={() => onCreateFromScratch?.()}
+                    className="flex-1 h-12 text-base font-semibold"
+                    size="lg"
+                  >
+                    <Plus size={16} className="mr-2" />
                     Create from Scratch
                   </Button>
                 </div>

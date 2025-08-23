@@ -345,10 +345,6 @@ export function TreatmentPlanTab({ patient, onCreateProtocol, onUpdateInstructio
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Treatment Protocols ({treatmentPlans.length})</h3>
-        <TemplateDropdown 
-          onSelectTemplate={handleTemplateSelect}
-          onCreateFromScratch={handleCreateFromScratch}
-        />
       </div>
 
       {/* Protocols List */}

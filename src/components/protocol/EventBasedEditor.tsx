@@ -146,7 +146,7 @@ export function EventBasedEditor({
                 {mode === "instructions" ? "Update Instructions" : "Edit Treatment Plan"}
               </h1>
               <p className="text-muted-foreground">
-                {protocolName} - Patient: <span className="font-medium">{patientName}</span>
+                {protocolName} - Patient: <span className="font-medium text-primary">{patientName}</span>
               </p>
             </div>
           </div>
