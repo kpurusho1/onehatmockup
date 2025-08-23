@@ -26,7 +26,7 @@ const sidebarItems = [
   },
   {
     id: "protocol-templates",
-    label: "Protocol Templates",
+    label: "Treatment Templates",
     icon: FileText,
     path: "/protocol-templates",
   },

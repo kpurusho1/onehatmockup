@@ -107,8 +107,8 @@ export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patie
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Edit Protocol: {selectedProtocol.name}</h1>
-            <p className="text-muted-foreground">Edit the protocol template activities</p>
+            <h1 className="text-3xl font-bold">Edit Treatment: {selectedProtocol.name}</h1>
+            <p className="text-muted-foreground">Edit the treatment template activities</p>
           </div>
           <div className="flex space-x-2">
             <Button variant="outline" onClick={() => setIsEditing(false)}>
@@ -122,7 +122,7 @@ export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patie
 
         <Card>
           <CardHeader>
-            <CardTitle>Protocol Activities</CardTitle>
+            <CardTitle>Treatment Activities</CardTitle>
           </CardHeader>
           <CardContent>
             <BlockEditor 
@@ -140,12 +140,12 @@ export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patie
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Protocol Templates</h1>
+          <h1 className="text-3xl font-bold">Treatment Templates</h1>
           <p className="text-muted-foreground">Create and manage reusable treatment protocols</p>
         </div>
         <Button className="flex items-center space-x-2" style={{backgroundColor: '#1c2f7f'}}>
           <Plus size={16} />
-          <span>Create Protocol</span>
+          <span>Create Treatment</span>
         </Button>
       </div>
 
@@ -154,11 +154,11 @@ export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patie
         <div className="col-span-5">
           <Card>
             <CardHeader>
-              <CardTitle>Protocol List</CardTitle>
+              <CardTitle>Treatment List</CardTitle>
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search protocols..."
+                  placeholder="Search treatments..."
                   className="pl-10"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -257,7 +257,7 @@ export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patie
             
             <CardContent className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold mb-3">Protocol Activities</h3>
+                <h3 className="text-lg font-semibold mb-3">Treatment Activities</h3>
                 <div className="space-y-3">
                   {/* Header Row */}
                   <div className="grid grid-cols-5 gap-4 text-sm font-medium text-muted-foreground bg-muted p-3 rounded">
