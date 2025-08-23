@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Link } from "lucide-react";
 import { CustomActivitySelect } from "./CustomActivitySelect";
+import { ManualFrequencyDialog } from "./ManualFrequencyDialog";
 
 interface BlockEvent {
   id: string;
@@ -25,7 +26,7 @@ interface BlockEditorProps {
 }
 
 const defaultActivityOptions = ["Exercise", "Consultation", "Physiotherapy", "Medication", "Diet", "Rest"];
-const defaultFrequencyOptions = ["Daily", "Twice Daily", "Weekly", "Twice Weekly", "As needed"];
+const defaultFrequencyOptions = ["Daily", "Weekly", "Alternate Days", "Alternate Weeks", "Choose Manually"];
 
 export function BlockEditor({ 
   events, 
@@ -33,6 +34,8 @@ export function BlockEditor({
   activityOptions = defaultActivityOptions,
   frequencyOptions = defaultFrequencyOptions
 }: BlockEditorProps) {
+  const [showManualFrequency, setShowManualFrequency] = useState(false);
+  const [editingEventIndex, setEditingEventIndex] = useState<number | null>(null);
   const addNewEvent = () => {
     const newEvent: BlockEvent = {
       id: Date.now().toString(),
@@ -61,6 +64,23 @@ export function BlockEditor({
     const videoUrl = prompt("Enter video URL:");
     if (videoUrl) {
       updateEvent(index, { videoUrl });
+    }
+  };
+
+  const handleFrequencyChange = (index: number, value: string) => {
+    if (value === "Choose Manually") {
+      setEditingEventIndex(index);
+      setShowManualFrequency(true);
+    } else {
+      updateEvent(index, { frequency: value });
+    }
+  };
+
+  const handleManualFrequencySave = (data: any) => {
+    if (editingEventIndex !== null) {
+      const frequencyText = `Manual: ${data.selectedDates.length} dates, every ${data.dayFrequency} ${data.timeUnit}`;
+      updateEvent(editingEventIndex, { frequency: frequencyText });
+      setEditingEventIndex(null);
     }
   };
 
@@ -105,7 +125,7 @@ export function BlockEditor({
               <div className="col-span-2">
                 <Select 
                   value={event.frequency} 
-                  onValueChange={(value) => updateEvent(index, { frequency: value })}
+                  onValueChange={(value) => handleFrequencyChange(index, value)}
                 >
                   <SelectTrigger className="h-9">
                     <SelectValue placeholder="Frequency" />
@@ -182,6 +202,13 @@ export function BlockEditor({
           </Button>
         </div>
       )}
+
+      {/* Manual Frequency Dialog */}
+      <ManualFrequencyDialog
+        open={showManualFrequency}
+        onOpenChange={setShowManualFrequency}
+        onSave={handleManualFrequencySave}
+      />
     </div>
   );
 }
