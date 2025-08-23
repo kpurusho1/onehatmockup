@@ -69,7 +69,13 @@ const protocols = [
   }
 ];
 
-export default function ProtocolTemplates() {
+interface ProtocolTemplatesProps {
+  onSelect?: (protocol: any) => void;
+  onCreateFromScratch?: () => void;
+  patientName?: string;
+}
+
+export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patientName }: ProtocolTemplatesProps = {}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProtocol, setSelectedProtocol] = useState(protocols[0]);
   const [isEditing, setIsEditing] = useState(false);
@@ -275,11 +281,11 @@ export default function ProtocolTemplates() {
               
               <div className="pt-4 border-t">
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => onSelect?.(selectedProtocol)}>
                     <Copy size={14} className="mr-1" />
-                    Create from Existing
+                    Use This Template
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => onCreateFromScratch?.()}>
                     <Plus size={14} className="mr-1" />
                     Create from Scratch
                   </Button>

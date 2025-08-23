@@ -5,6 +5,9 @@ import { PrescriptionTimeline } from "@/components/prescription/PrescriptionTime
 import { PrescriptionRow } from "@/components/prescription/PrescriptionRow";
 import { CreatePrescription } from "./CreatePrescription";
 import { AddPatientDialog } from "@/components/AddPatientDialog";
+import { FullScreenProtocolEditor } from "@/components/protocol/FullScreenProtocolEditor";
+import { EventBasedEditor } from "@/components/protocol/EventBasedEditor";
+import ProtocolTemplates from "./ProtocolTemplates";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -204,6 +207,11 @@ export default function PatientProtocols() {
   const [showProtocolBuilder, setShowProtocolBuilder] = useState(false);
   const [showCreateRx, setShowCreateRx] = useState(false);
   const [showAddPatient, setShowAddPatient] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [showFullScreenEditor, setShowFullScreenEditor] = useState(false);
+  const [showEventEditor, setShowEventEditor] = useState(false);
+  const [currentProtocol, setCurrentProtocol] = useState<any>(null);
+  const [editorMode, setEditorMode] = useState<"create" | "assign" | "instructions" | "plan">("create");
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -220,6 +228,43 @@ export default function PatientProtocols() {
     // In a real app, this would save to the backend
     console.log("Saving protocol:", protocol);
     setShowProtocolBuilder(false);
+    setShowFullScreenEditor(false);
+    setShowTemplateSelector(false);
+  };
+
+  const handleCreateTreatmentPlan = () => {
+    setShowTemplateSelector(true);
+  };
+
+  const handleTemplateSelect = (template: any) => {
+    setCurrentProtocol(template);
+    setEditorMode("assign");
+    setShowTemplateSelector(false);
+    setShowFullScreenEditor(true);
+  };
+
+  const handleCreateFromScratch = () => {
+    setCurrentProtocol(null);
+    setEditorMode("create");
+    setShowTemplateSelector(false);
+    setShowFullScreenEditor(true);
+  };
+
+  const handleUpdateInstructions = (protocol: any) => {
+    setCurrentProtocol(protocol);
+    setEditorMode("instructions");
+    setShowEventEditor(true);
+  };
+
+  const handleEditPlan = (protocol: any) => {
+    setCurrentProtocol(protocol);
+    setEditorMode("plan");
+    setShowEventEditor(true);
+  };
+
+  const handleEventEditorSave = (events: any[], newBlocks?: any[]) => {
+    console.log("Saving events:", events, "New blocks:", newBlocks);
+    setShowEventEditor(false);
   };
 
   if (showCreateRx) {
@@ -238,6 +283,73 @@ export default function PatientProtocols() {
         patientName={selectedPatient.name}
         onSave={handleSaveProtocol}
         onCancel={() => setShowProtocolBuilder(false)}
+      />
+    );
+  }
+
+  if (showTemplateSelector) {
+    return (
+      <ProtocolTemplates
+        onSelect={handleTemplateSelect}
+        onCreateFromScratch={handleCreateFromScratch}
+        patientName={selectedPatient.name}
+      />
+    );
+  }
+
+  if (showFullScreenEditor) {
+    return (
+      <FullScreenProtocolEditor
+        patientName={selectedPatient.name}
+        protocolName={currentProtocol?.name}
+        events={currentProtocol?.activities_list || currentProtocol?.events || []}
+        onSave={handleSaveProtocol}
+        onCancel={() => setShowFullScreenEditor(false)}
+        mode={editorMode as "create" | "assign"}
+      />
+    );
+  }
+
+  if (showEventEditor) {
+    // Mock scheduled events for demo
+    const mockScheduledEvents = [
+      {
+        id: "1",
+        activity: "Exercise",
+        instructions: "Morning jog for 30 minutes",
+        date: "2025-08-24",
+        time: "07:00",
+        completed: false,
+        videoUrl: ""
+      },
+      {
+        id: "2", 
+        activity: "Exercise",
+        instructions: "Evening walk for 20 minutes",
+        date: "2025-08-24",
+        time: "18:00",
+        completed: true,
+        videoUrl: ""
+      },
+      {
+        id: "3",
+        activity: "Physiotherapy",
+        instructions: "Knee strengthening exercises",
+        date: "2025-08-25",
+        time: "10:00",
+        completed: false,
+        videoUrl: "https://example.com/video"
+      }
+    ];
+
+    return (
+      <EventBasedEditor
+        patientName={selectedPatient.name}
+        protocolName={currentProtocol?.name || "Treatment Protocol"}
+        events={mockScheduledEvents}
+        onSave={handleEventEditorSave}
+        onCancel={() => setShowEventEditor(false)}
+        mode={editorMode as "instructions" | "plan"}
       />
     );
   }
@@ -410,7 +522,7 @@ export default function PatientProtocols() {
                         <Plus size={14} className="mr-2" />
                         Create Rx
                       </Button>
-                      <Button onClick={() => setShowProtocolBuilder(true)} size="sm" style={{backgroundColor: '#1c2f7f'}} className="hover:opacity-90">
+                      <Button onClick={handleCreateTreatmentPlan} size="sm" style={{backgroundColor: '#1c2f7f'}} className="hover:opacity-90">
                         <Plus size={14} className="mr-2" />
                         Create Treatment Plan
                       </Button>
@@ -447,7 +559,9 @@ export default function PatientProtocols() {
                 <TabsContent value="treatment-plan" className="space-y-4">
                   <TreatmentPlanTab 
                     patient={selectedPatient}
-                    onCreateProtocol={() => setShowProtocolBuilder(true)}
+                    onCreateProtocol={handleCreateTreatmentPlan}
+                    onUpdateInstructions={handleUpdateInstructions}
+                    onEditPlan={handleEditPlan}
                   />
                 </TabsContent>
                 

@@ -40,6 +40,8 @@ interface Patient {
 interface TreatmentPlanTabProps {
   patient: Patient;
   onCreateProtocol: () => void;
+  onUpdateInstructions?: (protocol: any) => void;
+  onEditPlan?: (protocol: any) => void;
 }
 
 // Mock treatment plan data - now supporting multiple protocols
@@ -186,7 +188,7 @@ const mockTreatmentPlans = [
   }
 ];
 
-export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTabProps) {
+export function TreatmentPlanTab({ patient, onCreateProtocol, onUpdateInstructions, onEditPlan }: TreatmentPlanTabProps) {
   const [treatmentPlans, setTreatmentPlans] = useState(mockTreatmentPlans);
   const [editingProtocol, setEditingProtocol] = useState<number | null>(null);
   const [editingEvent, setEditingEvent] = useState<string | null>(null);
@@ -396,37 +398,45 @@ export function TreatmentPlanTab({ patient, onCreateProtocol }: TreatmentPlanTab
                        </div>
                      </div>
                     
-                    <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingProtocol(isEditing ? null : protocol.id)}
-                      >
-                        <Settings size={14} className="mr-1" />
-                        {isEditing ? 'Done' : 'Edit'}
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <MoreVertical size={14} />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => console.log('Delete protocol', protocol.id)}>
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log('Override protocol', protocol.id)}>
-                            <RefreshCw className="mr-2 h-4 w-4" />
-                            Override
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log('Archive protocol', protocol.id)}>
-                            <FileText className="mr-2 h-4 w-4" />
-                            Archive
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                     <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+                       <Button
+                         variant="outline"
+                         size="sm"
+                         onClick={() => onUpdateInstructions?.(protocol)}
+                       >
+                         <Edit size={14} className="mr-1" />
+                         Update Instructions
+                       </Button>
+                       <Button
+                         variant="outline"
+                         size="sm"
+                         onClick={() => onEditPlan?.(protocol)}
+                       >
+                         <Settings size={14} className="mr-1" />
+                         Edit Plan
+                       </Button>
+                       <DropdownMenu>
+                         <DropdownMenuTrigger asChild>
+                           <Button variant="outline" size="sm">
+                             <MoreVertical size={14} />
+                           </Button>
+                         </DropdownMenuTrigger>
+                         <DropdownMenuContent>
+                           <DropdownMenuItem onClick={() => console.log('Delete protocol', protocol.id)}>
+                             <Trash2 className="mr-2 h-4 w-4" />
+                             Delete
+                           </DropdownMenuItem>
+                           <DropdownMenuItem onClick={() => console.log('Override protocol', protocol.id)}>
+                             <RefreshCw className="mr-2 h-4 w-4" />
+                             Override
+                           </DropdownMenuItem>
+                           <DropdownMenuItem onClick={() => console.log('Archive protocol', protocol.id)}>
+                             <FileText className="mr-2 h-4 w-4" />
+                             Archive
+                           </DropdownMenuItem>
+                         </DropdownMenuContent>
+                       </DropdownMenu>
+                     </div>
                   </div>
                 </div>
                 

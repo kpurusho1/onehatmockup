@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Link } from "lucide-react";
+import { CustomActivitySelect } from "./CustomActivitySelect";
 
 interface BlockEvent {
   id: string;
@@ -82,19 +83,11 @@ export function BlockEditor({
             <div className="grid grid-cols-11 gap-4 items-center">
               {/* Activity */}
               <div className="col-span-2">
-                <Select 
-                  value={event.activity} 
-                  onValueChange={(value) => updateEvent(index, { activity: value })}
-                >
-                  <SelectTrigger className="h-9">
-                    <SelectValue placeholder="Activity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {activityOptions.map((option) => (
-                      <SelectItem key={option} value={option}>{option}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <CustomActivitySelect
+                  value={event.activity}
+                  onChange={(value) => updateEvent(index, { activity: value })}
+                  activityOptions={activityOptions}
+                />
               </div>
 
               {/* Instructions */}
