@@ -4,8 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import VoiceHealthRecord from "./pages/VoiceHealthRecord";
-import PatientProtocols from "./pages/PatientProtocols";
-import ProtocolTemplates from "./pages/ProtocolTemplates";
+import PatientTreatmentPlans from "./pages/PatientTreatmentPlans";
+import TreatmentPlanTemplates from "./pages/TreatmentPlanTemplates";
 import Prescription from "./pages/Prescription";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
@@ -19,10 +19,10 @@ const App = () => (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/patient-protocols" replace />} />
+          <Route index element={<Navigate to="/patient-treatment-plans" replace />} />
           <Route path="voice-health" element={<VoiceHealthRecord />} />
-          <Route path="patient-protocols" element={<PatientProtocols />} />
-          <Route path="protocol-templates" element={<ProtocolTemplates />} />
+          <Route path="patient-treatment-plans" element={<PatientTreatmentPlans />} />
+          <Route path="treatment-plan-templates" element={<TreatmentPlanTemplates />} />
           <Route path="prescription" element={<Prescription />} />
           <Route path="profile" element={<Profile />} />
         </Route>

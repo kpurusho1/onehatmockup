@@ -7,7 +7,7 @@ import { CreatePrescription } from "./CreatePrescription";
 import { AddPatientDialog } from "@/components/AddPatientDialog";
 import { FullScreenProtocolEditor } from "@/components/protocol/FullScreenProtocolEditor";
 import { EventBasedEditor } from "@/components/protocol/EventBasedEditor";
-import ProtocolTemplates from "./ProtocolTemplates";
+import TreatmentPlanTemplates from "./TreatmentPlanTemplates";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -201,7 +201,7 @@ const patients = [
   }
 ];
 
-export default function PatientProtocols() {
+export default function PatientTreatmentPlans() {
   const [selectedPatient, setSelectedPatient] = useState(patients[0]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showProtocolBuilder, setShowProtocolBuilder] = useState(false);
@@ -289,7 +289,7 @@ export default function PatientProtocols() {
 
   if (showTemplateSelector) {
     return (
-      <ProtocolTemplates
+      <TreatmentPlanTemplates
         onSelect={handleTemplateSelect}
         onCreateFromScratch={handleCreateFromScratch}
         patientName={selectedPatient.name}
@@ -301,7 +301,7 @@ export default function PatientProtocols() {
     return (
       <FullScreenProtocolEditor
         patientName={selectedPatient.name}
-        protocolName={currentProtocol?.name}
+        treatmentPlanName={currentProtocol?.name}
         events={currentProtocol?.activities_list || currentProtocol?.events || []}
         onSave={handleSaveProtocol}
         onCancel={() => setShowFullScreenEditor(false)}
@@ -345,7 +345,7 @@ export default function PatientProtocols() {
     return (
       <EventBasedEditor
         patientName={selectedPatient.name}
-        protocolName={currentProtocol?.name || "Treatment Protocol"}
+        treatmentPlanName={currentProtocol?.name || "Treatment Plan"}
         events={mockScheduledEvents}
         onSave={handleEventEditorSave}
         onCancel={() => setShowEventEditor(false)}
