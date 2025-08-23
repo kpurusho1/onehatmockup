@@ -18,7 +18,7 @@ import doctorConsultation from "@/assets/doctor-consultation.jpg";
 import physiotherapy from "@/assets/physiotherapy.jpg";
 import medicalEquipment from "@/assets/medical-equipment.jpg";
 
-const treatmentPlans = [
+const protocols = [
   {
     id: 1,
     name: "Knee Surgery Recovery",
@@ -69,30 +69,30 @@ const treatmentPlans = [
   }
 ];
 
-interface TreatmentPlanTemplatesProps {
-  onSelect?: (treatmentPlan: any) => void;
+interface ProtocolTemplatesProps {
+  onSelect?: (protocol: any) => void;
   onCreateFromScratch?: () => void;
   patientName?: string;
 }
 
-export default function TreatmentPlanTemplates({ onSelect, onCreateFromScratch, patientName }: TreatmentPlanTemplatesProps = {}) {
+export default function ProtocolTemplates({ onSelect, onCreateFromScratch, patientName }: ProtocolTemplatesProps = {}) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedTreatmentPlan, setSelectedTreatmentPlan] = useState(treatmentPlans[0]);
+  const [selectedProtocol, setSelectedProtocol] = useState(protocols[0]);
   const [isEditing, setIsEditing] = useState(false);
-  const [events, setEvents] = useState(selectedTreatmentPlan.activities_list);
+  const [events, setEvents] = useState(selectedProtocol.activities_list);
 
-  const filteredTreatmentPlans = treatmentPlans.filter(treatmentPlan =>
-    treatmentPlan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    treatmentPlan.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProtocols = protocols.filter(protocol =>
+    protocol.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    protocol.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleEditTreatmentPlan = () => {
-    setEvents(selectedTreatmentPlan.activities_list);
+  const handleEditProtocol = () => {
+    setEvents(selectedProtocol.activities_list);
     setIsEditing(true);
   };
 
   const handleSaveChanges = () => {
-    // Update treatment plan with new events
+    // Update protocol with new events
     setIsEditing(false);
   };
 
@@ -101,8 +101,8 @@ export default function TreatmentPlanTemplates({ onSelect, onCreateFromScratch, 
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Edit Treatment Plan: {selectedTreatmentPlan.name}</h1>
-            <p className="text-muted-foreground">Edit the treatment plan template activities</p>
+            <h1 className="text-3xl font-bold">Edit Protocol: {selectedProtocol.name}</h1>
+            <p className="text-muted-foreground">Edit the protocol template activities</p>
           </div>
           <div className="flex space-x-2">
             <Button variant="outline" onClick={() => setIsEditing(false)}>
@@ -134,8 +134,8 @@ export default function TreatmentPlanTemplates({ onSelect, onCreateFromScratch, 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Treatment Plan Templates</h1>
-          <p className="text-muted-foreground">Create and manage reusable treatment plans</p>
+          <h1 className="text-3xl font-bold">Protocol Templates</h1>
+          <p className="text-muted-foreground">Create and manage reusable treatment protocols</p>
         </div>
         <Button className="flex items-center space-x-2" style={{backgroundColor: '#1c2f7f'}}>
           <Plus size={16} />
@@ -161,21 +161,21 @@ export default function TreatmentPlanTemplates({ onSelect, onCreateFromScratch, 
             </CardHeader>
             <CardContent className="p-0">
               <div className="space-y-2">
-                {filteredTreatmentPlans.map((treatmentPlan) => (
+                {filteredProtocols.map((protocol) => (
                   <div
-                    key={treatmentPlan.id}
+                    key={protocol.id}
                     className={`p-4 cursor-pointer transition-colors border-l-4 ${
-                      selectedTreatmentPlan.id === treatmentPlan.id
+                      selectedProtocol.id === protocol.id
                         ? "bg-primary/10 border-l-primary"
                         : "hover:bg-muted border-l-transparent"
                     }`}
-                    onClick={() => setSelectedTreatmentPlan(treatmentPlan)}
+                    onClick={() => setSelectedProtocol(protocol)}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
-                        <h3 className="font-medium mb-1">{treatmentPlan.name}</h3>
+                        <h3 className="font-medium mb-1">{protocol.name}</h3>
                         <p className="text-sm text-muted-foreground line-clamp-2">
-                          {treatmentPlan.description}
+                          {protocol.description}
                         </p>
                       </div>
                     </div>
@@ -184,15 +184,15 @@ export default function TreatmentPlanTemplates({ onSelect, onCreateFromScratch, 
                       <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                         <div className="flex items-center space-x-1">
                           <Activity size={12} />
-                          <span>{treatmentPlan.activities} activities</span>
+                          <span>{protocol.activities} activities</span>
                         </div>
                         <div className="flex items-center space-x-1">
                           <Clock size={12} />
-                          <span>{treatmentPlan.duration}</span>
+                          <span>{protocol.duration}</span>
                         </div>
                       </div>
                       <Badge variant="outline" className="text-xs">
-                        {treatmentPlan.createdBy}
+                        {protocol.createdBy}
                       </Badge>
                     </div>
                   </div>
@@ -209,35 +209,35 @@ export default function TreatmentPlanTemplates({ onSelect, onCreateFromScratch, 
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
-                    <h2 className="text-xl font-bold">{selectedTreatmentPlan.name}</h2>
-                    <Badge variant="secondary">{selectedTreatmentPlan.duration}</Badge>
+                    <h2 className="text-xl font-bold">{selectedProtocol.name}</h2>
+                    <Badge variant="secondary">{selectedProtocol.duration}</Badge>
                   </div>
                   <p className="text-muted-foreground mb-4">
-                    {selectedTreatmentPlan.description}
+                    {selectedProtocol.description}
                   </p>
                   
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="font-medium">Created By</p>
-                      <p className="text-muted-foreground">{selectedTreatmentPlan.createdBy}</p>
+                      <p className="text-muted-foreground">{selectedProtocol.createdBy}</p>
                     </div>
                     <div>
                       <p className="font-medium">Created On</p>
-                      <p className="text-muted-foreground">{selectedTreatmentPlan.createdOn}</p>
+                      <p className="text-muted-foreground">{selectedProtocol.createdOn}</p>
                     </div>
                     <div>
                       <p className="font-medium">Last Updated</p>
-                      <p className="text-muted-foreground">{selectedTreatmentPlan.updatedOn}</p>
+                      <p className="text-muted-foreground">{selectedProtocol.updatedOn}</p>
                     </div>
                     <div>
                       <p className="font-medium">Total Activities</p>
-                      <p className="text-muted-foreground">{selectedTreatmentPlan.activities}</p>
+                      <p className="text-muted-foreground">{selectedProtocol.activities}</p>
                     </div>
                   </div>
                 </div>
                 
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" onClick={handleEditTreatmentPlan}>
+                  <Button variant="outline" size="sm" onClick={handleEditProtocol}>
                     <Edit size={14} className="mr-1" />
                     Edit
                   </Button>
@@ -251,7 +251,7 @@ export default function TreatmentPlanTemplates({ onSelect, onCreateFromScratch, 
             
             <CardContent className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold mb-3">Treatment Plan Activities</h3>
+                <h3 className="text-lg font-semibold mb-3">Protocol Activities</h3>
                 <div className="space-y-3">
                   {/* Header Row */}
                   <div className="grid grid-cols-5 gap-4 text-sm font-medium text-muted-foreground bg-muted p-3 rounded">
@@ -263,7 +263,7 @@ export default function TreatmentPlanTemplates({ onSelect, onCreateFromScratch, 
                   </div>
                   
                   {/* Activity Rows */}
-                  {selectedTreatmentPlan.activities_list.map((event, index) => (
+                  {selectedProtocol.activities_list.map((event, index) => (
                     <div key={event.id} className="grid grid-cols-5 gap-4 text-sm p-3 border rounded bg-background">
                       <div className="flex items-center">
                         <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
@@ -282,7 +282,7 @@ export default function TreatmentPlanTemplates({ onSelect, onCreateFromScratch, 
               <div className="pt-4 border-t">
                 <div className="flex space-x-3">
                   <Button 
-                    onClick={() => onSelect?.(selectedTreatmentPlan)}
+                    onClick={() => onSelect?.(selectedProtocol)}
                     className="flex-1 h-12 text-base font-semibold"
                     size="lg"
                   >

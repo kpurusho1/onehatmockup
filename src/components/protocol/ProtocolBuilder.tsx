@@ -18,7 +18,7 @@ import {
 import { BlockEditor } from "./BlockEditor";
 import { TemplateSelector } from "./TemplateSelector";
 
-interface TreatmentPlanEvent {
+interface ProtocolEvent {
   id: string;
   activity: string;
   instructions: string;
@@ -27,11 +27,11 @@ interface TreatmentPlanEvent {
   videoUrl?: string;
 }
 
-interface TreatmentPlanBuilderProps {
+interface ProtocolBuilderProps {
   patientName: string;
-  onSave: (treatmentPlan: any) => void;
+  onSave: (protocol: any) => void;
   onCancel: () => void;
-  initialTreatmentPlan?: any;
+  initialProtocol?: any;
 }
 
 const activityOptions = [
@@ -54,10 +54,10 @@ const subActivityOptions = {
 
 const frequencyOptions = ["Daily", "Twice Daily", "Weekly", "Twice Weekly", "Choose manually", "As needed"];
 
-export function TreatmentPlanBuilder({ patientName, onSave, onCancel, initialTreatmentPlan }: TreatmentPlanBuilderProps) {
-  const [treatmentPlanName, setTreatmentPlanName] = useState(initialTreatmentPlan?.name || "");
-  const [events, setEvents] = useState<TreatmentPlanEvent[]>(
-    initialTreatmentPlan?.events?.map((event: any) => ({
+export function ProtocolBuilder({ patientName, onSave, onCancel, initialProtocol }: ProtocolBuilderProps) {
+  const [protocolName, setProtocolName] = useState(initialProtocol?.name || "");
+  const [events, setEvents] = useState<ProtocolEvent[]>(
+    initialProtocol?.events?.map((event: any) => ({
       id: event.id || Date.now().toString(),
       activity: event.activity || "",
       instructions: event.instructions || event.description || "",
@@ -69,7 +69,7 @@ export function TreatmentPlanBuilder({ patientName, onSave, onCancel, initialTre
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
   const handleTemplateSelect = (template: any) => {
-    setTreatmentPlanName(template.name);
+    setProtocolName(template.name);
     setEvents(template.events?.map((event: any) => ({
       id: event.id || Date.now().toString(),
       activity: event.activity || "",
@@ -82,13 +82,13 @@ export function TreatmentPlanBuilder({ patientName, onSave, onCancel, initialTre
   };
 
   const handleSave = () => {
-    const treatmentPlan = {
-      name: treatmentPlanName,
+    const protocol = {
+      name: protocolName,
       events,
       patientName,
       createdAt: new Date().toISOString()
     };
-    onSave(treatmentPlan);
+    onSave(protocol);
   };
 
   if (showTemplateSelector) {
@@ -111,54 +111,54 @@ export function TreatmentPlanBuilder({ patientName, onSave, onCancel, initialTre
           </Button>
           <div>
             <h2 className="text-2xl font-bold">
-              {initialTreatmentPlan ? "Edit Treatment Plan" : "Create Treatment Plan"}
+              {initialProtocol ? "Edit Protocol" : "Create Protocol"}
             </h2>
             <p className="text-muted-foreground">Patient: {patientName}</p>
           </div>
         </div>
         <div className="flex space-x-2">
-          {!initialTreatmentPlan && (
+          {!initialProtocol && (
             <Button variant="outline" onClick={() => setShowTemplateSelector(true)}>
               Choose from Template
             </Button>
           )}
-          <Button onClick={handleSave} disabled={!treatmentPlanName || events.length === 0}>
+          <Button onClick={handleSave} disabled={!protocolName || events.length === 0}>
             <Save size={16} className="mr-2" />
-            Save Treatment Plan
+            Save Protocol
           </Button>
         </div>
       </div>
 
-      {/* Treatment Plan Details */}
+      {/* Protocol Details */}
       <Card>
         <CardHeader>
-          <CardTitle>Treatment Plan Details</CardTitle>
+          <CardTitle>Protocol Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="treatmentPlanName">Treatment Plan Name *</Label>
+            <Label htmlFor="protocolName">Protocol Name *</Label>
             <Input
-              id="treatmentPlanName"
-              value={treatmentPlanName}
-              onChange={(e) => setTreatmentPlanName(e.target.value)}
-              placeholder="e.g., Knee Surgery Recovery Treatment Plan"
+              id="protocolName"
+              value={protocolName}
+              onChange={(e) => setProtocolName(e.target.value)}
+              placeholder="e.g., Knee Surgery Recovery Protocol"
             />
           </div>
           <div>
-            <Label htmlFor="treatmentPlanInstructions">Treatment Plan Instructions</Label>
+            <Label htmlFor="protocolInstructions">Protocol Instructions</Label>
             <Textarea
-              id="treatmentPlanInstructions"
-              placeholder="General instructions and guidelines for this treatment plan..."
+              id="protocolInstructions"
+              placeholder="General instructions and guidelines for this protocol..."
               className="min-h-20"
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Treatment Plan Events */}
+      {/* Protocol Events */}
       <Card>
         <CardHeader>
-          <CardTitle>Treatment Plan Events</CardTitle>
+          <CardTitle>Protocol Events</CardTitle>
         </CardHeader>
         <CardContent>
           <BlockEditor
@@ -172,6 +172,3 @@ export function TreatmentPlanBuilder({ patientName, onSave, onCancel, initialTre
     </div>
   );
 }
-
-// Export both old and new names for compatibility
-export const ProtocolBuilder = TreatmentPlanBuilder;

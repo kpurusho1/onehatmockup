@@ -39,16 +39,16 @@ interface Patient {
 
 interface TreatmentPlanTabProps {
   patient: Patient;
-  onCreateTreatmentPlan: () => void;
-  onUpdateInstructions?: (treatmentPlan: any) => void;
-  onEditPlan?: (treatmentPlan: any) => void;
+  onCreateProtocol: () => void;
+  onUpdateInstructions?: (protocol: any) => void;
+  onEditPlan?: (protocol: any) => void;
 }
 
 // Mock treatment plan data - now supporting multiple protocols
 const mockTreatmentPlans = [
   {
     id: 1,
-    name: "Knee Surgery Recovery Treatment Plan",
+    name: "Knee Surgery Recovery Protocol",
     startDate: "2025-08-15",
     endDate: "2025-10-15",
     progress: 65,
@@ -126,7 +126,7 @@ const mockTreatmentPlans = [
   },
   {
     id: 2,
-    name: "Post-Surgery Mobility Treatment Plan",
+    name: "Post-Surgery Mobility Protocol",
     startDate: "2025-08-20",
     endDate: "2025-09-20",
     progress: 25,
@@ -188,7 +188,7 @@ const mockTreatmentPlans = [
   }
 ];
 
-export function TreatmentPlanTab({ patient, onCreateTreatmentPlan, onUpdateInstructions, onEditPlan }: TreatmentPlanTabProps) {
+export function TreatmentPlanTab({ patient, onCreateProtocol, onUpdateInstructions, onEditPlan }: TreatmentPlanTabProps) {
   const [treatmentPlans, setTreatmentPlans] = useState(mockTreatmentPlans);
   const [editingProtocol, setEditingProtocol] = useState<number | null>(null);
   const [editingEvent, setEditingEvent] = useState<string | null>(null);
@@ -214,20 +214,20 @@ export function TreatmentPlanTab({ patient, onCreateTreatmentPlan, onUpdateInstr
     );
   };
 
-  const addNewTreatmentPlan = () => {
-    onCreateTreatmentPlan();
+  const addNewProtocol = () => {
+    onCreateProtocol();
   };
 
   const handleTemplateSelect = (template: any) => {
     // Create new protocol from template
     console.log("Creating protocol from template:", template);
-    onCreateTreatmentPlan();
+    onCreateProtocol();
   };
 
   const handleCreateFromScratch = () => {
-    // Create empty treatment plan
-    console.log("Creating treatment plan from scratch");
-    onCreateTreatmentPlan();
+    // Create empty protocol
+    console.log("Creating protocol from scratch");
+    onCreateProtocol();
   };
 
   const addNewActivity = (protocolId: number) => {
@@ -313,7 +313,7 @@ export function TreatmentPlanTab({ patient, onCreateTreatmentPlan, onUpdateInstr
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Treatment Plans</h3>
+          <h3 className="text-lg font-semibold">Treatment Protocols</h3>
           <TemplateDropdown 
             onSelectTemplate={handleTemplateSelect}
             onCreateFromScratch={handleCreateFromScratch}
@@ -323,12 +323,12 @@ export function TreatmentPlanTab({ patient, onCreateTreatmentPlan, onUpdateInstr
         <div className="flex items-center justify-center min-h-[400px]">
           <Card className="p-8 text-center max-w-md">
             <Calendar className="mx-auto h-16 w-16 text-muted-foreground mb-6" />
-            <h4 className="text-xl font-medium mb-3">No treatment plans assigned</h4>
+            <h4 className="text-xl font-medium mb-3">No treatment protocols assigned</h4>
             <p className="text-muted-foreground mb-6">
-              Create a personalized treatment plan to track {patient.name}'s recovery progress
+              Create a personalized treatment protocol to track {patient.name}'s recovery progress
             </p>
             <Button 
-              onClick={() => onCreateTreatmentPlan()}
+              onClick={() => onCreateProtocol()} 
               className="w-full" 
               style={{backgroundColor: '#1c2f7f'}}
             >
@@ -344,7 +344,7 @@ export function TreatmentPlanTab({ patient, onCreateTreatmentPlan, onUpdateInstr
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Treatment Plans ({treatmentPlans.length})</h3>
+        <h3 className="text-lg font-semibold">Treatment Protocols ({treatmentPlans.length})</h3>
       </div>
 
       {/* Protocols List */}

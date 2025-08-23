@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Save } from "lucide-react";
 import { BlockEditor } from "./BlockEditor";
 
-interface TreatmentPlanEvent {
+interface ProtocolEvent {
   id: string;
   activity: string;
   instructions: string;
@@ -16,36 +16,36 @@ interface TreatmentPlanEvent {
   videoUrl?: string;
 }
 
-interface FullScreenTreatmentPlanEditorProps {
+interface FullScreenProtocolEditorProps {
   patientName: string;
-  treatmentPlanName?: string;
-  events?: TreatmentPlanEvent[];
-  onSave: (treatmentPlan: any) => void;
+  protocolName?: string;
+  events?: ProtocolEvent[];
+  onSave: (protocol: any) => void;
   onCancel: () => void;
   mode: "create" | "assign";
 }
 
-export function FullScreenTreatmentPlanEditor({ 
+export function FullScreenProtocolEditor({ 
   patientName, 
-  treatmentPlanName: initialTreatmentPlanName = "",
+  protocolName: initialProtocolName = "",
   events: initialEvents = [],
   onSave, 
   onCancel,
   mode 
-}: FullScreenTreatmentPlanEditorProps) {
-  const [treatmentPlanName, setTreatmentPlanName] = useState(initialTreatmentPlanName);
-  const [events, setEvents] = useState<TreatmentPlanEvent[]>(initialEvents);
-  const [treatmentPlanInstructions, setTreatmentPlanInstructions] = useState("");
+}: FullScreenProtocolEditorProps) {
+  const [protocolName, setProtocolName] = useState(initialProtocolName);
+  const [events, setEvents] = useState<ProtocolEvent[]>(initialEvents);
+  const [protocolInstructions, setProtocolInstructions] = useState("");
 
   const handleSave = () => {
-    const treatmentPlan = {
-      name: treatmentPlanName,
+    const protocol = {
+      name: protocolName,
       events,
-      instructions: treatmentPlanInstructions,
+      instructions: protocolInstructions,
       patientName,
       createdAt: new Date().toISOString()
     };
-    onSave(treatmentPlan);
+    onSave(protocol);
   };
 
   return (
@@ -67,46 +67,46 @@ export function FullScreenTreatmentPlanEditor({
           </div>
           <Button 
             onClick={handleSave} 
-            disabled={!treatmentPlanName || events.length === 0}
+            disabled={!protocolName || events.length === 0}
             className="min-w-[120px]"
           >
             <Save size={16} className="mr-2" />
-            {mode === "create" ? "Save Treatment Plan" : "Assign Treatment Plan"}
+            {mode === "create" ? "Save Protocol" : "Assign Protocol"}
           </Button>
         </div>
 
-        {/* Treatment Plan Details */}
+        {/* Protocol Details */}
         <Card>
           <CardHeader>
-            <CardTitle>Treatment Plan Details</CardTitle>
+            <CardTitle>Protocol Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="treatmentPlanName">Treatment Plan Name *</Label>
+              <Label htmlFor="protocolName">Protocol Name *</Label>
               <Input
-                id="treatmentPlanName"
-                value={treatmentPlanName}
-                onChange={(e) => setTreatmentPlanName(e.target.value)}
-                placeholder="e.g., Knee Surgery Recovery Treatment Plan"
+                id="protocolName"
+                value={protocolName}
+                onChange={(e) => setProtocolName(e.target.value)}
+                placeholder="e.g., Knee Surgery Recovery Protocol"
               />
             </div>
             <div>
-              <Label htmlFor="treatmentPlanInstructions">General Instructions</Label>
+              <Label htmlFor="protocolInstructions">General Instructions</Label>
               <Textarea
-                id="treatmentPlanInstructions"
-                value={treatmentPlanInstructions}
-                onChange={(e) => setTreatmentPlanInstructions(e.target.value)}
-                placeholder="General instructions and guidelines for this treatment plan..."
+                id="protocolInstructions"
+                value={protocolInstructions}
+                onChange={(e) => setProtocolInstructions(e.target.value)}
+                placeholder="General instructions and guidelines for this protocol..."
                 className="min-h-20"
               />
             </div>
           </CardContent>
         </Card>
 
-        {/* Treatment Plan Events */}
+        {/* Protocol Events */}
         <Card>
           <CardHeader>
-            <CardTitle>Treatment Plan Activities</CardTitle>
+            <CardTitle>Protocol Activities</CardTitle>
           </CardHeader>
           <CardContent>
             <BlockEditor
@@ -119,6 +119,3 @@ export function FullScreenTreatmentPlanEditor({
     </div>
   );
 }
-
-// Export both old and new names for compatibility
-export const FullScreenProtocolEditor = FullScreenTreatmentPlanEditor;

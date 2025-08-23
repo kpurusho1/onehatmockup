@@ -19,16 +19,16 @@ const sidebarItems = [
     path: "/voice-health",
   },
   {
-    id: "patient-treatment-plans",
+    id: "patient-protocols",
     label: "Patient Management",
     icon: Users,
-    path: "/patient-treatment-plans",
+    path: "/patient-protocols",
   },
   {
-    id: "treatment-plan-templates",
-    label: "Treatment Plan Templates",
+    id: "protocol-templates",
+    label: "Protocol Templates",
     icon: FileText,
-    path: "/treatment-plan-templates",
+    path: "/protocol-templates",
   },
   {
     id: "prescription",

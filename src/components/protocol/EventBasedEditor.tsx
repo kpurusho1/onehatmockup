@@ -20,7 +20,7 @@ interface ScheduledEvent {
 
 interface EventBasedEditorProps {
   patientName: string;
-  treatmentPlanName: string;
+  protocolName: string;
   events: ScheduledEvent[];
   onSave: (events: ScheduledEvent[], newBlocks?: any[]) => void;
   onCancel: () => void;
@@ -29,7 +29,7 @@ interface EventBasedEditorProps {
 
 export function EventBasedEditor({ 
   patientName, 
-  treatmentPlanName,
+  protocolName,
   events: initialEvents,
   onSave, 
   onCancel,
@@ -147,7 +147,7 @@ export function EventBasedEditor({
                 {mode === "instructions" ? "Update Instructions" : "Edit Treatment Plan"}
               </h1>
               <p className="text-muted-foreground">
-                {treatmentPlanName} - Patient: <span className="font-medium text-primary">{patientName}</span>
+                {protocolName} - Patient: <span className="font-medium text-primary">{patientName}</span>
               </p>
             </div>
           </div>
