@@ -24,6 +24,7 @@ import {
 import { ScheduleView } from "./ScheduleView";
 import { BlockEditor } from "./BlockEditor";
 import { TemplateDropdown } from "./TemplateDropdown";
+import { ProtocolStartDateDialog } from "./ProtocolStartDateDialog";
 
 interface Patient {
   id: number;
@@ -193,6 +194,8 @@ export function TreatmentPlanTab({ patient, onCreateProtocol, onUpdateInstructio
   const [editingProtocol, setEditingProtocol] = useState<number | null>(null);
   const [editingEvent, setEditingEvent] = useState<string | null>(null);
   const [openProtocols, setOpenProtocols] = useState<number[]>([1]); // First protocol open by default
+  const [showStartDateDialog, setShowStartDateDialog] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const hasProtocols = patient.adherence > 30; // Mock condition - adjusted to show protocols
 
   const activityOptions = ["Exercise", "Consultation", "Physiotherapy", "Medication", "Diet", "Rest"];
@@ -219,9 +222,31 @@ export function TreatmentPlanTab({ patient, onCreateProtocol, onUpdateInstructio
   };
 
   const handleTemplateSelect = (template: any) => {
-    // Create new protocol from template
-    console.log("Creating protocol from template:", template);
-    onCreateProtocol();
+    // Store template and show start date dialog
+    setSelectedTemplate(template);
+    setShowStartDateDialog(true);
+  };
+
+  const handleStartDateConfirm = (startDay: number) => {
+    if (selectedTemplate) {
+      // Create protocol with start day configuration
+      console.log("Creating protocol from template:", selectedTemplate, "starting from day:", startDay);
+      
+      // Adjust durations based on start day
+      const adjustedTemplate = {
+        ...selectedTemplate,
+        startDay,
+        // You can add logic here to adjust durations based on start day
+        events: selectedTemplate.events?.map((event: any) => ({
+          ...event,
+          // Adjust duration if needed based on start day
+          duration: startDay > 0 ? (parseInt(event.duration) + startDay).toString() : event.duration
+        }))
+      };
+      
+      onCreateProtocol();
+      setSelectedTemplate(null);
+    }
   };
 
   const handleCreateFromScratch = () => {
@@ -555,6 +580,14 @@ export function TreatmentPlanTab({ patient, onCreateProtocol, onUpdateInstructio
           );
         })}
       </div>
+
+      {/* Protocol Start Date Dialog */}
+      <ProtocolStartDateDialog
+        open={showStartDateDialog}
+        onOpenChange={setShowStartDateDialog}
+        onConfirm={handleStartDateConfirm}
+        templateName={selectedTemplate?.name || ""}
+      />
     </div>
   );
 }
