@@ -96,6 +96,41 @@ export function EventBasedEditor({
     return colors[activity as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200";
   };
 
+  // Convert events to blocks for instructions editing
+  const convertEventsToBlocks = () => {
+    const blockMap = new Map();
+    events.forEach(event => {
+      const key = `${event.activity}-${event.instructions}`;
+      if (!blockMap.has(key)) {
+        blockMap.set(key, {
+          id: `block-${Date.now()}-${Math.random()}`,
+          activity: event.activity,
+          instructions: event.instructions,
+          frequency: "N/A", // Not editable in instructions mode
+          duration: 0, // Not editable in instructions mode
+          videoUrl: event.videoUrl,
+          eventIds: []
+        });
+      }
+      blockMap.get(key).eventIds.push(event.id);
+    });
+    return Array.from(blockMap.values());
+  };
+
+  const handleBlockUpdate = (blockIndex: number, updates: any) => {
+    const blocks = convertEventsToBlocks();
+    const block = blocks[blockIndex];
+    
+    // Update all events that belong to this block
+    const updatedEvents = events.map(event => {
+      if (block.eventIds.includes(event.id)) {
+        return { ...event, ...updates };
+      }
+      return event;
+    });
+    setEvents(updatedEvents);
+  };
+
   return (
     <div className="fixed inset-0 bg-background z-50 overflow-auto">
       <div className="min-h-screen p-6 space-y-6">
@@ -150,86 +185,196 @@ export function EventBasedEditor({
           </Card>
         )}
 
-        {/* Events List */}
-        <div className="space-y-6">
-          {Object.entries(groupedEvents).map(([activity, activityEvents]) => (
-            <Card key={activity}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Badge className={`px-3 py-1 rounded-full border ${getActivityColor(activity)}`}>
-                      {activity}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {activityEvents.length} events
-                    </span>
-                  </div>
-                  {mode === "plan" && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleSelectAllForActivity(activity)}
-                    >
-                      {activityEvents.every(e => selectedEvents.includes(e.id)) ? 'Deselect All' : 'Select All'}
-                    </Button>
-                  )}
+        {/* Instructions Mode - Block-wise editing */}
+        {mode === "instructions" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Update Instructions</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Edit instructions and video links for each activity block
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Header */}
+                <div className="grid grid-cols-11 gap-4 px-4 py-2 text-sm font-medium text-muted-foreground border-b">
+                  <div className="col-span-2">Activity</div>
+                  <div className="col-span-4">Instructions</div>
+                  <div className="col-span-2">Frequency</div>
+                  <div className="col-span-1">Duration</div>
+                  <div className="col-span-1">Video</div>
+                  <div className="col-span-1">Events</div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {activityEvents.map((event) => (
-                    <div key={event.id} className="border rounded-lg p-4">
-                      <div className="flex items-start space-x-3">
-                        {mode === "plan" && (
-                          <Checkbox
-                            checked={selectedEvents.includes(event.id)}
-                            onCheckedChange={(checked) => handleEventSelect(event.id, !!checked)}
-                            className="mt-1"
+
+                {/* Blocks */}
+                <div className="space-y-2">
+                  {convertEventsToBlocks().map((block, index) => (
+                    <Card key={block.id} className="p-4">
+                      <div className="grid grid-cols-11 gap-4 items-center">
+                        {/* Activity - Disabled */}
+                        <div className="col-span-2">
+                          <Badge className={`px-3 py-1 rounded-full border ${getActivityColor(block.activity)}`}>
+                            {block.activity}
+                          </Badge>
+                        </div>
+
+                        {/* Instructions - Editable */}
+                        <div className="col-span-4">
+                          <Textarea
+                            value={block.instructions}
+                            onChange={(e) => handleBlockUpdate(index, { instructions: e.target.value })}
+                            placeholder="Enter instructions for this activity..."
+                            className="min-h-[36px] resize-none"
+                            rows={1}
                           />
-                        )}
-                        <div className="flex-1 space-y-3">
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                              <Calendar size={14} />
-                              <span>{event.date}</span>
-                              <span>{event.time}</span>
-                            </div>
-                            {event.completed && (
-                              <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                Completed
-                              </Badge>
-                            )}
-                          </div>
-                          
-                          <div>
-                            <label className="text-sm font-medium">Instructions</label>
-                            <Textarea
-                              value={event.instructions}
-                              onChange={(e) => handleUpdateEvent(event.id, { instructions: e.target.value })}
-                              className="mt-1"
-                              disabled={mode === "plan"}
-                            />
-                          </div>
-                          
-                          <div>
-                            <label className="text-sm font-medium">Video URL</label>
-                            <Input
-                              value={event.videoUrl || ""}
-                              onChange={(e) => handleUpdateEvent(event.id, { videoUrl: e.target.value })}
-                              placeholder="Enter video URL..."
-                              className="mt-1"
-                              disabled={mode === "plan"}
-                            />
+                        </div>
+
+                        {/* Frequency - Disabled */}
+                        <div className="col-span-2">
+                          <div className="px-3 py-2 bg-muted rounded text-sm text-muted-foreground">
+                            {block.frequency}
                           </div>
                         </div>
+
+                        {/* Duration - Disabled */}
+                        <div className="col-span-1">
+                          <div className="px-3 py-2 bg-muted rounded text-sm text-muted-foreground text-center">
+                            -
+                          </div>
+                        </div>
+
+                        {/* Video Link - Editable */}
+                        <div className="col-span-1">
+                          <Input
+                            value={block.videoUrl || ""}
+                            onChange={(e) => handleBlockUpdate(index, { videoUrl: e.target.value })}
+                            placeholder="Video URL"
+                            className="h-9"
+                          />
+                        </div>
+
+                        {/* Event Count */}
+                        <div className="col-span-1 text-center">
+                          <Badge variant="secondary" className="text-xs">
+                            {block.eventIds.length}
+                          </Badge>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Plan Mode - Event-wise editing */}
+        {mode === "plan" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Edit Treatment Plan Events</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Select and manage individual events. You can delete selected events or add new activity blocks.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Header Row */}
+                <div className="grid grid-cols-8 gap-4 text-sm font-medium text-muted-foreground bg-muted p-3 rounded">
+                  <div className="flex items-center">
+                    <Checkbox
+                      checked={selectedEvents.length === events.length && events.length > 0}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedEvents(events.map(e => e.id));
+                        } else {
+                          setSelectedEvents([]);
+                        }
+                      }}
+                    />
+                  </div>
+                  <div>Activity</div>
+                  <div className="col-span-2">Instructions</div>
+                  <div>Date</div>
+                  <div>Time</div>
+                  <div>Status</div>
+                  <div>Video</div>
+                </div>
+                
+                {/* Event Rows */}
+                <div className="space-y-2">
+                  {events.map((event) => (
+                    <div key={event.id} className="grid grid-cols-8 gap-4 text-sm p-3 border rounded bg-background items-center">
+                      <div className="flex items-center">
+                        <Checkbox
+                          checked={selectedEvents.includes(event.id)}
+                          onCheckedChange={(checked) => handleEventSelect(event.id, !!checked)}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Badge className={`px-2 py-1 rounded-full border text-xs ${getActivityColor(event.activity)}`}>
+                          {event.activity}
+                        </Badge>
+                      </div>
+                      
+                      <div className="col-span-2">
+                        <div className="text-sm">{event.instructions}</div>
+                      </div>
+                      
+                      <div className="text-muted-foreground">{event.date}</div>
+                      
+                      <div className="text-muted-foreground">{event.time}</div>
+                      
+                      <div>
+                        {event.completed ? (
+                          <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
+                            Completed
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-xs">
+                            Pending
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <div>
+                        {event.videoUrl ? (
+                          <Badge variant="secondary" className="text-xs">
+                            ✓ Video
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">-</span>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+
+                {/* Activity Groups for Select All */}
+                <div className="mt-6 pt-4 border-t">
+                  <h4 className="text-sm font-medium mb-3">Quick Select by Activity:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(groupedEvents).map(([activity, activityEvents]) => (
+                      <Button
+                        key={activity}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSelectAllForActivity(activity)}
+                        className="text-xs"
+                      >
+                        <Badge className={`mr-2 px-2 py-0 rounded-full border text-xs ${getActivityColor(activity)}`}>
+                          {activity}
+                        </Badge>
+                        {activityEvents.every(e => selectedEvents.includes(e.id)) ? 'Deselect All' : 'Select All'} ({activityEvents.length})
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
