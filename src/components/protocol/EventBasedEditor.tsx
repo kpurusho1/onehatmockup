@@ -39,6 +39,7 @@ export function EventBasedEditor({
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
   const [newBlocks, setNewBlocks] = useState<any[]>([]);
   const [showAddBlock, setShowAddBlock] = useState(false);
+  const [showEventWiseInstructions, setShowEventWiseInstructions] = useState(false);
 
   const groupedEvents = events.reduce((acc, event) => {
     if (!acc[event.activity]) {
@@ -186,13 +187,22 @@ export function EventBasedEditor({
         )}
 
         {/* Instructions Mode - Block-wise editing */}
-        {mode === "instructions" && (
+        {mode === "instructions" && !showEventWiseInstructions && (
           <Card>
-            <CardHeader>
-              <CardTitle>Update Instructions</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Edit instructions and video links for each activity block
-              </p>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <div>
+                <CardTitle>Update Instructions</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Edit instructions and video links for each activity block
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowEventWiseInstructions(true)}
+              >
+                Update Event Wise
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -268,6 +278,88 @@ export function EventBasedEditor({
           </Card>
         )}
 
+        {/* Instructions Mode - Event-wise editing */}
+        {mode === "instructions" && showEventWiseInstructions && (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <div>
+                <CardTitle>Update Instructions - Event Wise</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Edit instructions and video links for each individual event
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowEventWiseInstructions(false)}
+              >
+                Back to Block View
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Header Row */}
+                <div className="grid grid-cols-9 gap-4 text-sm font-medium text-muted-foreground bg-muted p-3 rounded">
+                  <div>Activity</div>
+                  <div className="col-span-3">Instructions</div>
+                  <div>Date</div>
+                  <div>Time</div>
+                  <div>Status</div>
+                  <div className="col-span-2">Video URL</div>
+                </div>
+                
+                {/* Event Rows */}
+                <div className="space-y-2">
+                  {events.map((event) => (
+                    <div key={event.id} className="grid grid-cols-9 gap-4 text-sm p-3 border rounded bg-background items-center">
+                      <div>
+                        <Badge className={`px-2 py-1 rounded-full border text-xs ${getActivityColor(event.activity)}`}>
+                          {event.activity}
+                        </Badge>
+                      </div>
+                      
+                      <div className="col-span-3">
+                        <Textarea
+                          value={event.instructions}
+                          onChange={(e) => handleUpdateEvent(event.id, { instructions: e.target.value })}
+                          placeholder="Enter instructions..."
+                          className="min-h-[36px] resize-none text-xs"
+                          rows={1}
+                        />
+                      </div>
+                      
+                      <div className="text-muted-foreground text-xs">{event.date}</div>
+                      
+                      <div className="text-muted-foreground text-xs">{event.time}</div>
+                      
+                      <div>
+                        {event.completed ? (
+                          <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
+                            Completed
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-xs">
+                            Pending
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <div className="col-span-2">
+                        <Input
+                          value={event.videoUrl || ""}
+                          onChange={(e) => handleUpdateEvent(event.id, { videoUrl: e.target.value })}
+                          placeholder="Enter video URL..."
+                          className="h-8 text-xs"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Plan Mode - Event-wise editing */}
         {mode === "plan" && (
           <Card>
@@ -280,7 +372,7 @@ export function EventBasedEditor({
             <CardContent>
               <div className="space-y-4">
                 {/* Header Row */}
-                <div className="grid grid-cols-8 gap-4 text-sm font-medium text-muted-foreground bg-muted p-3 rounded">
+                <div className="grid grid-cols-9 gap-4 text-sm font-medium text-muted-foreground bg-muted p-3 rounded">
                   <div className="flex items-center">
                     <Checkbox
                       checked={selectedEvents.length === events.length && events.length > 0}
@@ -298,13 +390,13 @@ export function EventBasedEditor({
                   <div>Date</div>
                   <div>Time</div>
                   <div>Status</div>
-                  <div>Video</div>
+                  <div className="col-span-2">Video URL</div>
                 </div>
                 
                 {/* Event Rows */}
                 <div className="space-y-2">
                   {events.map((event) => (
-                    <div key={event.id} className="grid grid-cols-8 gap-4 text-sm p-3 border rounded bg-background items-center">
+                    <div key={event.id} className="grid grid-cols-9 gap-4 text-sm p-3 border rounded bg-background items-center">
                       <div className="flex items-center">
                         <Checkbox
                           checked={selectedEvents.includes(event.id)}
@@ -338,14 +430,13 @@ export function EventBasedEditor({
                         )}
                       </div>
                       
-                      <div>
-                        {event.videoUrl ? (
-                          <Badge variant="secondary" className="text-xs">
-                            ✓ Video
-                          </Badge>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">-</span>
-                        )}
+                      <div className="col-span-2">
+                        <Input
+                          value={event.videoUrl || ""}
+                          onChange={(e) => handleUpdateEvent(event.id, { videoUrl: e.target.value })}
+                          placeholder="Enter video URL..."
+                          className="h-8 text-xs"
+                        />
                       </div>
                     </div>
                   ))}
@@ -374,6 +465,7 @@ export function EventBasedEditor({
               </div>
             </CardContent>
           </Card>
+
         )}
       </div>
     </div>
