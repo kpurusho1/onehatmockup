@@ -224,7 +224,7 @@ export default function CreateRecordTab() {
   // Patient Selection View
   if (currentStep === 'select-patient') {
     return (
-      <div className="p-4 space-y-4 h-full">
+      <div className="p-4 space-y-4 h-full pb-24">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Create Record</h2>
           <Button 
@@ -286,7 +286,14 @@ export default function CreateRecordTab() {
   // Recording View
   if (currentStep === 'recording') {
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full pb-24">
+        {/* Back Button */}
+        <div className="p-4">
+          <Button variant="ghost" onClick={() => setCurrentStep('select-patient')}>
+            <ArrowLeft size={16} className="mr-2" />
+            Back to Patient Selection
+          </Button>
+        </div>
         {/* Patient Info Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
           <div className="flex items-center justify-between">
@@ -384,7 +391,7 @@ export default function CreateRecordTab() {
   // View/Edit Record View
   if (currentStep === 'view-record' || currentStep === 'edit-record' || currentStep === 'send-record') {
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full pb-24">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-2">

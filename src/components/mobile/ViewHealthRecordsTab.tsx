@@ -14,7 +14,8 @@ import {
   Send, 
   Mic,
   CheckCircle2,
-  Clock
+  Clock,
+  ArrowLeft
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -120,6 +121,11 @@ export default function ViewHealthRecordsTab() {
   if (!selectedPatient) {
     return (
       <div className="p-4 space-y-6 pb-24">
+        {/* Back Button */}
+        <Button variant="ghost" className="mb-4" onClick={() => window.history.back()}>
+          <ArrowLeft size={16} className="mr-2" />
+          Back
+        </Button>
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">View Health Records</h2>
           <p className="text-muted-foreground">Select a patient to view their records</p>
@@ -170,85 +176,42 @@ export default function ViewHealthRecordsTab() {
   if (selectedRecord) {
     return (
       <div className="p-4 space-y-6 pb-24">
+        {/* Back Button */}
+        <Button variant="ghost" onClick={() => setSelectedRecord(null)}>
+          <ArrowLeft size={16} className="mr-2" />
+          Back to Records
+        </Button>
+
         {/* Patient Header */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Avatar>
-                <AvatarFallback className="bg-white/20 text-white">
-                  <User size={20} />
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
-                <p className="text-white/80">ID: #{selectedPatient.id}230187</p>
-                <p className="text-white/80">Age: {selectedPatient.age} years • {selectedPatient.phone}</p>
-              </div>
+          <div className="flex items-center space-x-3">
+            <Avatar>
+              <AvatarFallback className="bg-white/20 text-white">
+                <User size={20} />
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
+              <p className="text-white/80">ID: #{selectedPatient.id}230187</p>
+              <p className="text-white/80">Age: {selectedPatient.age} years • {selectedPatient.phone}</p>
             </div>
-            <Button 
-              variant="secondary" 
-              size="sm"
-              onClick={() => setSelectedRecord(null)}
-            >
-              Back to Records
-            </Button>
           </div>
         </div>
 
         {/* Record Content */}
-        <div className="grid grid-cols-12 gap-4">
-          {/* Medical Records Sidebar */}
-          <div className="col-span-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center space-x-2">
-                  <FileText size={20} />
-                  <CardTitle className="text-lg">Medical Records</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {mockRecords.map((record) => (
-                  <div 
-                    key={record.id}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                      record.id === selectedRecord.id ? 'bg-primary/10 border-primary' : 'hover:bg-accent/50'
-                    }`}
-                    onClick={() => setSelectedRecord(record)}
-                  >
-                    <div className="font-semibold text-sm">{record.date}</div>
-                    <div className="text-xs text-muted-foreground">{record.segments} segments</div>
-                    <div className="flex items-center space-x-2 mt-2">
-                      <Badge variant="secondary" className="text-xs">
-                        <span className="text-green-600">{record.sent} sent</span>
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs">
-                        <span className="text-orange-600">{record.edited} edited</span>
-                      </Badge>
-                    </div>
-                    <Badge variant={record.status === 'sent' ? 'default' : 'secondary'} className="mt-2">
-                      {record.status}
-                    </Badge>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Main Content */}
-          <div className="col-span-8">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Calendar size={20} />
-                    <CardTitle>Consultation - {selectedRecord.date}</CardTitle>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Edit size={16} className="mr-2" />
-                    Edit
-                  </Button>
-                </div>
-              </CardHeader>
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Calendar size={20} />
+                <CardTitle>Consultation - {selectedRecord.date}</CardTitle>
+              </div>
+              <Button variant="outline" size="sm">
+                <Edit size={16} className="mr-2" />
+                Edit
+              </Button>
+            </div>
+          </CardHeader>
               <CardContent className="space-y-6">
                 {/* Key Items / Other Items Tabs */}
                 <div className="flex space-x-6 border-b">
@@ -321,8 +284,6 @@ export default function ViewHealthRecordsTab() {
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </div>
 
         {/* Send Dialog */}
         <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
@@ -387,28 +348,25 @@ export default function ViewHealthRecordsTab() {
 
   return (
     <div className="p-4 space-y-6 pb-24">
+      {/* Back Button */}
+      <Button variant="ghost" onClick={() => setSelectedPatient(null)}>
+        <ArrowLeft size={16} className="mr-2" />
+        Change Patient
+      </Button>
+
       {/* Patient Header */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Avatar>
-              <AvatarFallback className="bg-white/20 text-white">
-                <User size={20} />
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
-              <p className="text-white/80">ID: #{selectedPatient.id}230187</p>
-              <p className="text-white/80">Age: {selectedPatient.age} years • {selectedPatient.phone}</p>
-            </div>
+        <div className="flex items-center space-x-3">
+          <Avatar>
+            <AvatarFallback className="bg-white/20 text-white">
+              <User size={20} />
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
+            <p className="text-white/80">ID: #{selectedPatient.id}230187</p>
+            <p className="text-white/80">Age: {selectedPatient.age} years • {selectedPatient.phone}</p>
           </div>
-          <Button 
-            variant="secondary" 
-            size="sm"
-            onClick={() => setSelectedPatient(null)}
-          >
-            Change Patient
-          </Button>
         </div>
       </div>
 
