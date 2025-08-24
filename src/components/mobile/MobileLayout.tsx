@@ -19,25 +19,27 @@ export const MobileLayout = () => {
       </header>
 
       {/* Tab Content */}
-      <div className="flex-1 overflow-hidden">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <div className="flex-1 overflow-auto">
-            <TabsContent value="create-record" className="h-full m-0">
-              <CreateRecordTab />
-            </TabsContent>
-            <TabsContent value="view-records" className="h-full m-0">
-              <ViewHealthRecordsTab />
-            </TabsContent>
-            <TabsContent value="patient-management" className="h-full m-0">
-              <PatientManagementTab />
-            </TabsContent>
-            <TabsContent value="prescriptions" className="h-full m-0">
-              <PrescriptionsTab />
-            </TabsContent>
-          </div>
+      <div className="flex-1 overflow-hidden pb-16">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+          <TabsContent value="create-record" className="h-full m-0">
+            <CreateRecordTab />
+          </TabsContent>
+          <TabsContent value="view-records" className="h-full m-0">
+            <ViewHealthRecordsTab />
+          </TabsContent>
+          <TabsContent value="patient-management" className="h-full m-0">
+            <PatientManagementTab />
+          </TabsContent>
+          <TabsContent value="prescriptions" className="h-full m-0">
+            <PrescriptionsTab />
+          </TabsContent>
+        </Tabs>
+      </div>
 
-          {/* Bottom Tab Navigation */}
-          <TabsList className="grid w-full grid-cols-4 h-16 bg-card border-t">
+      {/* Bottom Tab Navigation - Fixed to bottom */}
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t shadow-lg z-50">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4 h-16 bg-transparent">
             <TabsTrigger 
               value="create-record" 
               className="flex flex-col gap-1 h-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
