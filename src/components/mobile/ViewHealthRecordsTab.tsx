@@ -183,7 +183,7 @@ export default function ViewHealthRecordsTab() {
         </Button>
 
         {/* Patient Header */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg">
+        <div className="text-white p-4 rounded-lg" style={{ backgroundColor: '#1c2f7f' }}>
           <div className="flex items-center space-x-3">
             <Avatar>
               <AvatarFallback className="bg-white/20 text-white">
@@ -240,34 +240,37 @@ export default function ViewHealthRecordsTab() {
                     </div>
                     
                     <div className="overflow-x-auto">
-                      <table className="w-full border-collapse border border-gray-300">
+                      <table className="w-full border-collapse border border-gray-300 text-sm">
                         <thead>
                           <tr className="bg-gray-50">
-                            <th className="border border-gray-300 p-2 text-left">Medicine</th>
-                            <th className="border border-gray-300 p-2 text-center">Morning</th>
-                            <th className="border border-gray-300 p-2 text-center">Noon</th>
-                            <th className="border border-gray-300 p-2 text-center">Evening</th>
-                            <th className="border border-gray-300 p-2 text-center">Night</th>
-                            <th className="border border-gray-300 p-2 text-center">Duration (Days)</th>
-                            <th className="border border-gray-300 p-2 text-center">Time to Take</th>
-                            <th className="border border-gray-300 p-2 text-left">Remarks</th>
+                            <th className="border border-gray-300 p-1.5 text-left text-xs">Medicine</th>
+                            <th className="border border-gray-300 p-1.5 text-center text-xs">M</th>
+                            <th className="border border-gray-300 p-1.5 text-center text-xs">N</th>
+                            <th className="border border-gray-300 p-1.5 text-center text-xs">E</th>
+                            <th className="border border-gray-300 p-1.5 text-center text-xs">Nt</th>
+                            <th className="border border-gray-300 p-1.5 text-center text-xs">Duration</th>
                           </tr>
                         </thead>
                         <tbody>
                           {selectedRecord.prescriptions.map((prescription, index) => (
                             <tr key={index}>
-                              <td className="border border-gray-300 p-2">{prescription.medicine}</td>
-                              <td className="border border-gray-300 p-2 text-center">{prescription.morning}</td>
-                              <td className="border border-gray-300 p-2 text-center">{prescription.noon}</td>
-                              <td className="border border-gray-300 p-2 text-center">{prescription.evening}</td>
-                              <td className="border border-gray-300 p-2 text-center">{prescription.night}</td>
-                              <td className="border border-gray-300 p-2 text-center">{prescription.duration}</td>
-                              <td className="border border-gray-300 p-2 text-center">{prescription.timeToTake}</td>
-                              <td className="border border-gray-300 p-2">{prescription.remarks}</td>
+                              <td className="border border-gray-300 p-1.5 text-xs">{prescription.medicine}</td>
+                              <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.morning}</td>
+                              <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.noon}</td>
+                              <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.evening}</td>
+                              <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.night}</td>
+                              <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.duration}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
+                      {selectedRecord.prescriptions.map((prescription, index) => (
+                        prescription.remarks && (
+                          <div key={index} className="mt-2 text-xs text-muted-foreground">
+                            <strong>Note:</strong> {prescription.remarks}
+                          </div>
+                        )
+                      ))}
                     </div>
                   </div>
                 )}
@@ -355,7 +358,7 @@ export default function ViewHealthRecordsTab() {
       </Button>
 
       {/* Patient Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg">
+      <div className="text-white p-4 rounded-lg" style={{ backgroundColor: '#1c2f7f' }}>
         <div className="flex items-center space-x-3">
           <Avatar>
             <AvatarFallback className="bg-white/20 text-white">
