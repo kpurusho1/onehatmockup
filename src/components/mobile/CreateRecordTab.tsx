@@ -269,7 +269,7 @@ export default function CreateRecordTab() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline">Select</Badge>
+                <Badge variant="outline">Record</Badge>
               </div>
             ))}
           </CardContent>
@@ -295,7 +295,7 @@ export default function CreateRecordTab() {
           </Button>
         </div>
         {/* Patient Info Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
+        <div className="text-white p-4" style={{ backgroundColor: '#1c2f7f' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">

@@ -13,8 +13,13 @@ export const MobileLayout = () => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-4 shadow-lg">
-        <div className="flex items-center justify-center">
-          <h1 className="text-xl font-bold">OneHat Medical</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold">1hat doc app</h1>
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+              <span className="text-sm font-medium">Dr</span>
+            </div>
+          </div>
         </div>
       </header>
 
