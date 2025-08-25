@@ -171,28 +171,16 @@ export default function CreateRecordTab() {
     setProcessingProgress(0);
     setMedicalRecord(prev => ({ ...prev, patientId: selectedPatient?.id || "" }));
     
-    let wasInterrupted = false;
-    
-    // Monitor for interruption by checking if user goes back to patient selection
-    const checkForInterruption = () => {
-      const currentStepCheck = currentStep;
-      if (currentStepCheck === 'select-patient') {
-        wasInterrupted = true;
-      }
-    };
-    
     // Simulate processing with progress
     const progressInterval = setInterval(() => {
       setProcessingProgress(prev => {
-        checkForInterruption(); // Check for interruption on each progress update
-        
         if (prev >= 100) {
           clearInterval(progressInterval);
-          // Only auto-show summary if processing completed without interruption
-          if (!wasInterrupted) {
+          // Only show summary when processing reaches 100% and user is still on processing page
+          if (currentStep === 'processing') {
             setCurrentStep('view-record');
           } else {
-            // Send notification instead if interrupted
+            // If user navigated away, add notification
             toast({
               title: "Recording processed",
               description: "Your consultation summary is ready for review.",
