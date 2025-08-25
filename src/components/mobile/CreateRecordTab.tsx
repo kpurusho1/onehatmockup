@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +46,9 @@ type FlowStep = 'select-patient' | 'recording' | 'processing' | 'view-record' | 
 
 export default function CreateRecordTab() {
   const { toast } = useToast();
+  const processingCompleteRef = useRef(false);
+  const isProcessingRef = useRef(false);
+  
   const [patients] = useState<Patient[]>([
     { id: "1", name: "Arjun Sharma", phone: "+91 98765 43210", age: 32 },
     { id: "2", name: "Priya Patel", phone: "+91 87654 32109", age: 28 },
@@ -141,6 +144,17 @@ export default function CreateRecordTab() {
     return () => clearInterval(interval);
   }, [isRecording, isPaused]);
 
+  // Monitor navigation away from processing
+  useEffect(() => {
+    if (currentStep !== 'processing' && isProcessingRef.current && !processingCompleteRef.current) {
+      // User navigated away before processing completed
+      toast({
+        title: "Recording processed",
+        description: "Your consultation summary is ready for review.",
+      });
+    }
+  }, [currentStep, toast]);
+
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.phone.includes(searchTerm)
@@ -171,25 +185,25 @@ export default function CreateRecordTab() {
     setProcessingProgress(0);
     setMedicalRecord(prev => ({ ...prev, patientId: selectedPatient?.id || "" }));
     
-    let processingStep = 'processing'; // Track the step when processing started
+    // Mark processing as started
+    isProcessingRef.current = true;
+    processingCompleteRef.current = false;
     
     // Simulate processing with progress
     const progressInterval = setInterval(() => {
       setProcessingProgress(prev => {
         if (prev >= 100) {
           clearInterval(progressInterval);
-          // Check current step at completion time
+          processingCompleteRef.current = true;
+          
+          // Check if user is still on processing screen
           setCurrentStep(currentStepValue => {
-            if (currentStepValue === 'processing' && processingStep === 'processing') {
-              // User is still on processing screen, show summary
+            if (currentStepValue === 'processing') {
+              // User stayed on processing screen, show summary
               return 'view-record';
             } else {
-              // User navigated away, send notification
-              toast({
-                title: "Recording processed",
-                description: "Your consultation summary is ready for review.",
-              });
-              return currentStepValue; // Keep current step unchanged
+              // User already navigated away, notification was already sent
+              return currentStepValue;
             }
           });
           return 100;
@@ -197,21 +211,6 @@ export default function CreateRecordTab() {
         return prev + 10;
       });
     }, 1000);
-    
-    // Update tracking when user navigates away
-    const checkNavigation = () => {
-      if (currentStep !== 'processing') {
-        processingStep = 'navigated-away';
-      }
-    };
-    
-    // Check navigation periodically
-    const navigationCheck = setInterval(checkNavigation, 100);
-    
-    // Cleanup navigation check when processing completes
-    setTimeout(() => {
-      clearInterval(navigationCheck);
-    }, 11000); // Slightly longer than processing time
   };
 
   const cancelRecording = () => {
@@ -573,6 +572,9 @@ export default function CreateRecordTab() {
                 setSelectedPatient(null);
                 setSelectedPatientId("");
                 setRecordingDuration(0);
+                // Reset processing flags
+                isProcessingRef.current = false;
+                processingCompleteRef.current = false;
               }}
             >
               Create New Recording
