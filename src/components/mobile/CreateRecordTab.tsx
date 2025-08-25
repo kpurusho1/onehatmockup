@@ -171,33 +171,47 @@ export default function CreateRecordTab() {
     setProcessingProgress(0);
     setMedicalRecord(prev => ({ ...prev, patientId: selectedPatient?.id || "" }));
     
-    let hasNavigatedAway = false;
+    let processingStep = 'processing'; // Track the step when processing started
     
     // Simulate processing with progress
     const progressInterval = setInterval(() => {
       setProcessingProgress(prev => {
-        // Check if user has navigated away from processing
-        if (currentStep !== 'processing') {
-          hasNavigatedAway = true;
-        }
-        
         if (prev >= 100) {
           clearInterval(progressInterval);
-          // Only show summary if user is still on processing screen
-          if (!hasNavigatedAway && currentStep === 'processing') {
-            setCurrentStep('view-record');
-          } else {
-            // If user navigated away, just send notification
-            toast({
-              title: "Recording processed",
-              description: "Your consultation summary is ready for review.",
-            });
-          }
+          // Check current step at completion time
+          setCurrentStep(currentStepValue => {
+            if (currentStepValue === 'processing' && processingStep === 'processing') {
+              // User is still on processing screen, show summary
+              return 'view-record';
+            } else {
+              // User navigated away, send notification
+              toast({
+                title: "Recording processed",
+                description: "Your consultation summary is ready for review.",
+              });
+              return currentStepValue; // Keep current step unchanged
+            }
+          });
           return 100;
         }
         return prev + 10;
       });
     }, 1000);
+    
+    // Update tracking when user navigates away
+    const checkNavigation = () => {
+      if (currentStep !== 'processing') {
+        processingStep = 'navigated-away';
+      }
+    };
+    
+    // Check navigation periodically
+    const navigationCheck = setInterval(checkNavigation, 100);
+    
+    // Cleanup navigation check when processing completes
+    setTimeout(() => {
+      clearInterval(navigationCheck);
+    }, 11000); // Slightly longer than processing time
   };
 
   const cancelRecording = () => {
