@@ -55,14 +55,14 @@ type Record = {
 };
 
 const mockPatients: Patient[] = [
-  { id: "1", name: "John Doe", age: 45, phone: "9876543210" },
-  { id: "2", name: "Jane Smith", age: 32, phone: "9765432109" },
-  { id: "3", name: "Robert Johnson", age: 28, phone: "8754321098" },
-  { id: "4", name: "Emily Davis", age: 32, phone: "9123456789" },
-  { id: "5", name: "Michael Brown", age: 58, phone: "8765432109" },
-  { id: "6", name: "Sarah Wilson", age: 29, phone: "9234567890" },
-  { id: "7", name: "David Miller", age: 42, phone: "8654321987" },
-  { id: "8", name: "Lisa Garcia", age: 36, phone: "9345678901" },
+  { id: "1", name: "Arjun Sharma", phone: "+91 98765 43210", age: 32 },
+  { id: "2", name: "Priya Patel", phone: "+91 87654 32109", age: 28 },
+  { id: "3", name: "Vikram Singh", phone: "+91 76543 21098", age: 45 },
+  { id: "4", name: "Deepika Reddy", phone: "+91 65432 10987", age: 35 },
+  { id: "5", name: "Rohit Kumar", phone: "+91 54321 09876", age: 29 },
+  { id: "6", name: "Ananya Gupta", phone: "+91 43210 98765", age: 31 },
+  { id: "7", name: "Karthik Iyer", phone: "+91 32109 87654", age: 38 },
+  { id: "8", name: "Sneha Nair", phone: "+91 21098 76543", age: 26 },
 ];
 
 const mockRecords: Record[] = [
@@ -241,12 +241,11 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
                         <User size={20} className="text-primary" />
                       </div>
                       <div className="flex-1 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-foreground">{patient.name}</span>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="text-sm text-muted-foreground">{patient.age} yrs</span>
-                        </div>
-                        <span className="text-sm text-muted-foreground/70 italic ml-auto">{patient.phone}</span>
+                       <div className="flex items-center space-x-3 flex-1 min-w-0">
+                         <span className="font-medium text-foreground text-sm truncate">{patient.name}</span>
+                         <span className="text-xs text-muted-foreground flex-shrink-0">{patient.age}y</span>
+                       </div>
+                       <span className="text-xs text-muted-foreground ml-2 flex-shrink-0">{patient.phone}</span>
                       </div>
                     </div>
                     <Button 
@@ -325,19 +324,19 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
 
       <div className="p-4 space-y-6">
         {/* Patient Info */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <User size={24} className="text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold">{selectedPatient.name}</h3>
-                <p className="text-sm text-muted-foreground">{selectedPatient.age} years • {selectedPatient.phone}</p>
-              </div>
+        <div className="text-white p-4 rounded-lg" style={{ backgroundColor: '#1c2f7f' }}>
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <span className="text-white font-semibold">
+                {selectedPatient.name.split(' ').map(n => n[0]).join('')}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
+              <p className="text-white/80">{selectedPatient.age} years • {selectedPatient.phone}</p>
+            </div>
+          </div>
+        </div>
 
         {/* Records List */}
         <div className="space-y-3">

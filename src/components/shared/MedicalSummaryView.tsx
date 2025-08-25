@@ -170,12 +170,6 @@ export default function MedicalSummaryView({
             <ArrowLeft size={16} className="mr-2" />
             Back
           </Button>
-          {recordId && (
-            <Badge variant="secondary" className="bg-green-100 text-green-700">
-              <CheckCircle2 size={14} className="mr-1" />
-              Ready for Review
-            </Badge>
-          )}
         </div>
       </div>
 
@@ -288,7 +282,6 @@ export default function MedicalSummaryView({
                     <Pill size={20} className="mr-2 text-primary" />
                     Prescription
                     {!selectedSections.prescriptionData && <span className="ml-2 text-xs text-muted-foreground">(not selected for sending)</span>}
-                    <CheckCircle2 size={20} className="ml-auto text-green-600" />
                   </h3>
                   {showCreateRx && (
                     <Button
@@ -425,7 +418,6 @@ export default function MedicalSummaryView({
                       {/* Medicine Header */}
                       <div className="flex justify-between items-center mb-4">
                         <h4 className="text-lg font-semibold text-gray-800">{medication.name}</h4>
-                        <CheckCircle2 size={20} className="text-green-600" />
                       </div>
                       
                       {/* Dosage Grid */}
