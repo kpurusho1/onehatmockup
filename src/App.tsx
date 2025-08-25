@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { MobileLayout } from "./components/mobile/MobileLayout";
-import MobileApp from "./pages/MobileApp";
+
 import Login from "./pages/Login";
 import VoiceHealthRecord from "./pages/VoiceHealthRecord";
 import PatientProtocols from "./pages/PatientProtocols";
@@ -24,25 +24,13 @@ const App = () => (
         {/* Login page */}
         <Route path="/login" element={<Login />} />
         
-        {/* App Selector */}
-        <Route path="/" element={<MobileApp />} />
+        {/* Redirect to mobile app */}
+        <Route path="/" element={<Navigate to="/mobile" replace />} />
         
         {/* Mobile App Route */}
         <Route path="/mobile" element={<MobileLayout />} />
         
-        {/* Desktop Routes - Hidden for now */}
-        {/*
-        <Route path="/desktop" element={<Layout />}>
-          <Route index element={<Navigate to="/desktop/patient-protocols" replace />} />
-          <Route path="voice-health" element={<VoiceHealthRecord />} />
-          <Route path="patient-protocols" element={<PatientProtocols />} />
-          <Route path="protocol-templates" element={<ProtocolTemplates />} />
-          <Route path="prescription" element={<Prescription />} />
-          <Route path="profile" element={<Profile />} />
-        </Route>
-        */}
-        
-        {/* Legacy desktop routes redirected to mobile */}
+        {/* Legacy routes redirected to mobile */}
         <Route path="/voice-health" element={<Navigate to="/mobile" replace />} />
         <Route path="/patient-protocols" element={<Navigate to="/mobile" replace />} />
         <Route path="/protocol-templates" element={<Navigate to="/mobile" replace />} />
