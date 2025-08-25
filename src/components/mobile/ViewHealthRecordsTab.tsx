@@ -406,45 +406,49 @@ export default function ViewHealthRecordsTab() {
       </div>
 
       {/* AI Query Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <Bot size={20} className="text-primary" />
-            <CardTitle>Ask 1hat AI about patient history</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex space-x-2">
-            <Input
-              placeholder="Ask about patient's medical history, patterns, or specific conditions..."
-              value={aiQuery}
-              onChange={(e) => setAiQuery(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleAiQuery()}
-              className="flex-1"
-            />
-            <Button 
-              onClick={handleAiQuery}
-              disabled={!aiQuery.trim() || isAiLoading}
-              className="px-4"
-            >
-              {isAiLoading ? (
-                <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
-              ) : (
-                <Send size={16} />
-              )}
-            </Button>
-          </div>
-          
-          {aiResponse && (
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <div className="flex items-start space-x-2">
-                <Bot size={16} className="text-primary mt-1 flex-shrink-0" />
-                <p className="text-sm">{aiResponse}</p>
-              </div>
+      <div className="p-4 border-2 border-transparent bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg"></div>
+        <div className="absolute inset-[2px] bg-background rounded-lg"></div>
+        <div className="relative">
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">AI</span>
             </div>
-          )}
-        </CardContent>
-      </Card>
+            <h3 className="font-medium text-lg">Ask 1hat AI about patient history</h3>
+          </div>
+          <div className="space-y-4">
+            <div className="flex space-x-2">
+              <Input
+                placeholder="Ask about patient's medical history, patterns, or specific conditions..."
+                value={aiQuery}
+                onChange={(e) => setAiQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleAiQuery()}
+                className="flex-1 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20 border-transparent"
+              />
+              <Button 
+                onClick={handleAiQuery}
+                disabled={!aiQuery.trim() || isAiLoading}
+                className="px-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+              >
+                {isAiLoading ? (
+                  <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+                ) : (
+                  <Send size={16} />
+                )}
+              </Button>
+            </div>
+            
+            {aiResponse && (
+              <div className="p-4 bg-white dark:bg-card rounded-lg border">
+                <div className="flex items-start space-x-2">
+                  <Bot size={16} className="text-primary mt-1 flex-shrink-0" />
+                  <p className="text-sm">{aiResponse}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Medical Records List */}
       <Card>

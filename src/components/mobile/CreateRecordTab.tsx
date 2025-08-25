@@ -7,8 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, User, Clock, Play, Pause, Square, X, Search, Edit2, Send, ArrowLeft, Eye, Loader2 } from "lucide-react";
+import { Plus, User, Clock, Play, Pause, Square, X, Search, Edit2, Send, ArrowLeft, Eye, Loader2, Mic } from "lucide-react";
 import { AddPatientDialog } from "@/components/AddPatientDialog";
 
 interface Patient {
@@ -44,21 +46,21 @@ type FlowStep = 'select-patient' | 'recording' | 'processing' | 'view-record' | 
 export default function CreateRecordTab() {
   const { toast } = useToast();
   const [patients] = useState<Patient[]>([
-    { id: "1", name: "John Doe", phone: "8954229999", age: 35 },
-    { id: "2", name: "Jane Smith", phone: "9876543210", age: 28 },
-    { id: "3", name: "Robert Johnson", phone: "8754321098", age: 45 },
-    { id: "4", name: "Emily Davis", phone: "9123456789", age: 32 },
-    { id: "5", name: "Michael Brown", phone: "8765432109", age: 58 },
-    { id: "6", name: "Sarah Wilson", phone: "9234567890", age: 29 },
-    { id: "7", name: "David Miller", phone: "8654321987", age: 42 },
-    { id: "8", name: "Lisa Garcia", phone: "9345678901", age: 36 },
-    { id: "9", name: "Thomas Anderson", phone: "8543219876", age: 51 },
-    { id: "10", name: "Maria Rodriguez", phone: "9456789012", age: 27 },
-    { id: "11", name: "James Taylor", phone: "8432198765", age: 39 },
-    { id: "12", name: "Jennifer Lee", phone: "9567890123", age: 44 },
-    { id: "13", name: "Christopher White", phone: "8321987654", age: 33 },
-    { id: "14", name: "Amanda Clark", phone: "9678901234", age: 26 },
-    { id: "15", name: "Daniel Harris", phone: "8210987643", age: 48 }
+    { id: "1", name: "Arjun Sharma", phone: "+91 98765 43210", age: 32 },
+    { id: "2", name: "Priya Patel", phone: "+91 87654 32109", age: 28 },
+    { id: "3", name: "Vikram Singh", phone: "+91 76543 21098", age: 45 },
+    { id: "4", name: "Deepika Reddy", phone: "+91 65432 10987", age: 35 },
+    { id: "5", name: "Rohit Kumar", phone: "+91 54321 09876", age: 29 },
+    { id: "6", name: "Ananya Gupta", phone: "+91 43210 98765", age: 31 },
+    { id: "7", name: "Karthik Iyer", phone: "+91 32109 87654", age: 38 },
+    { id: "8", name: "Sneha Nair", phone: "+91 21098 76543", age: 26 },
+    { id: "9", name: "Aditya Joshi", phone: "+91 10987 65432", age: 42 },
+    { id: "10", name: "Kavya Menon", phone: "+91 09876 54321", age: 33 },
+    { id: "11", name: "Rajesh Verma", phone: "+91 98765 43211", age: 41 },
+    { id: "12", name: "Meera Agarwal", phone: "+91 87654 32108", age: 27 },
+    { id: "13", name: "Suresh Pillai", phone: "+91 76543 21097", age: 47 },
+    { id: "14", name: "Pooja Bansal", phone: "+91 65432 10986", age: 30 },
+    { id: "15", name: "Manoj Rao", phone: "+91 54321 09875", age: 39 }
   ]);
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -71,6 +73,7 @@ export default function CreateRecordTab() {
   const [isPaused, setIsPaused] = useState(false);
   const [showRemarksDialog, setShowRemarksDialog] = useState(false);
   const [selectedRemarks, setSelectedRemarks] = useState("");
+  const [processingProgress, setProcessingProgress] = useState(0);
   
   // Mock medical record data
   const [medicalRecord, setMedicalRecord] = useState<MedicalRecord>({
@@ -164,12 +167,20 @@ export default function CreateRecordTab() {
     setIsRecording(false);
     setIsPaused(false);
     setCurrentStep('processing');
+    setProcessingProgress(0);
     setMedicalRecord(prev => ({ ...prev, patientId: selectedPatient?.id || "" }));
     
-    // Simulate processing time
-    setTimeout(() => {
-      setCurrentStep('view-record');
-    }, 3000);
+    // Simulate processing with progress
+    const progressInterval = setInterval(() => {
+      setProcessingProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          setCurrentStep('view-record');
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 1000);
   };
 
   const cancelRecording = () => {
@@ -308,19 +319,21 @@ export default function CreateRecordTab() {
                 {filteredPatients.map((patient) => (
                   <div
                     key={patient.id}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                    className="flex items-center p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
                     onClick={() => setSelectedPatientId(patient.id)}
                   >
-                    <div className="flex items-center space-x-3 flex-1">
-                      <RadioGroupItem value={patient.id} id={patient.id} />
-                      <div className="flex-1 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-foreground">{patient.name}</span>
-                          <span className="text-muted-foreground">•</span>
-                          <span className="text-sm text-muted-foreground">{patient.age} yrs</span>
-                        </div>
-                        <span className="text-sm text-muted-foreground/70 italic ml-auto">{patient.phone}</span>
+                    <RadioGroupItem value={patient.id} id={patient.id} className="mr-4" />
+                    <Avatar className="w-12 h-12 mr-3">
+                      <AvatarImage src={`/src/assets/patient-avatar-${Math.floor(Math.random() * 3) + 1}.jpg`} />
+                      <AvatarFallback>{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-foreground">{patient.name}</span>
+                        <span className="text-muted-foreground">•</span>
+                        <span className="text-sm text-muted-foreground">{patient.age} yrs</span>
                       </div>
+                      <span className="text-sm text-muted-foreground/70 italic ml-auto">{patient.phone}</span>
                     </div>
                   </div>
                 ))}
@@ -460,13 +473,56 @@ export default function CreateRecordTab() {
   // Processing View
   if (currentStep === 'processing') {
     return (
-      <div className="flex flex-col h-full pb-24 items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-          <h2 className="text-xl font-semibold">Processing...</h2>
-          <p className="text-muted-foreground">
-            Analyzing your recording and generating medical summary
-          </p>
+      <div className="flex-1 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Avatar className="w-12 h-12 bg-white/20">
+                <AvatarFallback className="text-white bg-transparent">
+                  {selectedPatient?.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="font-semibold">Patient ({selectedPatient?.name})</h2>
+                <p className="text-sm opacity-90">ID: #{selectedPatient?.id.padStart(6, '0')} • Age: {selectedPatient?.age} years • {selectedPatient?.phone}</p>
+              </div>
+            </div>
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1.5">
+              <span className="text-sm font-medium">Processing...</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Processing Content */}
+        <div className="p-6 space-y-6">
+          <div className="bg-white dark:bg-card rounded-lg p-4 border-l-4 border-green-500">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-medium text-green-700 dark:text-green-400">Processing Recording</h3>
+              <p className="text-sm text-muted-foreground">Generating medical record from your consultation</p>
+            </div>
+          </div>
+
+          <div className="text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+              <Clock className="w-8 h-8 text-primary" />
+            </div>
+            
+            <div className="text-4xl font-bold text-primary">
+              00:00
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-primary font-medium">Processing... {processingProgress}%</span>
+              </div>
+              <Progress value={processingProgress} className="h-2" />
+            </div>
+
+            <p className="text-muted-foreground">
+              Usually takes 30-60 seconds for record generation
+            </p>
+          </div>
         </div>
       </div>
     );
