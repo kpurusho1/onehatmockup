@@ -165,14 +165,17 @@ export default function CreateRecordTab() {
 
   const startRecording = () => {
     console.log("startRecording called, selectedPatientId:", selectedPatientId);
+    console.log("Current step before:", currentStep);
     const patient = patients.find(p => p.id === selectedPatientId);
     console.log("Found patient:", patient);
     if (patient) {
+      console.log("Setting patient and changing step to recording");
       setSelectedPatient(patient);
       setCurrentStep('recording');
       setIsRecording(true);
       setRecordingDuration(0);
       console.log("Recording started for patient:", patient.name);
+      console.log("New step should be: recording");
     } else {
       console.log("No patient found for ID:", selectedPatientId);
     }
@@ -427,7 +430,9 @@ export default function CreateRecordTab() {
   }
 
   // Recording View
+  console.log("Checking currentStep for recording view:", currentStep);
   if (currentStep === 'recording') {
+    console.log("Rendering recording view for patient:", selectedPatient?.name);
     return (
       <div className="flex flex-col h-full pb-24">
         {/* Back Button */}
