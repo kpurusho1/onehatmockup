@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Plus, User, Clock, Play, Pause, Square, X, Search, Edit2, Send, ArrowLeft } from "lucide-react";
 import { AddPatientDialog } from "@/components/AddPatientDialog";
 
@@ -47,6 +48,7 @@ export default function CreateRecordTab() {
   
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [selectedPatientId, setSelectedPatientId] = useState<string>("");
   const [showAddPatient, setShowAddPatient] = useState(false);
   const [currentStep, setCurrentStep] = useState<FlowStep>('select-patient');
   const [recordingDuration, setRecordingDuration] = useState(0);
@@ -120,11 +122,14 @@ export default function CreateRecordTab() {
     patient.phone.includes(searchTerm)
   );
 
-  const startRecording = (patient: Patient) => {
-    setSelectedPatient(patient);
-    setCurrentStep('recording');
-    setIsRecording(true);
-    setRecordingDuration(0);
+  const startRecording = () => {
+    const patient = patients.find(p => p.id === selectedPatientId);
+    if (patient) {
+      setSelectedPatient(patient);
+      setCurrentStep('recording');
+      setIsRecording(true);
+      setRecordingDuration(0);
+    }
   };
 
   const pauseRecording = () => {
@@ -148,6 +153,7 @@ export default function CreateRecordTab() {
     setRecordingDuration(0);
     setCurrentStep('select-patient');
     setSelectedPatient(null);
+    setSelectedPatientId("");
   };
 
   const handleEdit = () => {
@@ -169,6 +175,7 @@ export default function CreateRecordTab() {
     alert("Record sent successfully!");
     setCurrentStep('select-patient');
     setSelectedPatient(null);
+    setSelectedPatientId("");
   };
 
   const goBack = () => {
@@ -178,6 +185,7 @@ export default function CreateRecordTab() {
     } else if (currentStep === 'view-record') {
       setCurrentStep('select-patient');
       setSelectedPatient(null);
+      setSelectedPatientId("");
     }
   };
 
@@ -251,27 +259,38 @@ export default function CreateRecordTab() {
           <CardHeader>
             <CardTitle>Select Patient to Record</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 max-h-96 overflow-y-auto">
-            {filteredPatients.map((patient) => (
-              <div
-                key={patient.id}
-                className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                onClick={() => startRecording(patient)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                    <User size={20} className="text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">{patient.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Age: {patient.age} • {patient.phone}
-                    </p>
+          <CardContent className="space-y-4 max-h-96 overflow-y-auto">
+            <RadioGroup value={selectedPatientId} onValueChange={setSelectedPatientId}>
+              {filteredPatients.map((patient) => (
+                <div
+                  key={patient.id}
+                  className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                  onClick={() => setSelectedPatientId(patient.id)}
+                >
+                  <RadioGroupItem value={patient.id} id={patient.id} />
+                  <div className="flex-1">
+                    <label htmlFor={patient.id} className="cursor-pointer">
+                      <div className="font-medium">{patient.name}, {patient.age} yrs, {patient.phone}</div>
+                    </label>
                   </div>
                 </div>
-                <Badge variant="outline">Record</Badge>
-              </div>
-            ))}
+              ))}
+            </RadioGroup>
+            
+            {/* Record Button */}
+            <div className="pt-4">
+              <Button 
+                onClick={startRecording}
+                disabled={!selectedPatientId}
+                className={`w-full h-12 text-lg font-semibold ${
+                  selectedPatientId 
+                    ? 'bg-red-600 hover:bg-red-700 text-white' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Record
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
