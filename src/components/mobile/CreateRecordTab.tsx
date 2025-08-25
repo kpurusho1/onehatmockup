@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -74,6 +74,7 @@ export default function CreateRecordTab() {
   const [showRemarksDialog, setShowRemarksDialog] = useState(false);
   const [selectedRemarks, setSelectedRemarks] = useState("");
   const [processingProgress, setProcessingProgress] = useState(0);
+  const patientSelectionRef = useRef<HTMLDivElement>(null);
   
   // Mock medical record data
   const [medicalRecord, setMedicalRecord] = useState<MedicalRecord>({
@@ -139,6 +140,23 @@ export default function CreateRecordTab() {
     }
     return () => clearInterval(interval);
   }, [isRecording, isPaused]);
+
+  // Click outside to deselect patient
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (patientSelectionRef.current && !patientSelectionRef.current.contains(event.target as Node)) {
+        setSelectedPatientId("");
+      }
+    };
+
+    if (selectedPatientId && currentStep === 'select-patient') {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [selectedPatientId, currentStep]);
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -342,7 +360,7 @@ export default function CreateRecordTab() {
             />
           </div>
 
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+          <div className="space-y-2 max-h-96 overflow-y-auto" ref={patientSelectionRef}>
             {filteredPatients.map((patient) => (
               <div
                 key={patient.id}
