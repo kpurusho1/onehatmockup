@@ -567,88 +567,107 @@ export default function CreateRecordTab() {
             </div>
             
             {isEditing ? (
-              // Table format for editing
-              <div className="border rounded-lg overflow-hidden">
-                <div className="grid grid-cols-8 gap-2 p-3 bg-muted text-sm font-medium">
-                  <div>Medicine</div>
-                  <div>Morning</div>
-                  <div>Noon</div>
-                  <div>Evening</div>
-                  <div>Night</div>
-                  <div>Duration</div>
-                  <div>Time</div>
-                  <div>Remarks</div>
-                </div>
-                
+              // Card format for editing - more mobile friendly
+              <div className="space-y-4">
                 {medicalRecord.medications.map((medication, index) => (
-                  <div key={medication.id} className="grid grid-cols-8 gap-2 p-3 border-t text-sm">
+                  <div key={medication.id} className="p-4 border rounded-lg space-y-3">
+                    {/* Medicine Name */}
                     <div>
+                      <label className="text-sm font-medium text-muted-foreground">Medicine Name</label>
                       <Input
                         value={medication.name}
                         onChange={(e) => updateMedication(index, 'name', e.target.value)}
-                        className="h-8"
+                        placeholder="Enter medicine name"
+                        className="mt-1"
                       />
                     </div>
-                    <div>
-                      <Input
-                        type="number"
-                        value={medication.morning}
-                        onChange={(e) => updateMedication(index, 'morning', parseInt(e.target.value) || 0)}
-                        className="h-8"
-                      />
+                    
+                    <div className="flex gap-4">
+                      {/* Dosage Section */}
+                      <div className="flex-1">
+                        <label className="text-sm font-medium text-muted-foreground">Dosage</label>
+                        <div className="grid grid-cols-2 gap-2 mt-1">
+                          <div>
+                            <label className="text-xs text-muted-foreground">Morning</label>
+                            <Input
+                              type="number"
+                              value={medication.morning}
+                              onChange={(e) => updateMedication(index, 'morning', parseInt(e.target.value) || 0)}
+                              className="h-8"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-muted-foreground">Noon</label>
+                            <Input
+                              type="number"
+                              value={medication.noon}
+                              onChange={(e) => updateMedication(index, 'noon', parseInt(e.target.value) || 0)}
+                              className="h-8"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-muted-foreground">Evening</label>
+                            <Input
+                              type="number"
+                              value={medication.evening}
+                              onChange={(e) => updateMedication(index, 'evening', parseInt(e.target.value) || 0)}
+                              className="h-8"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-muted-foreground">Night</label>
+                            <Input
+                              type="number"
+                              value={medication.night}
+                              onChange={(e) => updateMedication(index, 'night', parseInt(e.target.value) || 0)}
+                              className="h-8"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Duration and Remarks Section */}
+                      <div className="flex-1 space-y-2">
+                        <div>
+                          <label className="text-xs text-muted-foreground">Duration (Days)</label>
+                          <Input
+                            type="number"
+                            value={medication.duration}
+                            onChange={(e) => updateMedication(index, 'duration', parseInt(e.target.value) || 0)}
+                            className="h-8 mt-1"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground">Time to Take</label>
+                          <Input
+                            value={medication.timeToTake}
+                            onChange={(e) => updateMedication(index, 'timeToTake', e.target.value)}
+                            className="h-8 mt-1"
+                            placeholder="e.g., After meals"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground">Remarks</label>
+                          <Textarea
+                            value={medication.remarks}
+                            onChange={(e) => updateMedication(index, 'remarks', e.target.value)}
+                            className="mt-1 min-h-[60px]"
+                            placeholder="Additional instructions"
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <Input
-                        type="number"
-                        value={medication.noon}
-                        onChange={(e) => updateMedication(index, 'noon', parseInt(e.target.value) || 0)}
-                        className="h-8"
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        type="number"
-                        value={medication.evening}
-                        onChange={(e) => updateMedication(index, 'evening', parseInt(e.target.value) || 0)}
-                        className="h-8"
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        type="number"
-                        value={medication.night}
-                        onChange={(e) => updateMedication(index, 'night', parseInt(e.target.value) || 0)}
-                        className="h-8"
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        type="number"
-                        value={medication.duration}
-                        onChange={(e) => updateMedication(index, 'duration', parseInt(e.target.value) || 0)}
-                        className="h-8"
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        value={medication.timeToTake}
-                        onChange={(e) => updateMedication(index, 'timeToTake', e.target.value)}
-                        className="h-8"
-                      />
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Input
-                        value={medication.remarks}
-                        onChange={(e) => updateMedication(index, 'remarks', e.target.value)}
-                        className="h-8 flex-1"
-                      />
+                    
+                    {/* Remove Button */}
+                    <div className="flex justify-end">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => removeMedication(index)}
-                        className="text-red-500 hover:text-red-700 h-8 w-8 p-0"
+                        className="text-red-500 hover:text-red-700"
                       >
-                        <X size={14} />
+                        <X size={16} className="mr-1" />
+                        Remove
                       </Button>
                     </div>
                   </div>
