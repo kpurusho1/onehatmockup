@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Plus, User, Clock, Play, Pause, Square, X, Search, Edit2, Send, ArrowLeft } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Plus, User, Clock, Play, Pause, Square, X, Search, Edit2, Send, ArrowLeft, Eye, Loader2 } from "lucide-react";
 import { AddPatientDialog } from "@/components/AddPatientDialog";
 
 interface Patient {
@@ -37,9 +39,10 @@ interface MedicalRecord {
   recordDate: string;
 }
 
-type FlowStep = 'select-patient' | 'recording' | 'view-record' | 'edit-record' | 'send-record';
+type FlowStep = 'select-patient' | 'recording' | 'processing' | 'view-record' | 'edit-record' | 'send-record';
 
 export default function CreateRecordTab() {
+  const { toast } = useToast();
   const [patients] = useState<Patient[]>([
     { id: "1", name: "John Doe", phone: "8954229999", age: 35 },
     { id: "2", name: "Jane Smith", phone: "9876543210", age: 28 },
@@ -54,12 +57,14 @@ export default function CreateRecordTab() {
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [showRemarksDialog, setShowRemarksDialog] = useState(false);
+  const [selectedRemarks, setSelectedRemarks] = useState("");
   
   // Mock medical record data
   const [medicalRecord, setMedicalRecord] = useState<MedicalRecord>({
     id: "1",
     patientId: "",
-    keyFacts: "Patient is prescribed antibiotics, alpha blocker, and pain medication for kidney stone.\nFollow-up is scheduled via WhatsApp message after one week.\nCost of the procedure is estimated at 20 plus medicines.\nMedical expulsive therapy is the initial plan, with URS plus DJ stent as a backup.",
+    keyFacts: "Patient presents with symptoms consistent with kidney stone. Experiencing severe flank pain, nausea, and difficulty urinating. Physical examination reveals tenderness in the right costovertebral angle.",
     medications: [
       {
         id: "1",
@@ -69,8 +74,8 @@ export default function CreateRecordTab() {
         evening: 1,
         night: 0,
         duration: 7,
-        timeToTake: "N/A",
-        remarks: "Oral antibiotic, 200 BD, morning one, evening one, for seven days, finish a course."
+        timeToTake: "After meals",
+        remarks: "Oral antibiotic, 200mg BD, morning one, evening one, for seven days, finish a course. Important to complete full course even if symptoms improve."
       },
       {
         id: "2",
@@ -80,8 +85,8 @@ export default function CreateRecordTab() {
         evening: 0,
         night: 0,
         duration: 3,
-        timeToTake: "N/A",
-        remarks: "Keep Drotin for only three days. After three days, if there is pain, then put it in, otherwise, stop it."
+        timeToTake: "As needed",
+        remarks: "Keep Drotin for only three days. After three days, if there is pain, then put it in, otherwise, stop it. Take only when experiencing severe pain."
       },
       {
         id: "3",
@@ -91,17 +96,20 @@ export default function CreateRecordTab() {
         evening: 0,
         night: 0,
         duration: 7,
-        timeToTake: "N/A",
-        remarks: "Alpha blocker. This is what will help you pass out the stone. This can be kept for seven days."
+        timeToTake: "Before bedtime",
+        remarks: "Alpha blocker. This is what will help you pass out the stone. This can be kept for seven days. Take consistently at the same time each day."
       }
     ],
-    nextSteps: "Immediate Actions: Start Cefixime and Urimax for seven days and Drotin for three days if needed.",
+    nextSteps: "Schedule follow-up appointment in one week. Increase fluid intake to 3-4 liters per day. Return immediately if symptoms worsen or fever develops.",
     recordDate: new Date().toLocaleDateString()
   });
+
+  const [diagnosis, setDiagnosis] = useState("Nephrolithiasis (Kidney Stone) - Right Side");
 
   const [isEditing, setIsEditing] = useState(false);
   const [selectedSections, setSelectedSections] = useState({
     keyFacts: true,
+    diagnosis: true,
     prescriptionData: true,
     nextSteps: true
   });
@@ -143,8 +151,13 @@ export default function CreateRecordTab() {
   const stopRecording = () => {
     setIsRecording(false);
     setIsPaused(false);
-    setCurrentStep('view-record');
+    setCurrentStep('processing');
     setMedicalRecord(prev => ({ ...prev, patientId: selectedPatient?.id || "" }));
+    
+    // Simulate processing time
+    setTimeout(() => {
+      setCurrentStep('view-record');
+    }, 3000);
   };
 
   const cancelRecording = () => {
@@ -171,11 +184,29 @@ export default function CreateRecordTab() {
   };
 
   const sendRecord = () => {
-    // Handle sending logic here
-    alert("Record sent successfully!");
+    toast({
+      title: "Records sent successfully!",
+      description: "The medical record has been sent to the patient.",
+    });
     setCurrentStep('select-patient');
     setSelectedPatient(null);
     setSelectedPatientId("");
+  };
+
+  const saveRecord = () => {
+    toast({
+      title: "Record saved!",
+      description: "The medical record has been saved successfully.",
+    });
+  };
+
+  const createNewRx = () => {
+    setMedicalRecord(prev => ({
+      ...prev,
+      medications: []
+    }));
+    setIsEditing(true);
+    setCurrentStep('edit-record');
   };
 
   const goBack = () => {
@@ -407,6 +438,20 @@ export default function CreateRecordTab() {
     );
   }
 
+  // Processing View
+  if (currentStep === 'processing') {
+    return (
+      <div className="flex flex-col h-full pb-24 items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+          <h2 className="text-xl font-semibold">Processing...</h2>
+          <p className="text-muted-foreground">
+            Analyzing your recording and generating medical summary
+          </p>
+        </div>
+      </div>
+    );
+  }
   // View/Edit Record View
   if (currentStep === 'view-record' || currentStep === 'edit-record' || currentStep === 'send-record') {
     return (
@@ -417,11 +462,14 @@ export default function CreateRecordTab() {
             <Button variant="ghost" size="sm" onClick={goBack}>
               <ArrowLeft size={16} />
             </Button>
-            <h1 className="text-xl font-semibold">Complete Medical Record</h1>
+            <h1 className="text-xl font-semibold">Medical Summary</h1>
           </div>
           <div className="flex items-center gap-2">
-            {currentStep === 'send-record' && (
-              <span className="text-lg font-medium">Select to Send</span>
+            {currentStep === 'view-record' && (
+              <Button variant="outline" size="sm" onClick={handleEdit}>
+                <Edit2 size={16} className="mr-1" />
+                Edit
+              </Button>
             )}
           </div>
         </div>
@@ -430,23 +478,13 @@ export default function CreateRecordTab() {
           {/* Key Facts Section */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold">Key Facts</h2>
-                {!isEditing && (
-                  <Badge variant="secondary" className="text-xs">
-                    <Send size={12} className="mr-1" />
-                    Sent
-                  </Badge>
-                )}
-              </div>
-              {currentStep === 'send-record' && (
-                <Checkbox 
-                  checked={selectedSections.keyFacts}
-                  onCheckedChange={(checked) => 
-                    setSelectedSections(prev => ({ ...prev, keyFacts: !!checked }))
-                  }
-                />
-              )}
+              <h2 className="text-lg font-semibold">Key Facts</h2>
+              <Checkbox 
+                checked={selectedSections.keyFacts}
+                onCheckedChange={(checked) => 
+                  setSelectedSections(prev => ({ ...prev, keyFacts: !!checked }))
+                }
+              />
             </div>
             {isEditing ? (
               <Textarea
@@ -462,148 +500,185 @@ export default function CreateRecordTab() {
             )}
           </div>
 
+          {/* Diagnosis Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Diagnosis</h2>
+              <Checkbox 
+                checked={selectedSections.diagnosis}
+                onCheckedChange={(checked) => 
+                  setSelectedSections(prev => ({ ...prev, diagnosis: !!checked }))
+                }
+              />
+            </div>
+            {isEditing ? (
+              <Input
+                value={diagnosis}
+                onChange={(e) => setDiagnosis(e.target.value)}
+                placeholder="Enter diagnosis..."
+              />
+            ) : (
+              <div className="p-4 bg-muted/50 rounded-lg">
+                <p className="font-medium">{diagnosis}</p>
+              </div>
+            )}
+          </div>
+
           {/* Prescription Data Section */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold">Prescription Data</h2>
-                {!isEditing && (
-                  <Badge variant="secondary" className="text-xs">
-                    <Send size={12} className="mr-1" />
-                    Sent
-                  </Badge>
-                )}
+                <h2 className="text-lg font-semibold">Prescription</h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={createNewRx}
+                  className="text-xs"
+                >
+                  <Plus size={12} className="mr-1" />
+                  Create Rx
+                </Button>
               </div>
-              {currentStep === 'send-record' && (
-                <Checkbox 
-                  checked={selectedSections.prescriptionData}
-                  onCheckedChange={(checked) => 
-                    setSelectedSections(prev => ({ ...prev, prescriptionData: !!checked }))
-                  }
-                />
-              )}
+              <Checkbox 
+                checked={selectedSections.prescriptionData}
+                onCheckedChange={(checked) => 
+                  setSelectedSections(prev => ({ ...prev, prescriptionData: !!checked }))
+                }
+              />
             </div>
             
-            <div className="border rounded-lg overflow-hidden">
-              <div className="grid grid-cols-8 gap-2 p-3 bg-muted text-sm font-medium">
-                <div>Medicine</div>
-                <div>Morning</div>
-                <div>Noon</div>
-                <div>Evening</div>
-                <div>Night</div>
-                <div>Duration (Days)</div>
-                <div>Time to Take</div>
-                <div>Remarks</div>
-              </div>
-              
-              {medicalRecord.medications.map((medication, index) => (
-                <div key={medication.id} className="grid grid-cols-8 gap-2 p-3 border-t text-sm">
-                  <div>
-                    {isEditing ? (
+            {isEditing ? (
+              // Table format for editing
+              <div className="border rounded-lg overflow-hidden">
+                <div className="grid grid-cols-8 gap-2 p-3 bg-muted text-sm font-medium">
+                  <div>Medicine</div>
+                  <div>Morning</div>
+                  <div>Noon</div>
+                  <div>Evening</div>
+                  <div>Night</div>
+                  <div>Duration</div>
+                  <div>Time</div>
+                  <div>Remarks</div>
+                </div>
+                
+                {medicalRecord.medications.map((medication, index) => (
+                  <div key={medication.id} className="grid grid-cols-8 gap-2 p-3 border-t text-sm">
+                    <div>
                       <Input
                         value={medication.name}
                         onChange={(e) => updateMedication(index, 'name', e.target.value)}
                         className="h-8"
                       />
-                    ) : (
-                      medication.name
-                    )}
-                  </div>
-                  <div>
-                    {isEditing ? (
+                    </div>
+                    <div>
                       <Input
                         type="number"
                         value={medication.morning}
                         onChange={(e) => updateMedication(index, 'morning', parseInt(e.target.value) || 0)}
                         className="h-8"
                       />
-                    ) : (
-                      medication.morning
-                    )}
-                  </div>
-                  <div>
-                    {isEditing ? (
+                    </div>
+                    <div>
                       <Input
                         type="number"
                         value={medication.noon}
                         onChange={(e) => updateMedication(index, 'noon', parseInt(e.target.value) || 0)}
                         className="h-8"
                       />
-                    ) : (
-                      medication.noon
-                    )}
-                  </div>
-                  <div>
-                    {isEditing ? (
+                    </div>
+                    <div>
                       <Input
                         type="number"
                         value={medication.evening}
                         onChange={(e) => updateMedication(index, 'evening', parseInt(e.target.value) || 0)}
                         className="h-8"
                       />
-                    ) : (
-                      medication.evening
-                    )}
-                  </div>
-                  <div>
-                    {isEditing ? (
+                    </div>
+                    <div>
                       <Input
                         type="number"
                         value={medication.night}
                         onChange={(e) => updateMedication(index, 'night', parseInt(e.target.value) || 0)}
                         className="h-8"
                       />
-                    ) : (
-                      medication.night
-                    )}
-                  </div>
-                  <div>
-                    {isEditing ? (
+                    </div>
+                    <div>
                       <Input
                         type="number"
                         value={medication.duration}
                         onChange={(e) => updateMedication(index, 'duration', parseInt(e.target.value) || 0)}
                         className="h-8"
                       />
-                    ) : (
-                      medication.duration
-                    )}
-                  </div>
-                  <div>
-                    {isEditing ? (
+                    </div>
+                    <div>
                       <Input
                         value={medication.timeToTake}
                         onChange={(e) => updateMedication(index, 'timeToTake', e.target.value)}
                         className="h-8"
                       />
-                    ) : (
-                      medication.timeToTake
-                    )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Input
+                        value={medication.remarks}
+                        onChange={(e) => updateMedication(index, 'remarks', e.target.value)}
+                        className="h-8 flex-1"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeMedication(index)}
+                        className="text-red-500 hover:text-red-700 h-8 w-8 p-0"
+                      >
+                        <X size={14} />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    {isEditing ? (
-                      <div className="flex items-center gap-1">
-                        <Input
-                          value={medication.remarks}
-                          onChange={(e) => updateMedication(index, 'remarks', e.target.value)}
-                          className="h-8 flex-1"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeMedication(index)}
-                          className="text-red-500 hover:text-red-700 h-8 w-8 p-0"
-                        >
-                          <X size={14} />
-                        </Button>
+                ))}
+              </div>
+            ) : (
+              // Card format for viewing with eye button for remarks
+              <div className="space-y-3">
+                {medicalRecord.medications.map((medication, index) => (
+                  <div key={medication.id} className="p-4 border rounded-lg">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-lg">{medication.name}</h3>
+                      <Badge variant="outline">{medication.duration} days</Badge>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2 text-sm mb-2">
+                      <div>
+                        <span className="text-muted-foreground">Morning:</span> {medication.morning}
                       </div>
-                    ) : (
-                      medication.remarks
-                    )}
+                      <div>
+                        <span className="text-muted-foreground">Noon:</span> {medication.noon}
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Evening:</span> {medication.evening}
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Night:</span> {medication.night}
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground mb-2">
+                      <span className="font-medium">Time to take:</span> {medication.timeToTake}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Remarks:</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedRemarks(medication.remarks);
+                          setShowRemarksDialog(true);
+                        }}
+                      >
+                        <Eye size={16} />
+                        View
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
             
             {isEditing && (
               <Button onClick={addMedication} variant="outline" className="w-full">
@@ -616,23 +691,13 @@ export default function CreateRecordTab() {
           {/* Next Steps Section */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold">Next Steps</h2>
-                {!isEditing && (
-                  <Badge variant="secondary" className="text-xs">
-                    <Send size={12} className="mr-1" />
-                    Sent
-                  </Badge>
-                )}
-              </div>
-              {currentStep === 'send-record' && (
-                <Checkbox 
-                  checked={selectedSections.nextSteps}
-                  onCheckedChange={(checked) => 
-                    setSelectedSections(prev => ({ ...prev, nextSteps: !!checked }))
-                  }
-                />
-              )}
+              <h2 className="text-lg font-semibold">Next Steps</h2>
+              <Checkbox 
+                checked={selectedSections.nextSteps}
+                onCheckedChange={(checked) => 
+                  setSelectedSections(prev => ({ ...prev, nextSteps: !!checked }))
+                }
+              />
             </div>
             {isEditing ? (
               <Textarea
@@ -650,37 +715,47 @@ export default function CreateRecordTab() {
         </div>
 
         {/* Action Buttons */}
-        <div className="p-4 border-t flex justify-between">
-          {currentStep === 'send-record' ? (
-            <>
-              <Button variant="outline">
-                Advanced Sending Options
+        <div className="p-4 border-t">
+          {isEditing ? (
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setCurrentStep('view-record')} className="flex-1">
+                Cancel
               </Button>
-              <Button onClick={sendRecord} className="flex items-center gap-2">
-                <Send size={16} />
-                Send Record
-              </Button>
-            </>
-          ) : isEditing ? (
-            <>
-              <div></div>
-              <Button onClick={saveChanges} className="flex items-center gap-2">
+              <Button onClick={saveChanges} className="flex-1">
                 Save Changes
               </Button>
-            </>
+            </div>
           ) : (
-            <>
-              <Button variant="outline" onClick={handleEdit} className="flex items-center gap-2">
-                <Edit2 size={16} />
-                Edit
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={saveRecord}
+                className="flex-1"
+              >
+                Save
               </Button>
-              <Button onClick={goToSendRecord} className="flex items-center gap-2">
-                <Send size={16} />
-                Send Record
+              <Button 
+                onClick={sendRecord}
+                className="flex-1 bg-green-600 hover:bg-green-700"
+              >
+                <Send size={16} className="mr-1" />
+                Send
               </Button>
-            </>
+            </div>
           )}
         </div>
+
+        {/* Remarks Dialog */}
+        <Dialog open={showRemarksDialog} onOpenChange={setShowRemarksDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Medication Remarks</DialogTitle>
+            </DialogHeader>
+            <div className="p-4">
+              <p className="whitespace-pre-line">{selectedRemarks}</p>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
