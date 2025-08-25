@@ -235,29 +235,35 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                 <Pill size={20} className="mr-2 text-primary" />
                 Prescription
                 {!selectedSections.prescription && <span className="ml-2 text-xs text-muted-foreground">(not selected for sending)</span>}
+                <CheckCircle2 size={20} className="ml-auto text-green-600" />
               </h3>
               {isEditing ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {mockRecord.medications.map((medication, index) => (
-                    <div key={index} className="p-4 border rounded-lg space-y-3">
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded text-sm font-medium"
-                        value={medication.name}
-                        onChange={(e) => setMockRecord(prev => ({
-                          ...prev,
-                          medications: prev.medications.map((med, i) => 
-                            i === index ? { ...med, name: e.target.value } : med
-                          )
-                        }))}
-                        placeholder="Medication name"
-                      />
-                      <div className="grid grid-cols-4 gap-2">
+                    <div key={index} className="bg-gray-50 rounded-lg p-6 space-y-4">
+                      {/* Medicine Name */}
+                      <div>
+                        <input
+                          type="text"
+                          className="w-full p-3 border border-gray-300 rounded-lg text-lg font-medium bg-white"
+                          value={medication.name}
+                          onChange={(e) => setMockRecord(prev => ({
+                            ...prev,
+                            medications: prev.medications.map((med, i) => 
+                              i === index ? { ...med, name: e.target.value } : med
+                            )
+                          }))}
+                          placeholder="Enter medicine name"
+                        />
+                      </div>
+
+                      {/* Dosage Grid */}
+                      <div className="grid grid-cols-4 gap-3">
                         <div>
-                          <label className="text-xs text-muted-foreground">Morning</label>
+                          <label className="block text-sm font-medium text-gray-600 mb-2">Morning</label>
                           <input
                             type="number"
-                            className="w-full p-1 border rounded text-xs"
+                            className="w-full p-3 border border-gray-300 rounded-lg text-center text-lg font-medium bg-white"
                             value={medication.morning}
                             onChange={(e) => setMockRecord(prev => ({
                               ...prev,
@@ -268,10 +274,10 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-muted-foreground">Noon</label>
+                          <label className="block text-sm font-medium text-gray-600 mb-2">Noon</label>
                           <input
                             type="number"
-                            className="w-full p-1 border rounded text-xs"
+                            className="w-full p-3 border border-gray-300 rounded-lg text-center text-lg font-medium bg-white"
                             value={medication.noon}
                             onChange={(e) => setMockRecord(prev => ({
                               ...prev,
@@ -282,10 +288,10 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-muted-foreground">Evening</label>
+                          <label className="block text-sm font-medium text-gray-600 mb-2">Evening</label>
                           <input
                             type="number"
-                            className="w-full p-1 border rounded text-xs"
+                            className="w-full p-3 border border-gray-300 rounded-lg text-center text-lg font-medium bg-white"
                             value={medication.evening}
                             onChange={(e) => setMockRecord(prev => ({
                               ...prev,
@@ -296,10 +302,10 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-muted-foreground">Night</label>
+                          <label className="block text-sm font-medium text-gray-600 mb-2">Night</label>
                           <input
                             type="number"
-                            className="w-full p-1 border rounded text-xs"
+                            className="w-full p-3 border border-gray-300 rounded-lg text-center text-lg font-medium bg-white"
                             value={medication.night}
                             onChange={(e) => setMockRecord(prev => ({
                               ...prev,
@@ -310,12 +316,14 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                           />
                         </div>
                       </div>
+
+                      {/* Duration and Time to take */}
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-xs text-muted-foreground">Duration</label>
+                          <label className="block text-sm font-medium text-gray-600 mb-2">Duration</label>
                           <input
                             type="text"
-                            className="w-full p-2 border rounded text-sm"
+                            className="w-full p-3 border border-gray-300 rounded-lg bg-white"
                             value={medication.duration}
                             onChange={(e) => setMockRecord(prev => ({
                               ...prev,
@@ -323,14 +331,14 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                                 i === index ? { ...med, duration: e.target.value } : med
                               )
                             }))}
-                            placeholder="Duration"
+                            placeholder="e.g., 7 days"
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-muted-foreground">Time to take</label>
+                          <label className="block text-sm font-medium text-gray-600 mb-2">Time to take</label>
                           <input
                             type="text"
-                            className="w-full p-2 border rounded text-sm"
+                            className="w-full p-3 border border-gray-300 rounded-lg bg-white"
                             value={medication.timeToTake}
                             onChange={(e) => setMockRecord(prev => ({
                               ...prev,
@@ -338,58 +346,83 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                                 i === index ? { ...med, timeToTake: e.target.value } : med
                               )
                             }))}
-                            placeholder="Time to take"
+                            placeholder="e.g., After meals"
                           />
                         </div>
                       </div>
-                      <textarea
-                        className="w-full p-2 border rounded text-xs min-h-[60px]"
-                        value={medication.remarks}
-                        onChange={(e) => setMockRecord(prev => ({
-                          ...prev,
-                          medications: prev.medications.map((med, i) => 
-                            i === index ? { ...med, remarks: e.target.value } : med
-                          )
-                        }))}
-                        placeholder="Remarks"
-                      />
+
+                      {/* Remarks */}
+                      <div>
+                        <textarea
+                          className="w-full p-3 border border-gray-300 rounded-lg bg-white min-h-[100px] text-sm"
+                          value={medication.remarks}
+                          onChange={(e) => setMockRecord(prev => ({
+                            ...prev,
+                            medications: prev.medications.map((med, i) => 
+                              i === index ? { ...med, remarks: e.target.value } : med
+                            )
+                          }))}
+                          placeholder="Additional instructions or remarks..."
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className={`space-y-4 ${!selectedSections.prescription ? 'opacity-50' : ''}`}>
+                <div className={`space-y-6 ${!selectedSections.prescription ? 'opacity-50' : ''}`}>
                   {mockRecord.medications.map((medication, index) => (
-                    <div key={index} className="p-4 border rounded-lg">
-                      <div className="flex justify-between items-start mb-3">
-                        <h4 className="font-semibold text-lg">{medication.name}</h4>
-                        <Badge variant="outline">{medication.duration}</Badge>
+                    <div key={index} className="bg-gray-50 rounded-lg p-6">
+                      {/* Medicine Header */}
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-lg font-semibold text-gray-800">{medication.name}</h4>
+                        <CheckCircle2 size={20} className="text-green-600" />
                       </div>
                       
-                      <div className="grid grid-cols-4 gap-4 text-sm mb-3">
-                        <div>
-                          <span className="text-muted-foreground">Morning:</span> {medication.morning}
+                      {/* Dosage Grid */}
+                      <div className="grid grid-cols-4 gap-4 mb-4">
+                        <div className="text-center">
+                          <div className="text-sm font-medium text-gray-600 mb-1">Morning</div>
+                          <div className="text-2xl font-bold text-gray-800 bg-white rounded-lg py-2 border">
+                            {medication.morning}
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">Noon:</span> {medication.noon}
+                        <div className="text-center">
+                          <div className="text-sm font-medium text-gray-600 mb-1">Noon</div>
+                          <div className="text-2xl font-bold text-gray-800 bg-white rounded-lg py-2 border">
+                            {medication.noon}
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">Evening:</span> {medication.evening}
+                        <div className="text-center">
+                          <div className="text-sm font-medium text-gray-600 mb-1">Evening</div>
+                          <div className="text-2xl font-bold text-gray-800 bg-white rounded-lg py-2 border">
+                            {medication.evening}
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">Night:</span> {medication.night}
+                        <div className="text-center">
+                          <div className="text-sm font-medium text-gray-600 mb-1">Night</div>
+                          <div className="text-2xl font-bold text-gray-800 bg-white rounded-lg py-2 border">
+                            {medication.night}
+                          </div>
                         </div>
                       </div>
-                      
-                      <div className="text-sm text-muted-foreground mb-3">
-                        <span className="font-medium">Time to take:</span> {medication.timeToTake}
+
+                      {/* Duration and Time to take */}
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="bg-white rounded-lg p-3 border">
+                          <div className="text-sm font-medium text-gray-600 mb-1">Duration</div>
+                          <div className="font-semibold text-gray-800">{medication.duration}</div>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border">
+                          <div className="text-sm font-medium text-gray-600 mb-1">Time to take</div>
+                          <div className="font-semibold text-gray-800">{medication.timeToTake}</div>
+                        </div>
                       </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Remarks:</span>
-                        <Button variant="ghost" size="sm">
-                          <Eye size={16} className="mr-1" />
-                          View
-                        </Button>
+
+                      {/* Remarks */}
+                      <div className="bg-white rounded-lg p-4 border">
+                        <div className="text-sm text-gray-600 leading-relaxed">
+                          {medication.remarks}
+                        </div>
                       </div>
                     </div>
                   ))}

@@ -30,7 +30,8 @@ const App = () => (
         {/* Mobile App Route */}
         <Route path="/mobile" element={<MobileLayout />} />
         
-        {/* Desktop Routes */}
+        {/* Desktop Routes - Hidden for now */}
+        {/*
         <Route path="/desktop" element={<Layout />}>
           <Route index element={<Navigate to="/desktop/patient-protocols" replace />} />
           <Route path="voice-health" element={<VoiceHealthRecord />} />
@@ -39,13 +40,15 @@ const App = () => (
           <Route path="prescription" element={<Prescription />} />
           <Route path="profile" element={<Profile />} />
         </Route>
+        */}
         
-        {/* Legacy desktop routes for backward compatibility */}
-        <Route path="/voice-health" element={<Navigate to="/desktop/voice-health" replace />} />
-        <Route path="/patient-protocols" element={<Navigate to="/desktop/patient-protocols" replace />} />
-        <Route path="/protocol-templates" element={<Navigate to="/desktop/protocol-templates" replace />} />
-        <Route path="/prescription" element={<Navigate to="/desktop/prescription" replace />} />
-        <Route path="/profile" element={<Navigate to="/desktop/profile" replace />} />
+        {/* Legacy desktop routes redirected to mobile */}
+        <Route path="/voice-health" element={<Navigate to="/mobile" replace />} />
+        <Route path="/patient-protocols" element={<Navigate to="/mobile" replace />} />
+        <Route path="/protocol-templates" element={<Navigate to="/mobile" replace />} />
+        <Route path="/prescription" element={<Navigate to="/mobile" replace />} />
+        <Route path="/profile" element={<Navigate to="/mobile" replace />} />
+        <Route path="/desktop" element={<Navigate to="/mobile" replace />} />
         
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />

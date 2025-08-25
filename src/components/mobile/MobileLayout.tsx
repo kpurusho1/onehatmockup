@@ -3,12 +3,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { FileText, Eye, Users, Home, Bell, Settings } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { FileText, Eye, Users, Home, Bell, Settings, Mic, LogOut, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import CreateRecordTab from "./CreateRecordTab";
 import ViewHealthRecordsTab from "./ViewHealthRecordsTab";
 import PatientManagementTab from "./PatientManagementTab";
 
 export const MobileLayout = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("home");
   const [homeSubTab, setHomeSubTab] = useState<'consultations' | 'pending'>('consultations');
   const [notifications, setNotifications] = useState([
@@ -55,7 +58,7 @@ export const MobileLayout = () => {
       <header className="text-primary-foreground p-4 shadow-lg" style={{ backgroundColor: '#1c2f7f' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <img src="/src/assets/1hat-logo.png" alt="1hat" className="w-8 h-8" />
+            <span className="text-lg font-bold">1hat</span>
             <div>
               <h1 className="text-lg font-bold">Dr. Abhishant Padmanaban</h1>
               <p className="text-sm opacity-90">City General Hospital</p>
@@ -121,14 +124,28 @@ export const MobileLayout = () => {
               )}
             </div>
             
-            <Button
-              variant="ghost"
-              size="sm" 
-              className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-primary-foreground hover:bg-white/30"
-              onClick={() => setShowProfile(true)}
-            >
-              <span className="text-sm font-medium">Dr</span>
-            </Button>
+            {/* Profile Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm" 
+                  className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-primary-foreground hover:bg-white/30"
+                >
+                  <span className="text-sm font-medium">Dr</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => setShowProfile(true)}>
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/login')}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
@@ -281,7 +298,7 @@ export const MobileLayout = () => {
               value="home" 
               className="flex flex-col gap-1 h-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              <Home size={20} />
+              <Mic size={20} />
               <span className="text-xs">Create new</span>
             </TabsTrigger>
             <TabsTrigger 
