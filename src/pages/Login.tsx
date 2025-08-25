@@ -22,7 +22,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'hsl(168, 49%, 44%)' }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'hsl(var(--brand-navy))' }}>
       <div className="w-full max-w-md">
         {/* Welcome Header */}
         <div className="text-center mb-8">
@@ -106,6 +106,12 @@ export default function Login() {
                       <SelectItem value="guru">Guru Hospital</SelectItem>
                       <SelectItem value="giri">Giri Hospital</SelectItem>
                       <SelectItem value="women-child">Women and Child Clinic</SelectItem>
+                      <SelectItem value="apollo">Apollo Hospital</SelectItem>
+                      <SelectItem value="fortis">Fortis Healthcare</SelectItem>
+                      <SelectItem value="manipal">Manipal Hospital</SelectItem>
+                      <SelectItem value="max">Max Healthcare</SelectItem>
+                      <SelectItem value="aiims">AIIMS</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -114,8 +120,8 @@ export default function Login() {
               {/* Sign In Button */}
               <Button 
                 type="submit" 
-                className="w-full h-12 text-lg font-semibold text-white"
-                style={{ backgroundColor: '#1c2f7f' }}
+                className="w-full h-12 text-lg font-semibold"
+                style={{ backgroundColor: 'hsl(var(--brand-primary))', color: 'white' }}
               >
                 Sign In
               </Button>
@@ -128,8 +134,8 @@ export default function Login() {
               </button>
               <p className="text-xs text-muted-foreground">
                 Need help? Contact support at{" "}
-                <a href="mailto:support@1hat.in" className="text-primary hover:underline">
-                  support@1hat.in
+                <a href="mailto:support@1hat.com" className="text-primary hover:underline">
+                  support@1hat.com
                 </a>
               </p>
             </div>

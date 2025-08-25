@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,24 +37,6 @@ export const MobileLayout = () => {
   const unreadCount = notifications.filter(n => !n.isRead).length;
   const [notificationRecordData, setNotificationRecordData] = useState<any>(null);
   const [showProfile, setShowProfile] = useState(false);
-  const notificationsRef = useRef<HTMLDivElement>(null);
-
-  // Close notifications on outside click
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-        setShowNotifications(false);
-      }
-    };
-
-    if (showNotifications) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showNotifications]);
 
   const handleNotificationClick = (notification: any) => {
     // Mark as read
@@ -84,7 +66,7 @@ export const MobileLayout = () => {
           </div>
           <div className="flex items-center space-x-3">
             {/* Notification Bell */}
-            <div className="relative" ref={notificationsRef}>
+            <div className="relative">
               <Button
                 variant="ghost"
                 size="sm"

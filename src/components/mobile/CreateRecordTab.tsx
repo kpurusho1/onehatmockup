@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -74,7 +74,6 @@ export default function CreateRecordTab() {
   const [showRemarksDialog, setShowRemarksDialog] = useState(false);
   const [selectedRemarks, setSelectedRemarks] = useState("");
   const [processingProgress, setProcessingProgress] = useState(0);
-  const patientSelectionRef = useRef<HTMLDivElement>(null);
   
   // Mock medical record data
   const [medicalRecord, setMedicalRecord] = useState<MedicalRecord>({
@@ -141,43 +140,18 @@ export default function CreateRecordTab() {
     return () => clearInterval(interval);
   }, [isRecording, isPaused]);
 
-  // Click outside to deselect patient
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (patientSelectionRef.current && !patientSelectionRef.current.contains(event.target as Node)) {
-        setSelectedPatientId("");
-      }
-    };
-
-    if (selectedPatientId && currentStep === 'select-patient') {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [selectedPatientId, currentStep]);
-
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.phone.includes(searchTerm)
   );
 
   const startRecording = () => {
-    console.log("startRecording called, selectedPatientId:", selectedPatientId);
-    console.log("Current step before:", currentStep);
     const patient = patients.find(p => p.id === selectedPatientId);
-    console.log("Found patient:", patient);
     if (patient) {
-      console.log("Setting patient and changing step to recording");
       setSelectedPatient(patient);
       setCurrentStep('recording');
       setIsRecording(true);
       setRecordingDuration(0);
-      console.log("Recording started for patient:", patient.name);
-      console.log("New step should be: recording");
-    } else {
-      console.log("No patient found for ID:", selectedPatientId);
     }
   };
 
@@ -368,7 +342,7 @@ export default function CreateRecordTab() {
             />
           </div>
 
-          <div className="space-y-2 max-h-96 overflow-y-auto" ref={patientSelectionRef}>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
             {filteredPatients.map((patient) => (
               <div
                 key={patient.id}
@@ -379,10 +353,7 @@ export default function CreateRecordTab() {
                       ? 'opacity-30 pointer-events-none'
                       : 'hover:bg-muted/50'
                 }`}
-                onClick={() => {
-                  console.log("Patient clicked:", patient.id, patient.name);
-                  setSelectedPatientId(patient.id);
-                }}
+                onClick={() => setSelectedPatientId(patient.id)}
               >
                 {/* Selection Overlay */}
                 {selectedPatientId === patient.id && (
@@ -430,9 +401,7 @@ export default function CreateRecordTab() {
   }
 
   // Recording View
-  console.log("Checking currentStep for recording view:", currentStep);
   if (currentStep === 'recording') {
-    console.log("Rendering recording view for patient:", selectedPatient?.name);
     return (
       <div className="flex flex-col h-full pb-24">
         {/* Back Button */}
