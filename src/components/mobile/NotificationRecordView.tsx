@@ -134,48 +134,16 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Section Selection */}
-          <div className="space-y-3">
-            <h3 className="font-semibold">Select sections to include:</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center space-x-2">
+          {/* Key Facts */}
+          {selectedSections.keyFacts && (
+            <div className="relative">
+              <div className="absolute top-0 right-0">
                 <Checkbox 
                   id="keyFacts"
                   checked={selectedSections.keyFacts}
                   onCheckedChange={() => handleSectionToggle('keyFacts')}
                 />
-                <label htmlFor="keyFacts" className="text-sm font-medium">Key Facts</label>
               </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="diagnosis"
-                  checked={selectedSections.diagnosis}
-                  onCheckedChange={() => handleSectionToggle('diagnosis')}
-                />
-                <label htmlFor="diagnosis" className="text-sm font-medium">Diagnosis</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="prescription"
-                  checked={selectedSections.prescription}
-                  onCheckedChange={() => handleSectionToggle('prescription')}
-                />
-                <label htmlFor="prescription" className="text-sm font-medium">Prescription</label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="nextSteps"
-                  checked={selectedSections.nextSteps}
-                  onCheckedChange={() => handleSectionToggle('nextSteps')}
-                />
-                <label htmlFor="nextSteps" className="text-sm font-medium">Next Steps</label>
-              </div>
-            </div>
-          </div>
-
-          {/* Key Facts */}
-          {selectedSections.keyFacts && (
-            <div>
               <h3 className="font-semibold text-lg mb-3 flex items-center">
                 <FileText size={20} className="mr-2 text-primary" />
                 Key Facts
@@ -193,7 +161,14 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
 
           {/* Diagnosis */}
           {selectedSections.diagnosis && (
-            <div>
+            <div className="relative">
+              <div className="absolute top-0 right-0">
+                <Checkbox 
+                  id="diagnosis"
+                  checked={selectedSections.diagnosis}
+                  onCheckedChange={() => handleSectionToggle('diagnosis')}
+                />
+              </div>
               <h3 className="font-semibold text-lg mb-3">Diagnosis</h3>
               <p className="text-sm text-muted-foreground">{mockRecord.diagnosis}</p>
             </div>
@@ -201,7 +176,14 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
 
           {/* Prescription */}
           {selectedSections.prescription && (
-            <div>
+            <div className="relative">
+              <div className="absolute top-0 right-0">
+                <Checkbox 
+                  id="prescription"
+                  checked={selectedSections.prescription}
+                  onCheckedChange={() => handleSectionToggle('prescription')}
+                />
+              </div>
               <h3 className="font-semibold text-lg mb-3 flex items-center">
                 <Pill size={20} className="mr-2 text-primary" />
                 Prescription
@@ -233,7 +215,14 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
 
           {/* Next Steps */}
           {selectedSections.nextSteps && (
-            <div>
+            <div className="relative">
+              <div className="absolute top-0 right-0">
+                <Checkbox 
+                  id="nextSteps"
+                  checked={selectedSections.nextSteps}
+                  onCheckedChange={() => handleSectionToggle('nextSteps')}
+                />
+              </div>
               <h3 className="font-semibold text-lg mb-3">Next Steps</h3>
               <ul className="space-y-2">
                 {mockRecord.nextSteps.map((step, index) => (

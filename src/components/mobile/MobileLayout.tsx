@@ -10,11 +10,12 @@ import PrescriptionsTab from "./PrescriptionsTab";
 
 export const MobileLayout = () => {
   const [activeTab, setActiveTab] = useState("home");
+  const [homeSubTab, setHomeSubTab] = useState<'consultations' | 'pending'>('consultations');
   const [notifications, setNotifications] = useState([
     {
       id: "1",
       patientName: "Arjun Sharma",
-      message: "Medical summary ready for review",
+      message: "Ready for Review",
       timestamp: "2 min ago",
       isRead: false,
       recordId: "rec_001"
@@ -22,7 +23,7 @@ export const MobileLayout = () => {
     {
       id: "2", 
       patientName: "Priya Patel",
-      message: "Processing completed",
+      message: "Ready for Review",
       timestamp: "5 min ago",
       isRead: false,
       recordId: "rec_002"
@@ -124,141 +125,66 @@ export const MobileLayout = () => {
       <div className="flex-1 overflow-hidden pb-16">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
           <TabsContent value="home" className="h-full m-0">
-            <div className="p-4 space-y-6 h-full">
-              <h2 className="text-2xl font-bold">Welcome to 1hat doc app</h2>
-              
-              {/* Stats Toggle */}
-              <div className="flex justify-center">
+            <div className="h-full flex flex-col">
+              {/* Top Tabs */}
+              <div className="p-4 pb-0">
                 <div className="bg-muted p-1 rounded-lg">
                   <div className="flex">
                     <button
-                      onClick={() => setStatsToggle('today')}
-                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        statsToggle === 'today'
+                      onClick={() => setHomeSubTab('consultations')}
+                      className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        homeSubTab === 'consultations'
                           ? 'bg-background text-foreground shadow-sm'
                           : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      Today
+                      Consultations
                     </button>
                     <button
-                      onClick={() => setStatsToggle('weekly')}
-                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        statsToggle === 'weekly'
+                      onClick={() => setHomeSubTab('pending')}
+                      className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        homeSubTab === 'pending'
                           ? 'bg-background text-foreground shadow-sm'
                           : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      Weekly
+                      Pending Reviews
                     </button>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Dashboard Stats */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50 p-4 rounded-lg border">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    <span className="text-sm text-blue-600/80 dark:text-blue-400/80">Total Patients</span>
-                  </div>
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {statsToggle === 'today' ? '24' : '156'}
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/50 p-4 rounded-lg border">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Calendar className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    <span className="text-sm text-green-600/80 dark:text-green-400/80">Consultations</span>
-                  </div>
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {statsToggle === 'today' ? '12' : '89'}
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50 p-4 rounded-lg border">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <TrendingUp className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                    <span className="text-sm text-purple-600/80 dark:text-purple-400/80">Pending Reviews</span>
-                  </div>
-                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    {statsToggle === 'today' ? '8' : '23'}
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/50 dark:to-orange-900/50 p-4 rounded-lg border">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Bell className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                    <span className="text-sm text-orange-600/80 dark:text-orange-400/80">Follow-ups Due</span>
-                  </div>
-                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                    {statsToggle === 'today' ? '5' : '18'}
                   </div>
                 </div>
               </div>
 
-              {/* Quick Actions */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-center">What are you looking to do?</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Record New Consultation */}
-                  <button
-                    onClick={() => setActiveTab("create-record")}
-                    className="aspect-square bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 flex flex-col items-center justify-center space-y-3 hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105"
-                  >
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                      <FileText className="w-6 h-6" />
+              {/* Content based on sub-tab */}
+              <div className="flex-1 overflow-hidden">
+                {homeSubTab === 'consultations' ? (
+                  <CreateRecordTab />
+                ) : (
+                  <div className="p-4 space-y-4 h-full">
+                    <h3 className="text-lg font-semibold">Pending Reviews</h3>
+                    <div className="space-y-3">
+                      {notifications.filter(n => !n.isRead).map((notification) => (
+                        <div
+                          key={notification.id}
+                          className="p-3 border rounded-lg hover:bg-accent cursor-pointer"
+                          onClick={() => handleNotificationClick(notification)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">{notification.patientName}</span>
+                            <span className="text-xs text-muted-foreground">{notification.timestamp}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{notification.message}</p>
+                        </div>
+                      ))}
+                      {notifications.filter(n => !n.isRead).length === 0 && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          No pending reviews
+                        </div>
+                      )}
                     </div>
-                    <div className="text-center">
-                      <div className="font-semibold text-sm">Record New</div>
-                      <div className="font-semibold text-sm">Consultation</div>
-                    </div>
-                  </button>
-                  
-                  {/* View Patient Records */}
-                  <button
-                    onClick={() => setActiveTab("view-records")}
-                    className="aspect-square bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl p-6 flex flex-col items-center justify-center space-y-3 hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105"
-                  >
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                      <Eye className="w-6 h-6" />
-                    </div>
-                    <div className="text-center">
-                      <div className="font-semibold text-sm">View Patient</div>
-                      <div className="font-semibold text-sm">Records</div>
-                    </div>
-                  </button>
-                  
-                  {/* Manage Prescriptions */}
-                  <button
-                    onClick={() => setActiveTab("prescriptions")}
-                    className="aspect-square bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 flex flex-col items-center justify-center space-y-3 hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105"
-                  >
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                      <Pill className="w-6 h-6" />
-                    </div>
-                    <div className="text-center">
-                      <div className="font-semibold text-sm">Manage</div>
-                      <div className="font-semibold text-sm">Prescriptions</div>
-                    </div>
-                  </button>
-                  
-                  {/* Upload Records */}
-                  <button
-                    className="aspect-square bg-gradient-to-br from-red-500 to-red-600 text-white rounded-2xl p-6 flex flex-col items-center justify-center space-y-3 hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105"
-                  >
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                      <Upload className="w-6 h-6" />
-                    </div>
-                    <div className="text-center">
-                      <div className="font-semibold text-sm">Upload</div>
-                      <div className="font-semibold text-sm">Records</div>
-                    </div>
-                  </button>
-                </div>
+                  </div>
+                )}
               </div>
             </div>
-          </TabsContent>
-          <TabsContent value="create-record" className="h-full m-0">
-            <CreateRecordTab />
           </TabsContent>
           <TabsContent value="view-records" className="h-full m-0">
             <ViewHealthRecordsTab 
@@ -291,20 +217,13 @@ export const MobileLayout = () => {
       {/* Bottom Tab Navigation - Fixed to bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-card border-t shadow-lg z-50">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 h-16 bg-transparent">
+          <TabsList className="grid w-full grid-cols-4 h-16 bg-transparent">
             <TabsTrigger 
               value="home" 
               className="flex flex-col gap-1 h-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Home size={20} />
               <span className="text-xs">Home</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="create-record" 
-              className="flex flex-col gap-1 h-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              <FileText size={20} />
-              <span className="text-xs">Create</span>
             </TabsTrigger>
             <TabsTrigger 
               value="view-records" 

@@ -495,56 +495,45 @@ export default function CreateRecordTab() {
         </div>
 
         {/* Processing Content */}
-        <div className="p-6 space-y-6">
-          <div className="bg-white dark:bg-card rounded-lg p-4 border-l-4 border-green-500">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-medium text-green-700 dark:text-green-400">Processing Recording</h3>
-              <p className="text-sm text-muted-foreground">Generating medical record from your consultation</p>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
+          <div className="text-center space-y-6">
+            <div className="relative">
+              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-green-100 to-blue-100 rounded-full flex items-center justify-center">
+                <Loader2 className="w-16 h-16 text-primary animate-spin" />
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <h3 className="text-2xl font-bold text-primary">Processing Recording</h3>
+              <p className="text-muted-foreground text-lg">
+                AI is analyzing your consultation...
+              </p>
+            </div>
+            
+            <div className="space-y-3">
+              <Progress value={processingProgress} className="w-full max-w-sm mx-auto h-4" />
+              <p className="text-sm text-muted-foreground">
+                {processingProgress}% Complete
+              </p>
             </div>
           </div>
 
-          <div className="text-center space-y-6">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-              <Clock className="w-8 h-8 text-primary" />
-            </div>
-            
-            <div className="text-4xl font-bold text-primary">
-              00:00
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-primary font-medium">Processing... {processingProgress}%</span>
-              </div>
-              <Progress value={processingProgress} className="h-2" />
-            </div>
-
-            <p className="text-muted-foreground">
-              Usually takes 30-60 seconds for record generation
+          <div className="w-full max-w-md space-y-4">
+            <Button 
+              size="lg" 
+              className="w-full h-16 text-lg bg-blue-600 hover:bg-blue-700"
+              onClick={() => {
+                setCurrentStep('select-patient');
+                setSelectedPatient(null);
+                setSelectedPatientId("");
+                setRecordingDuration(0);
+              }}
+            >
+              Create New Recording
+            </Button>
+            <p className="text-sm text-muted-foreground text-center">
+              We'll notify you once this summary is ready!
             </p>
-
-            {/* New section for continuing workflow */}
-            <div className="mt-8 p-4 bg-white dark:bg-card rounded-lg border border-primary/20">
-              <div className="text-center space-y-3">
-                <h4 className="font-medium text-primary">Continue Your Workflow</h4>
-                <p className="text-sm text-muted-foreground">
-                  You can record for another patient while this summary is being generated. 
-                  You'll receive a notification once it's ready.
-                </p>
-                <Button 
-                  onClick={() => {
-                    setCurrentStep('select-patient');
-                    setSelectedPatient(null);
-                    setSelectedPatientId("");
-                    setRecordingDuration(0);
-                  }}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Record for Another Patient
-                </Button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
