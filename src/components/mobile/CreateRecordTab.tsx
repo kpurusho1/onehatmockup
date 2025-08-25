@@ -147,13 +147,27 @@ export default function CreateRecordTab() {
   // Monitor navigation away from processing
   useEffect(() => {
     if (currentStep !== 'processing' && isProcessingRef.current && !processingCompleteRef.current) {
-      // User navigated away before processing completed
+      // User navigated away before processing completed - store for notification
+      const notificationData = {
+        id: Date.now().toString(),
+        patientName: selectedPatient?.name || "Unknown Patient",
+        recordId: Date.now().toString(),
+        type: "processing_complete",
+        message: "Recording processed and ready for review",
+        timestamp: new Date().toISOString()
+      };
+      
+      // Store in localStorage for notification system
+      const existingNotifications = JSON.parse(localStorage.getItem('medicalNotifications') || '[]');
+      localStorage.setItem('medicalNotifications', JSON.stringify([notificationData, ...existingNotifications]));
+      
+      // Show toast
       toast({
         title: "Recording processed",
-        description: "Your consultation summary is ready for review.",
+        description: "Your consultation summary is ready for review in notifications.",
       });
     }
-  }, [currentStep, toast]);
+  }, [currentStep, toast, selectedPatient]);
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

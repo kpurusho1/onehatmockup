@@ -30,7 +30,6 @@ export default function Login() {
             <img src="/src/assets/1hat-logo.png" alt="1hat" className="h-12 w-auto" />
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Welcome to 1hat</h1>
-          <p className="text-white/80">Sign in to your doctor account</p>
         </div>
 
         {/* Login Card */}
