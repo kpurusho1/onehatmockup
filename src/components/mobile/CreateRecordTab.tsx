@@ -317,14 +317,13 @@ export default function CreateRecordTab() {
   // Patient Selection View
   if (currentStep === 'select-patient') {
     return (
-      <div className="relative h-full pb-32">
-        <div className={`p-4 space-y-4 h-full transition-all ${selectedPatientId ? 'opacity-30' : ''}`}>
-          <div className="flex items-center justify-between">
+      <div className="relative h-full">
+        <div className="p-4 space-y-4 h-full pb-32">
+          <div className={`flex items-center justify-between transition-all ${selectedPatientId ? 'opacity-30 pointer-events-none' : ''}`}>
             <h2 className="text-2xl font-bold">Create Record</h2>
             <Button 
               onClick={() => setShowAddPatient(true)}
               className="flex items-center gap-2"
-              disabled={!!selectedPatientId}
             >
               <Plus size={16} />
               Add Patient
@@ -332,14 +331,13 @@ export default function CreateRecordTab() {
           </div>
 
           {/* Search */}
-          <div className="relative">
+          <div className={`relative transition-all ${selectedPatientId ? 'opacity-30 pointer-events-none' : ''}`}>
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
             <Input
               placeholder="Search patients by name or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
-              disabled={!!selectedPatientId}
             />
           </div>
 
@@ -349,9 +347,11 @@ export default function CreateRecordTab() {
                 key={patient.id}
                 className={`relative flex items-center p-2 border rounded-lg cursor-pointer transition-all ${
                   selectedPatientId === patient.id 
-                    ? 'border-primary bg-primary/5' 
-                    : 'hover:bg-muted/50'
-                } ${selectedPatientId && selectedPatientId !== patient.id ? 'pointer-events-none' : ''}`}
+                    ? 'border-primary bg-primary/5 z-10' 
+                    : selectedPatientId 
+                      ? 'opacity-30 pointer-events-none'
+                      : 'hover:bg-muted/50'
+                }`}
                 onClick={() => setSelectedPatientId(patient.id)}
               >
                 {/* Selection Overlay */}
@@ -375,20 +375,21 @@ export default function CreateRecordTab() {
           </div>
         </div>
 
-        {/* Overlaid Record Button when patient is selected */}
-        {selectedPatientId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-            <div className="pointer-events-auto">
-              <Button 
-                onClick={startRecording}
-                className="h-16 px-8 text-xl font-semibold bg-red-600 hover:bg-red-700 text-white shadow-2xl rounded-xl"
-              >
-                <Mic size={24} className="mr-3" />
-                Start Recording
-              </Button>
-            </div>
-          </div>
-        )}
+        {/* Start Recording Button - Fixed at Bottom */}
+        <div className="fixed bottom-20 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t z-50">
+          <Button 
+            onClick={startRecording}
+            disabled={!selectedPatientId}
+            className={`w-full h-12 text-lg font-semibold transition-all ${
+              selectedPatientId 
+                ? 'bg-red-600 hover:bg-red-700 text-white' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            <Mic size={20} className="mr-2" />
+            Start Recording
+          </Button>
+        </div>
 
         <AddPatientDialog 
           open={showAddPatient}

@@ -14,7 +14,8 @@ import {
   User,
   Pill,
   FileText,
-  CheckCircle2
+  CheckCircle2,
+  Eye
 } from "lucide-react";
 
 interface NotificationRecordViewProps {
@@ -48,17 +49,36 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
     medications: [
       {
         id: "1",
-        name: "Ibuprofen",
-        dosage: "400mg",
-        duration: "5 days",
-        remarks: "Take with food to prevent stomach upset"
+        name: "Cefixime",
+        morning: 1,
+        noon: 0,
+        evening: 1,
+        night: 0,
+        duration: "7 days",
+        timeToTake: "After meals",
+        remarks: "Oral antibiotic, 200mg BD, morning one, evening one, for seven days, finish a course. Important to complete full course even if symptoms improve."
       },
       {
         id: "2",
-        name: "Paracetamol", 
-        dosage: "500mg",
+        name: "Drotin", 
+        morning: 0,
+        noon: 0,
+        evening: 0,
+        night: 0,
+        duration: "3 days",
+        timeToTake: "As needed",
+        remarks: "Keep Drotin for only three days. After three days, if there is pain, then put it in, otherwise, stop it. Take only when experiencing severe pain."
+      },
+      {
+        id: "3",
+        name: "Urimax 0.4",
+        morning: 0,
+        noon: 0,
+        evening: 0,
+        night: 0,
         duration: "7 days",
-        remarks: "Can be taken every 6 hours if needed"
+        timeToTake: "Before bedtime",
+        remarks: "Alpha blocker. This is what will help you pass out the stone. This can be kept for seven days. Take consistently at the same time each day."
       }
     ],
     nextSteps: [
@@ -232,31 +252,95 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                         }))}
                         placeholder="Medication name"
                       />
+                      <div className="grid grid-cols-4 gap-2">
+                        <div>
+                          <label className="text-xs text-muted-foreground">Morning</label>
+                          <input
+                            type="number"
+                            className="w-full p-1 border rounded text-xs"
+                            value={medication.morning}
+                            onChange={(e) => setMockRecord(prev => ({
+                              ...prev,
+                              medications: prev.medications.map((med, i) => 
+                                i === index ? { ...med, morning: parseInt(e.target.value) || 0 } : med
+                              )
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground">Noon</label>
+                          <input
+                            type="number"
+                            className="w-full p-1 border rounded text-xs"
+                            value={medication.noon}
+                            onChange={(e) => setMockRecord(prev => ({
+                              ...prev,
+                              medications: prev.medications.map((med, i) => 
+                                i === index ? { ...med, noon: parseInt(e.target.value) || 0 } : med
+                              )
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground">Evening</label>
+                          <input
+                            type="number"
+                            className="w-full p-1 border rounded text-xs"
+                            value={medication.evening}
+                            onChange={(e) => setMockRecord(prev => ({
+                              ...prev,
+                              medications: prev.medications.map((med, i) => 
+                                i === index ? { ...med, evening: parseInt(e.target.value) || 0 } : med
+                              )
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground">Night</label>
+                          <input
+                            type="number"
+                            className="w-full p-1 border rounded text-xs"
+                            value={medication.night}
+                            onChange={(e) => setMockRecord(prev => ({
+                              ...prev,
+                              medications: prev.medications.map((med, i) => 
+                                i === index ? { ...med, night: parseInt(e.target.value) || 0 } : med
+                              )
+                            }))}
+                          />
+                        </div>
+                      </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <input
-                          type="text"
-                          className="p-2 border rounded text-sm"
-                          value={medication.dosage}
-                          onChange={(e) => setMockRecord(prev => ({
-                            ...prev,
-                            medications: prev.medications.map((med, i) => 
-                              i === index ? { ...med, dosage: e.target.value } : med
-                            )
-                          }))}
-                          placeholder="Dosage"
-                        />
-                        <input
-                          type="text"
-                          className="p-2 border rounded text-sm"
-                          value={medication.duration}
-                          onChange={(e) => setMockRecord(prev => ({
-                            ...prev,
-                            medications: prev.medications.map((med, i) => 
-                              i === index ? { ...med, duration: e.target.value } : med
-                            )
-                          }))}
-                          placeholder="Duration"
-                        />
+                        <div>
+                          <label className="text-xs text-muted-foreground">Duration</label>
+                          <input
+                            type="text"
+                            className="w-full p-2 border rounded text-sm"
+                            value={medication.duration}
+                            onChange={(e) => setMockRecord(prev => ({
+                              ...prev,
+                              medications: prev.medications.map((med, i) => 
+                                i === index ? { ...med, duration: e.target.value } : med
+                              )
+                            }))}
+                            placeholder="Duration"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground">Time to take</label>
+                          <input
+                            type="text"
+                            className="w-full p-2 border rounded text-sm"
+                            value={medication.timeToTake}
+                            onChange={(e) => setMockRecord(prev => ({
+                              ...prev,
+                              medications: prev.medications.map((med, i) => 
+                                i === index ? { ...med, timeToTake: e.target.value } : med
+                              )
+                            }))}
+                            placeholder="Time to take"
+                          />
+                        </div>
                       </div>
                       <textarea
                         className="w-full p-2 border rounded text-xs min-h-[60px]"
@@ -276,22 +360,37 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                 <div className={`space-y-4 ${!selectedSections.prescription ? 'opacity-50' : ''}`}>
                   {mockRecord.medications.map((medication, index) => (
                     <div key={index} className="p-4 border rounded-lg">
-                      <h4 className="font-medium text-primary mb-2">{medication.name}</h4>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex justify-between items-start mb-3">
+                        <h4 className="font-semibold text-lg">{medication.name}</h4>
+                        <Badge variant="outline">{medication.duration}</Badge>
+                      </div>
+                      
+                      <div className="grid grid-cols-4 gap-4 text-sm mb-3">
                         <div>
-                          <span className="text-muted-foreground">Dosage:</span>
-                          <span className="ml-2 font-medium">{medication.dosage}</span>
+                          <span className="text-muted-foreground">Morning:</span> {medication.morning}
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Duration:</span>
-                          <span className="ml-2 font-medium">{medication.duration}</span>
+                          <span className="text-muted-foreground">Noon:</span> {medication.noon}
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Evening:</span> {medication.evening}
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Night:</span> {medication.night}
                         </div>
                       </div>
-                      {medication.remarks && (
-                        <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
-                          <span className="font-medium">Note:</span> {medication.remarks}
-                        </div>
-                      )}
+                      
+                      <div className="text-sm text-muted-foreground mb-3">
+                        <span className="font-medium">Time to take:</span> {medication.timeToTake}
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Remarks:</span>
+                        <Button variant="ghost" size="sm">
+                          <Eye size={16} className="mr-1" />
+                          View
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
