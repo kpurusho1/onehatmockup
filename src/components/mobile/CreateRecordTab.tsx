@@ -247,7 +247,17 @@ export default function CreateRecordTab() {
   const createNewRx = () => {
     setMedicalRecord(prev => ({
       ...prev,
-      medications: []
+      medications: [{
+        id: Date.now().toString(),
+        name: "",
+        morning: 0,
+        noon: 0,
+        evening: 0,
+        night: 0,
+        duration: 0,
+        timeToTake: "N/A",
+        remarks: ""
+      }]
     }));
     setIsEditing(true);
     setCurrentStep('edit-record');

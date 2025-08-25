@@ -156,20 +156,322 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
 
   if (!selectedPatient) {
     return (
-      <div className="p-4 space-y-6 pb-24">
-        {/* Local Header */}
-        <div className="flex items-center mb-4">
-          <Button variant="ghost" onClick={() => window.history.back()}>
-            <ArrowLeft size={16} className="mr-2" />
-          </Button>
+      <div className="relative pb-24">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b p-4">
           <h1 className="text-xl font-semibold">Patient Details</h1>
         </div>
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">View Health Records</h2>
-          <p className="text-muted-foreground">Select a patient to view their records</p>
+
+        <div className="p-4 space-y-6">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-2">View Health Records</h2>
+            <p className="text-muted-foreground">Select a patient to view their records</p>
+          </div>
+
+          {/* AI Query Section for Cross-Patient History */}
+          <div className="p-4 border-2 border-transparent bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-lg relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg"></div>
+            <div className="absolute inset-[2px] bg-background rounded-lg"></div>
+            <div className="relative">
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">AI</span>
+                </div>
+                <h3 className="font-medium text-lg">Ask 1hat AI about patient history</h3>
+              </div>
+              <div className="space-y-4">
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="Search across all patients for conditions, treatments, patterns..."
+                    value={aiQuery}
+                    onChange={(e) => setAiQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAiQuery()}
+                    className="flex-1 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20 border-transparent"
+                  />
+                  <Button 
+                    onClick={handleAiQuery}
+                    disabled={!aiQuery.trim() || isAiLoading}
+                    className="px-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                  >
+                    {isAiLoading ? (
+                      <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+                    ) : (
+                      <Send size={16} />
+                    )}
+                  </Button>
+                </div>
+                
+                {aiResponse && (
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-lg p-4 border border-blue-200/30">
+                    <div className="flex items-start space-x-2">
+                      <Bot size={16} className="text-blue-600 mt-1 flex-shrink-0" />
+                      <div className="text-sm text-gray-700 dark:text-gray-300">
+                        {aiResponse}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Patient Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+            <Input
+              placeholder="Search patients by name or phone..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Patient List */}
+          <div className="space-y-3">
+            {filteredPatients.map((patient) => (
+              <Card 
+                key={patient.id} 
+                className="hover:bg-accent/50 transition-colors"
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3 flex-1">
+                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                        <User size={20} className="text-primary" />
+                      </div>
+                      <div className="flex-1 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground">{patient.name}</span>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-sm text-muted-foreground">{patient.age} yrs</span>
+                        </div>
+                        <span className="text-sm text-muted-foreground/70 italic ml-auto">{patient.phone}</span>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedPatient(patient)}
+                      className="ml-3"
+                    >
+                      <Eye size={16} className="mr-1" />
+                      View
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (selectedRecord) {
+    return (
+      <div className="relative pb-24">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b p-4">
+          <Button variant="ghost" onClick={() => setSelectedRecord(null)}>
+            <ArrowLeft size={16} className="mr-2" />
+            Back to Records
+          </Button>
+        </div>
+        <div className="p-4 space-y-6">
+          {/* Patient Header */}
+          <div className="text-white p-4 rounded-lg" style={{ backgroundColor: '#1c2f7f' }}>
+            <div className="flex items-center space-x-3">
+              <Avatar>
+                <AvatarFallback className="bg-white/20 text-white">
+                  <User size={20} />
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
+                <p className="text-white/80">ID: #{selectedPatient.id}230187</p>
+                <p className="text-white/80">Age: {selectedPatient.age} years • {selectedPatient.phone}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Record Content */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Calendar size={20} />
+                  <CardTitle>Consultation - {selectedRecord.date}</CardTitle>
+                </div>
+                <Button variant="outline" size="sm">
+                  <Edit size={16} className="mr-2" />
+                  Edit
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Diagnosis */}
+              {selectedRecord.diagnosis && (
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">Diagnosis</h3>
+                  <p>{selectedRecord.diagnosis}</p>
+                </div>
+              )}
+
+              {/* Prescription */}
+              {selectedRecord.prescriptions && (
+                <div>
+                  <div className="flex items-center space-x-2 mb-4">
+                    <h3 className="font-semibold text-lg">Prescription</h3>
+                    <Badge variant="secondary" className="text-green-600">Sent</Badge>
+                  </div>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300 text-sm">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="border border-gray-300 p-1.5 text-left text-xs">Medicine</th>
+                          <th className="border border-gray-300 p-1.5 text-center text-xs">M</th>
+                          <th className="border border-gray-300 p-1.5 text-center text-xs">N</th>
+                          <th className="border border-gray-300 p-1.5 text-center text-xs">E</th>
+                          <th className="border border-gray-300 p-1.5 text-center text-xs">Nt</th>
+                          <th className="border border-gray-300 p-1.5 text-center text-xs">Duration</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedRecord.prescriptions.map((prescription, index) => (
+                          <tr key={index}>
+                            <td className="border border-gray-300 p-1.5 text-xs">{prescription.medicine}</td>
+                            <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.morning}</td>
+                            <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.noon}</td>
+                            <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.evening}</td>
+                            <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.night}</td>
+                            <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.duration}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {selectedRecord.prescriptions.map((prescription, index) => (
+                      prescription.remarks && (
+                        <div key={index} className="mt-2 text-xs text-muted-foreground">
+                          <strong>Note:</strong> {prescription.remarks}
+                        </div>
+                      )
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3 pt-4">
+                <Button 
+                  className="flex-1"
+                  onClick={() => setShowSendDialog(true)}
+                >
+                  <Send size={16} className="mr-2" />
+                  Send to Patient
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Send Dialog */}
+          <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Send to Patient</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Select which sections to send to {selectedPatient.name}:
+                </p>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="keyFacts"
+                      checked={selectedSections.includes('keyFacts')}
+                      onCheckedChange={() => toggleSection('keyFacts')}
+                    />
+                    <label htmlFor="keyFacts" className="text-sm font-medium">
+                      Key Facts
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="diagnosis"
+                      checked={selectedSections.includes('diagnosis')}
+                      onCheckedChange={() => toggleSection('diagnosis')}
+                    />
+                    <label htmlFor="diagnosis" className="text-sm font-medium">
+                      Diagnosis
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="prescription"
+                      checked={selectedSections.includes('prescription')}
+                      onCheckedChange={() => toggleSection('prescription')}
+                    />
+                    <label htmlFor="prescription" className="text-sm font-medium">
+                      Prescription
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="nextSteps"
+                      checked={selectedSections.includes('nextSteps')}
+                      onCheckedChange={() => toggleSection('nextSteps')}
+                    />
+                    <label htmlFor="nextSteps" className="text-sm font-medium">
+                      Next Steps
+                    </label>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-3 pt-4">
+                  <Button variant="outline" onClick={() => setShowSendDialog(false)} className="flex-1">
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSendToPatient} className="flex-1">
+                    Send Selected
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative pb-24">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b p-4">
+        <h1 className="text-xl font-semibold">Patient Details</h1>
+      </div>
+
+      <div className="p-4 space-y-6">
+        {/* Patient Header */}
+        <div className="text-white p-4 rounded-lg" style={{ backgroundColor: '#1c2f7f' }}>
+          <div className="flex items-center space-x-3">
+            <Avatar>
+              <AvatarFallback className="bg-white/20 text-white">
+                <User size={20} />
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
+              <p className="text-white/80">ID: #{selectedPatient.id}230187</p>
+              <p className="text-white/80">Age: {selectedPatient.age} years • {selectedPatient.phone}</p>
+            </div>
+          </div>
         </div>
 
-        {/* AI Query Section for Cross-Patient History */}
+        {/* AI Query Section */}
         <div className="p-4 border-2 border-transparent bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-lg relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg"></div>
           <div className="absolute inset-[2px] bg-background rounded-lg"></div>
@@ -183,7 +485,7 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
             <div className="space-y-4">
               <div className="flex space-x-2">
                 <Input
-                  placeholder="Search across all patients for conditions, treatments, patterns..."
+                  placeholder="Ask about patient's medical history, patterns, or specific conditions..."
                   value={aiQuery}
                   onChange={(e) => setAiQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAiQuery()}
@@ -203,12 +505,10 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
               </div>
               
               {aiResponse && (
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-lg p-4 border border-blue-200/30">
+                <div className="p-4 bg-white dark:bg-card rounded-lg border">
                   <div className="flex items-start space-x-2">
-                    <Bot size={16} className="text-blue-600 mt-1 flex-shrink-0" />
-                    <div className="text-sm text-gray-700 dark:text-gray-300">
-                      {aiResponse}
-                    </div>
+                    <Bot size={16} className="text-primary mt-1 flex-shrink-0" />
+                    <p className="text-sm">{aiResponse}</p>
                   </div>
                 </div>
               )}
@@ -216,344 +516,47 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
           </div>
         </div>
 
-        {/* Patient Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
-          <Input
-            placeholder="Search patients by name or phone..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        {/* Patient List */}
-        <div className="space-y-3">
-          {filteredPatients.map((patient) => (
-            <Card 
-              key={patient.id} 
-              className="hover:bg-accent/50 transition-colors"
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3 flex-1">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                      <User size={20} className="text-primary" />
-                    </div>
-                    <div className="flex-1 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-foreground">{patient.name}</span>
-                        <span className="text-muted-foreground">•</span>
-                        <span className="text-sm text-muted-foreground">{patient.age} yrs</span>
-                      </div>
-                      <span className="text-sm text-muted-foreground/70 italic ml-auto">{patient.phone}</span>
-                    </div>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSelectedPatient(patient)}
-                    className="ml-3"
-                  >
-                    <Eye size={16} className="mr-1" />
-                    View
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (selectedRecord) {
-    return (
-      <div className="p-4 space-y-6 pb-24">
-        {/* Back Button */}
-        <Button variant="ghost" onClick={() => setSelectedRecord(null)}>
-          <ArrowLeft size={16} className="mr-2" />
-          Back to Records
-        </Button>
-
-        {/* Patient Header */}
-        <div className="text-white p-4 rounded-lg" style={{ backgroundColor: '#1c2f7f' }}>
-          <div className="flex items-center space-x-3">
-            <Avatar>
-              <AvatarFallback className="bg-white/20 text-white">
-                <User size={20} />
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
-              <p className="text-white/80">ID: #{selectedPatient.id}230187</p>
-              <p className="text-white/80">Age: {selectedPatient.age} years • {selectedPatient.phone}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Record Content */}
+        {/* Medical Records List */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Calendar size={20} />
-                <CardTitle>Consultation - {selectedRecord.date}</CardTitle>
-              </div>
-              <Button variant="outline" size="sm">
-                <Edit size={16} className="mr-2" />
-                Edit
-              </Button>
+            <div className="flex items-center space-x-2">
+              <FileText size={20} />
+              <CardTitle>Medical Records</CardTitle>
             </div>
           </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Key Items / Other Items Tabs */}
-                <div className="flex space-x-6 border-b">
-                  <button className="pb-2 border-b-2 border-primary font-semibold">
-                    Key Items
-                  </button>
-                  <button className="pb-2 text-muted-foreground">
-                    Other Items
-                  </button>
-                </div>
-
-                {/* Diagnosis */}
-                {selectedRecord.diagnosis && (
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Diagnosis</h3>
-                    <p>{selectedRecord.diagnosis}</p>
-                  </div>
-                )}
-
-                {/* Prescription */}
-                {selectedRecord.prescriptions && (
-                  <div>
-                    <div className="flex items-center space-x-2 mb-4">
-                      <h3 className="font-semibold text-lg">Prescription</h3>
-                      <Badge variant="secondary" className="text-green-600">Sent</Badge>
-                    </div>
-                    
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse border border-gray-300 text-sm">
-                        <thead>
-                          <tr className="bg-gray-50">
-                            <th className="border border-gray-300 p-1.5 text-left text-xs">Medicine</th>
-                            <th className="border border-gray-300 p-1.5 text-center text-xs">M</th>
-                            <th className="border border-gray-300 p-1.5 text-center text-xs">N</th>
-                            <th className="border border-gray-300 p-1.5 text-center text-xs">E</th>
-                            <th className="border border-gray-300 p-1.5 text-center text-xs">Nt</th>
-                            <th className="border border-gray-300 p-1.5 text-center text-xs">Duration</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {selectedRecord.prescriptions.map((prescription, index) => (
-                            <tr key={index}>
-                              <td className="border border-gray-300 p-1.5 text-xs">{prescription.medicine}</td>
-                              <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.morning}</td>
-                              <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.noon}</td>
-                              <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.evening}</td>
-                              <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.night}</td>
-                              <td className="border border-gray-300 p-1.5 text-center text-xs">{prescription.duration}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      {selectedRecord.prescriptions.map((prescription, index) => (
-                        prescription.remarks && (
-                          <div key={index} className="mt-2 text-xs text-muted-foreground">
-                            <strong>Note:</strong> {prescription.remarks}
-                          </div>
-                        )
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex space-x-3 pt-4">
-                  <Button 
-                    className="flex-1"
-                    onClick={() => setShowSendDialog(true)}
-                  >
-                    <Send size={16} className="mr-2" />
-                    Send to Patient
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-        {/* Send Dialog */}
-        <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Send to Patient</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Select which sections to send to {selectedPatient.name}:
-              </p>
-              
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="diagnosis"
-                    checked={selectedSections.includes('diagnosis')}
-                    onCheckedChange={() => toggleSection('diagnosis')}
-                  />
-                  <label htmlFor="diagnosis" className="text-sm font-medium">
-                    Diagnosis
-                  </label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="prescription"
-                    checked={selectedSections.includes('prescription')}
-                    onCheckedChange={() => toggleSection('prescription')}
-                  />
-                  <label htmlFor="prescription" className="text-sm font-medium">
-                    Prescription
-                  </label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="notes"
-                    checked={selectedSections.includes('notes')}
-                    onCheckedChange={() => toggleSection('notes')}
-                  />
-                  <label htmlFor="notes" className="text-sm font-medium">
-                    Consultation Notes
-                  </label>
-                </div>
-              </div>
-              
-              <div className="flex space-x-3 pt-4">
-                <Button variant="outline" onClick={() => setShowSendDialog(false)} className="flex-1">
-                  Cancel
-                </Button>
-                <Button onClick={handleSendToPatient} className="flex-1">
-                  Send Selected
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-    );
-  }
-
-  return (
-    <div className="p-4 space-y-6 pb-24">
-        {/* Local Header */}
-        <div className="flex items-center mb-4">
-          <Button variant="ghost" onClick={() => setSelectedPatient(null)}>
-            <ArrowLeft size={16} className="mr-2" />
-          </Button>
-          <h1 className="text-xl font-semibold">Patient Details</h1>
-        </div>
-
-      {/* Patient Header */}
-      <div className="text-white p-4 rounded-lg" style={{ backgroundColor: '#1c2f7f' }}>
-        <div className="flex items-center space-x-3">
-          <Avatar>
-            <AvatarFallback className="bg-white/20 text-white">
-              <User size={20} />
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
-            <p className="text-white/80">ID: #{selectedPatient.id}230187</p>
-            <p className="text-white/80">Age: {selectedPatient.age} years • {selectedPatient.phone}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* AI Query Section */}
-      <div className="p-4 border-2 border-transparent bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-lg relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg"></div>
-        <div className="absolute inset-[2px] bg-background rounded-lg"></div>
-        <div className="relative">
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-              <span className="text-white text-xs font-bold">AI</span>
-            </div>
-            <h3 className="font-medium text-lg">Ask 1hat AI about patient history</h3>
-          </div>
-          <div className="space-y-4">
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Ask about patient's medical history, patterns, or specific conditions..."
-                value={aiQuery}
-                onChange={(e) => setAiQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAiQuery()}
-                className="flex-1 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20 border-transparent"
-              />
-              <Button 
-                onClick={handleAiQuery}
-                disabled={!aiQuery.trim() || isAiLoading}
-                className="px-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+          <CardContent className="space-y-3">
+            {mockRecords.map((record) => (
+              <Card 
+                key={record.id}
+                className="cursor-pointer hover:bg-accent/50 transition-colors"
+                onClick={() => setSelectedRecord(record)}
               >
-                {isAiLoading ? (
-                  <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
-                ) : (
-                  <Send size={16} />
-                )}
-              </Button>
-            </div>
-            
-            {aiResponse && (
-              <div className="p-4 bg-white dark:bg-card rounded-lg border">
-                <div className="flex items-start space-x-2">
-                  <Bot size={16} className="text-primary mt-1 flex-shrink-0" />
-                  <p className="text-sm">{aiResponse}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Medical Records List */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <FileText size={20} />
-            <CardTitle>Medical Records</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {mockRecords.map((record) => (
-            <Card 
-              key={record.id}
-              className="cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => setSelectedRecord(record)}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold">{record.date}</div>
-                    <div className="text-sm text-muted-foreground">{record.segments} segments</div>
-                    <div className="flex items-center space-x-2 mt-2">
-                      <Badge variant="secondary" className="text-xs">
-                        <span className="text-green-600">{record.sent} sent</span>
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs">
-                        <span className="text-orange-600">{record.edited} edited</span>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold">{record.date}</div>
+                      <div className="text-sm text-muted-foreground">{record.segments} segments</div>
+                      <div className="flex items-center space-x-2 mt-2">
+                        <Badge variant="secondary" className="text-xs">
+                          <span className="text-green-600">{record.sent} sent</span>
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          <span className="text-orange-600">{record.edited} edited</span>
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end space-y-2">
+                      <Badge variant={record.status === 'sent' ? 'default' : 'secondary'}>
+                        {record.status}
                       </Badge>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end space-y-2">
-                    <Badge variant={record.status === 'sent' ? 'default' : 'secondary'}>
-                      {record.status}
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </CardContent>
-      </Card>
+                </CardContent>
+              </Card>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
