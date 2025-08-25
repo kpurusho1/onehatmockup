@@ -139,7 +139,7 @@ export const MobileLayout = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Settings size={20} />
-              Hospital Information
+              Doctor Details
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6">
@@ -161,71 +161,26 @@ export const MobileLayout = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Bell size={16} />
-                <h3 className="font-semibold">Hospital Pharmacy Contact</h3>
-              </div>
-              <div className="bg-muted p-3 rounded-lg">
-                <p className="font-mono text-lg">8954229999</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  This number will receive prescription segments automatically when sending to pharmacy.
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
               <h3 className="font-semibold">Default Send Segments</h3>
               <p className="text-sm text-muted-foreground">
                 Select which segments should be pre-checked when the "Send" window opens.
               </p>
-              <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="grid grid-cols-2 gap-3 text-sm">
                 <label className="flex items-center space-x-2">
                   <input type="checkbox" className="rounded" />
-                  <span>Patient Details</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded" />
-                  <span>Hospital Details</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" defaultChecked className="rounded" />
                   <span>Key Facts</span>
                 </label>
                 <label className="flex items-center space-x-2">
                   <input type="checkbox" className="rounded" />
-                  <span>Associated Symptoms</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded" />
-                  <span>Present Illness</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded" />
-                  <span>Past Medical History</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded" />
-                  <span>Doctor's Observations</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded" />
-                  <span>Preliminary Assessment</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded" />
-                  <span>Treatment Plan</span>
+                  <span>Diagnosis</span>
                 </label>
                 <label className="flex items-center space-x-2">
                   <input type="checkbox" defaultChecked className="rounded" />
                   <span>Prescription</span>
                 </label>
                 <label className="flex items-center space-x-2">
-                  <input type="checkbox" defaultChecked className="rounded" />
-                  <span>Next Steps</span>
-                </label>
-                <label className="flex items-center space-x-2">
                   <input type="checkbox" className="rounded" />
-                  <span>Referral Details</span>
+                  <span>Next Steps</span>
                 </label>
               </div>
             </div>

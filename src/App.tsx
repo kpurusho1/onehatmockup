@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { MobileLayout } from "./components/mobile/MobileLayout";
 import MobileApp from "./pages/MobileApp";
+import Login from "./pages/Login";
 import VoiceHealthRecord from "./pages/VoiceHealthRecord";
 import PatientProtocols from "./pages/PatientProtocols";
 import ProtocolTemplates from "./pages/ProtocolTemplates";
@@ -20,6 +21,9 @@ const App = () => (
     <Sonner />
     <BrowserRouter>
       <Routes>
+        {/* Login page */}
+        <Route path="/login" element={<Login />} />
+        
         {/* App Selector */}
         <Route path="/" element={<MobileApp />} />
         
