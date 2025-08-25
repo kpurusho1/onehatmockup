@@ -311,11 +311,11 @@ export default function CreateRecordTab() {
             />
           </div>
 
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-2 max-h-96 overflow-y-auto">
             {filteredPatients.map((patient) => (
               <div
                 key={patient.id}
-                className={`relative flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
+                className={`relative flex items-center p-2 border rounded-lg cursor-pointer transition-all ${
                   selectedPatientId === patient.id 
                     ? 'border-primary bg-primary/5' 
                     : 'hover:bg-muted/50'
@@ -327,15 +327,16 @@ export default function CreateRecordTab() {
                   <div className="absolute inset-0 bg-primary/10 rounded-lg border-2 border-primary"></div>
                 )}
                 
-                <Avatar className="w-8 h-8 mr-3 z-10">
+                <Avatar className="w-6 h-6 mr-2 z-10 flex-shrink-0">
                   <AvatarImage src={`/src/assets/patient-avatar-${Math.floor(Math.random() * 3) + 1}.jpg`} />
                   <AvatarFallback className="text-xs">{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                 </Avatar>
-                <div className="flex-1 flex items-center justify-between z-10">
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-foreground text-sm">{patient.name}</span>
-                    <span className="text-xs text-muted-foreground">{patient.age} yrs • {patient.phone}</span>
+                <div className="flex-1 flex items-center justify-between z-10 min-w-0">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
+                    <span className="font-medium text-foreground text-sm truncate">{patient.name}</span>
+                    <span className="text-xs text-muted-foreground flex-shrink-0">{patient.age}y</span>
                   </div>
+                  <span className="text-xs text-muted-foreground ml-2 flex-shrink-0">{patient.phone}</span>
                 </div>
               </div>
             ))}

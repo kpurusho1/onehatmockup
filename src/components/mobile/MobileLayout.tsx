@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Eye, Users, Pill, Home, Bell, Calendar, TrendingUp, ShoppingCart, Upload } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FileText, Eye, Users, Home, Bell, Settings } from "lucide-react";
 import CreateRecordTab from "./CreateRecordTab";
 import ViewHealthRecordsTab from "./ViewHealthRecordsTab";
 import PatientManagementTab from "./PatientManagementTab";
-import PrescriptionsTab from "./PrescriptionsTab";
 
 export const MobileLayout = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -33,6 +33,7 @@ export const MobileLayout = () => {
   const [statsToggle, setStatsToggle] = useState<'today' | 'weekly'>('today');
   const unreadCount = notifications.filter(n => !n.isRead).length;
   const [notificationRecordData, setNotificationRecordData] = useState<any>(null);
+  const [showProfile, setShowProfile] = useState(false);
 
   const handleNotificationClick = (notification: any) => {
     // Mark as read
@@ -53,7 +54,13 @@ export const MobileLayout = () => {
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-4 shadow-lg">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">1hat doc app</h1>
+          <div className="flex items-center space-x-3">
+            <img src="/src/assets/1hat-logo.png" alt="1hat" className="w-8 h-8" />
+            <div>
+              <h1 className="text-lg font-bold">Dr. Abhishant Padmanaban</h1>
+              <p className="text-sm opacity-90">City General Hospital</p>
+            </div>
+          </div>
           <div className="flex items-center space-x-3">
             {/* Notification Bell */}
             <div className="relative">
@@ -114,59 +121,168 @@ export const MobileLayout = () => {
               )}
             </div>
             
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <Button
+              variant="ghost"
+              size="sm" 
+              className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-primary-foreground hover:bg-white/30"
+              onClick={() => setShowProfile(true)}
+            >
               <span className="text-sm font-medium">Dr</span>
-            </div>
+            </Button>
           </div>
         </div>
       </header>
+
+      {/* Profile Dialog */}
+      <Dialog open={showProfile} onOpenChange={setShowProfile}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings size={20} />
+              Hospital Information
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Doctor Name</label>
+                  <p className="font-medium">Abhishant Padmanaban</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Hospital Name</label>
+                  <p className="font-medium">City General Hospital</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground">Specialty</label>
+                  <p className="font-medium">General Medicine</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Bell size={16} />
+                <h3 className="font-semibold">Hospital Pharmacy Contact</h3>
+              </div>
+              <div className="bg-muted p-3 rounded-lg">
+                <p className="font-mono text-lg">8954229999</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  This number will receive prescription segments automatically when sending to pharmacy.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold">Default Send Segments</h3>
+              <p className="text-sm text-muted-foreground">
+                Select which segments should be pre-checked when the "Send" window opens.
+              </p>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span>Patient Details</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span>Hospital Details</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" defaultChecked className="rounded" />
+                  <span>Key Facts</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span>Associated Symptoms</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span>Present Illness</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span>Past Medical History</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span>Doctor's Observations</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span>Preliminary Assessment</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span>Treatment Plan</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" defaultChecked className="rounded" />
+                  <span>Prescription</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" defaultChecked className="rounded" />
+                  <span>Next Steps</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="rounded" />
+                  <span>Referral Details</span>
+                </label>
+              </div>
+            </div>
+
+            <Button className="w-full">Save Default Settings</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Tab Content */}
       <div className="flex-1 overflow-hidden pb-16">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
           <TabsContent value="home" className="h-full m-0">
             <div className="h-full flex flex-col">
-              {/* Stats Toggle and Numbers */}
-              <div className="p-4 pb-0 space-y-4">
-                {/* Week/Today Toggle */}
-                <div className="bg-muted p-1 rounded-lg">
-                  <div className="flex">
-                    <button
-                      onClick={() => setStatsToggle('today')}
-                      className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        statsToggle === 'today'
-                          ? 'bg-background text-foreground shadow-sm'
-                          : 'text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      Today
-                    </button>
-                    <button
-                      onClick={() => setStatsToggle('weekly')}
-                      className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        statsToggle === 'weekly'
-                          ? 'bg-background text-foreground shadow-sm'
-                          : 'text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      This Week
-                    </button>
+              {/* Frozen Stats Section */}
+              <div className="bg-card border-b sticky top-0 z-10">
+                <div className="p-3 space-y-3">
+                  {/* Week/Today Toggle */}
+                  <div className="bg-muted p-1 rounded-lg">
+                    <div className="flex">
+                      <button
+                        onClick={() => setStatsToggle('today')}
+                        className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                          statsToggle === 'today'
+                            ? 'bg-background text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Today
+                      </button>
+                      <button
+                        onClick={() => setStatsToggle('weekly')}
+                        className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                          statsToggle === 'weekly'
+                            ? 'bg-background text-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        This Week
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                {/* Stats Numbers */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-card rounded-lg p-4 shadow-sm">
-                    <div className="text-2xl font-bold text-primary">
-                      {statsToggle === 'today' ? '8' : '42'}
+                  {/* Stats Numbers */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-background rounded-lg p-3 shadow-sm">
+                      <div className="text-xl font-bold text-primary">
+                        {statsToggle === 'today' ? '8' : '42'}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Consultations</div>
                     </div>
-                    <div className="text-sm text-muted-foreground">Consultations</div>
-                  </div>
-                  <div className="bg-card rounded-lg p-4 shadow-sm">
-                    <div className="text-2xl font-bold text-orange-500">
-                      {notifications.filter(n => !n.isRead).length}
+                    <div className="bg-background rounded-lg p-3 shadow-sm">
+                      <div className="text-xl font-bold text-orange-500">
+                        {notifications.filter(n => !n.isRead).length}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Pending Reviews</div>
                     </div>
-                    <div className="text-sm text-muted-foreground">Pending Reviews</div>
                   </div>
                 </div>
               </div>
@@ -199,16 +315,13 @@ export const MobileLayout = () => {
               </div>
             </div>
           </TabsContent>
-          <TabsContent value="prescriptions" className="h-full m-0">
-            <PrescriptionsTab />
-          </TabsContent>
         </Tabs>
       </div>
 
       {/* Bottom Tab Navigation - Fixed to bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-card border-t shadow-lg z-50">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 h-16 bg-transparent">
+          <TabsList className="grid w-full grid-cols-3 h-16 bg-transparent">
             <TabsTrigger 
               value="home" 
               className="flex flex-col gap-1 h-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -229,13 +342,6 @@ export const MobileLayout = () => {
             >
               <Users size={20} />
               <span className="text-xs">Treatment</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="prescriptions" 
-              className="flex flex-col gap-1 h-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              <Pill size={20} />
-              <span className="text-xs">Prescriptions</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
