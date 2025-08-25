@@ -164,12 +164,17 @@ export default function CreateRecordTab() {
   );
 
   const startRecording = () => {
+    console.log("startRecording called, selectedPatientId:", selectedPatientId);
     const patient = patients.find(p => p.id === selectedPatientId);
+    console.log("Found patient:", patient);
     if (patient) {
       setSelectedPatient(patient);
       setCurrentStep('recording');
       setIsRecording(true);
       setRecordingDuration(0);
+      console.log("Recording started for patient:", patient.name);
+    } else {
+      console.log("No patient found for ID:", selectedPatientId);
     }
   };
 
