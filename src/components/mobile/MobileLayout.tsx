@@ -202,7 +202,7 @@ export const MobileLayout = () => {
               </div>
             </div>
 
-            <Button className="w-full">Save Default Settings</Button>
+            <Button className="w-full">Save Settings</Button>
           </div>
         </DialogContent>
       </Dialog>
