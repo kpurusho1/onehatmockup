@@ -170,12 +170,13 @@ export default function CreateRecordTab() {
     setProcessingProgress(0);
     setMedicalRecord(prev => ({ ...prev, patientId: selectedPatient?.id || "" }));
     
-    // Simulate processing with progress
+    // Simulate processing with progress - now only sends notification, doesn't auto-show summary
     const progressInterval = setInterval(() => {
       setProcessingProgress(prev => {
         if (prev >= 100) {
           clearInterval(progressInterval);
-          setCurrentStep('view-record');
+          // Send notification but don't automatically show summary
+          // setCurrentStep('view-record'); // Removed this line
           return 100;
         }
         return prev + 10;
@@ -310,36 +311,35 @@ export default function CreateRecordTab() {
             />
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Select Patient to Record</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 max-h-96 overflow-y-auto">
-              <RadioGroup value={selectedPatientId} onValueChange={setSelectedPatientId}>
-                {filteredPatients.map((patient) => (
-                  <div
-                    key={patient.id}
-                    className="flex items-center p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                    onClick={() => setSelectedPatientId(patient.id)}
-                  >
-                    <RadioGroupItem value={patient.id} id={patient.id} className="mr-4" />
-                    <Avatar className="w-12 h-12 mr-3">
-                      <AvatarImage src={`/src/assets/patient-avatar-${Math.floor(Math.random() * 3) + 1}.jpg`} />
-                      <AvatarFallback>{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-foreground">{patient.name}</span>
-                        <span className="text-muted-foreground">•</span>
-                        <span className="text-sm text-muted-foreground">{patient.age} yrs</span>
-                      </div>
-                      <span className="text-sm text-muted-foreground/70 italic ml-auto">{patient.phone}</span>
-                    </div>
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {filteredPatients.map((patient) => (
+              <div
+                key={patient.id}
+                className={`relative flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
+                  selectedPatientId === patient.id 
+                    ? 'border-primary bg-primary/5' 
+                    : 'hover:bg-muted/50'
+                }`}
+                onClick={() => setSelectedPatientId(patient.id)}
+              >
+                {/* Selection Overlay */}
+                {selectedPatientId === patient.id && (
+                  <div className="absolute inset-0 bg-primary/10 rounded-lg border-2 border-primary"></div>
+                )}
+                
+                <Avatar className="w-8 h-8 mr-3 z-10">
+                  <AvatarImage src={`/src/assets/patient-avatar-${Math.floor(Math.random() * 3) + 1}.jpg`} />
+                  <AvatarFallback className="text-xs">{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 flex items-center justify-between z-10">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-foreground text-sm">{patient.name}</span>
+                    <span className="text-xs text-muted-foreground">{patient.age} yrs • {patient.phone}</span>
                   </div>
-                ))}
-              </RadioGroup>
-            </CardContent>
-          </Card>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Sticky Record Button */}

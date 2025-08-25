@@ -126,63 +126,54 @@ export const MobileLayout = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
           <TabsContent value="home" className="h-full m-0">
             <div className="h-full flex flex-col">
-              {/* Top Tabs */}
-              <div className="p-4 pb-0">
+              {/* Stats Toggle and Numbers */}
+              <div className="p-4 pb-0 space-y-4">
+                {/* Week/Today Toggle */}
                 <div className="bg-muted p-1 rounded-lg">
                   <div className="flex">
                     <button
-                      onClick={() => setHomeSubTab('consultations')}
+                      onClick={() => setStatsToggle('today')}
                       className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        homeSubTab === 'consultations'
+                        statsToggle === 'today'
                           ? 'bg-background text-foreground shadow-sm'
                           : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      Consultations
+                      Today
                     </button>
                     <button
-                      onClick={() => setHomeSubTab('pending')}
+                      onClick={() => setStatsToggle('weekly')}
                       className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        homeSubTab === 'pending'
+                        statsToggle === 'weekly'
                           ? 'bg-background text-foreground shadow-sm'
                           : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      Pending Reviews
+                      This Week
                     </button>
+                  </div>
+                </div>
+
+                {/* Stats Numbers */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-card rounded-lg p-4 shadow-sm">
+                    <div className="text-2xl font-bold text-primary">
+                      {statsToggle === 'today' ? '8' : '42'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Consultations</div>
+                  </div>
+                  <div className="bg-card rounded-lg p-4 shadow-sm">
+                    <div className="text-2xl font-bold text-orange-500">
+                      {notifications.filter(n => !n.isRead).length}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Pending Reviews</div>
                   </div>
                 </div>
               </div>
 
-              {/* Content based on sub-tab */}
+              {/* Create Record Section */}
               <div className="flex-1 overflow-hidden">
-                {homeSubTab === 'consultations' ? (
-                  <CreateRecordTab />
-                ) : (
-                  <div className="p-4 space-y-4 h-full">
-                    <h3 className="text-lg font-semibold">Pending Reviews</h3>
-                    <div className="space-y-3">
-                      {notifications.filter(n => !n.isRead).map((notification) => (
-                        <div
-                          key={notification.id}
-                          className="p-3 border rounded-lg hover:bg-accent cursor-pointer"
-                          onClick={() => handleNotificationClick(notification)}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">{notification.patientName}</span>
-                            <span className="text-xs text-muted-foreground">{notification.timestamp}</span>
-                          </div>
-                          <p className="text-sm text-muted-foreground">{notification.message}</p>
-                        </div>
-                      ))}
-                      {notifications.filter(n => !n.isRead).length === 0 && (
-                        <div className="text-center py-8 text-muted-foreground">
-                          No pending reviews
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+                <CreateRecordTab />
               </div>
             </div>
           </TabsContent>
