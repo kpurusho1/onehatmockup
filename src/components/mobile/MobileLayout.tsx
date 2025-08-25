@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Eye, Users, Pill, Home, Bell } from "lucide-react";
+import { FileText, Eye, Users, Pill, Home, Bell, Calendar, TrendingUp, ShoppingCart, Upload } from "lucide-react";
 import CreateRecordTab from "./CreateRecordTab";
 import ViewHealthRecordsTab from "./ViewHealthRecordsTab";
 import PatientManagementTab from "./PatientManagementTab";
@@ -29,6 +29,7 @@ export const MobileLayout = () => {
     }
   ]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [statsToggle, setStatsToggle] = useState<'today' | 'weekly'>('today');
   const unreadCount = notifications.filter(n => !n.isRead).length;
   const [notificationRecordData, setNotificationRecordData] = useState<any>(null);
 
@@ -126,50 +127,131 @@ export const MobileLayout = () => {
             <div className="p-4 space-y-6 h-full">
               <h2 className="text-2xl font-bold">Welcome to 1hat doc app</h2>
               
+              {/* Stats Toggle */}
+              <div className="flex justify-center">
+                <div className="bg-muted p-1 rounded-lg">
+                  <div className="flex">
+                    <button
+                      onClick={() => setStatsToggle('today')}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        statsToggle === 'today'
+                          ? 'bg-background text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      Today
+                    </button>
+                    <button
+                      onClick={() => setStatsToggle('weekly')}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        statsToggle === 'weekly'
+                          ? 'bg-background text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      Weekly
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
               {/* Dashboard Stats */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50 p-4 rounded-lg border">
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">24</div>
-                  <div className="text-sm text-blue-600/80 dark:text-blue-400/80">Total Patients</div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <span className="text-sm text-blue-600/80 dark:text-blue-400/80">Total Patients</span>
+                  </div>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {statsToggle === 'today' ? '24' : '156'}
+                  </div>
                 </div>
                 <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/50 p-4 rounded-lg border">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">12</div>
-                  <div className="text-sm text-green-600/80 dark:text-green-400/80">Today's Consultations</div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Calendar className="w-5 h-5 text-green-600 dark:text-green-400" />
+                    <span className="text-sm text-green-600/80 dark:text-green-400/80">Consultations</span>
+                  </div>
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {statsToggle === 'today' ? '12' : '89'}
+                  </div>
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50 p-4 rounded-lg border">
-                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">8</div>
-                  <div className="text-sm text-purple-600/80 dark:text-purple-400/80">Pending Reviews</div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <TrendingUp className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    <span className="text-sm text-purple-600/80 dark:text-purple-400/80">Pending Reviews</span>
+                  </div>
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {statsToggle === 'today' ? '8' : '23'}
+                  </div>
                 </div>
                 <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/50 dark:to-orange-900/50 p-4 rounded-lg border">
-                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">5</div>
-                  <div className="text-sm text-orange-600/80 dark:text-orange-400/80">Follow-ups Due</div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Bell className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                    <span className="text-sm text-orange-600/80 dark:text-orange-400/80">Follow-ups Due</span>
+                  </div>
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                    {statsToggle === 'today' ? '5' : '18'}
+                  </div>
                 </div>
               </div>
 
               {/* Quick Actions */}
-              <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Quick Actions</h3>
-                <div className="space-y-3">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-center">What are you looking to do?</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Record New Consultation */}
                   <button
                     onClick={() => setActiveTab("create-record")}
-                    className="w-full p-4 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-lg flex items-center justify-between hover:from-primary/90 hover:to-primary/70 transition-all"
+                    className="aspect-square bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 flex flex-col items-center justify-center space-y-3 hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105"
                   >
-                    <div className="flex items-center space-x-3">
-                      <FileText className="w-5 h-5" />
-                      <span className="font-medium">Record New Consultation</span>
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                      <FileText className="w-6 h-6" />
                     </div>
-                    <span className="text-sm opacity-80">→</span>
+                    <div className="text-center">
+                      <div className="font-semibold text-sm">Record New</div>
+                      <div className="font-semibold text-sm">Consultation</div>
+                    </div>
                   </button>
                   
+                  {/* View Patient Records */}
                   <button
                     onClick={() => setActiveTab("view-records")}
-                    className="w-full p-4 bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground rounded-lg flex items-center justify-between hover:from-secondary/90 hover:to-secondary/70 transition-all"
+                    className="aspect-square bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl p-6 flex flex-col items-center justify-center space-y-3 hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105"
                   >
-                    <div className="flex items-center space-x-3">
-                      <Eye className="w-5 h-5" />
-                      <span className="font-medium">View Patient Records</span>
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                      <Eye className="w-6 h-6" />
                     </div>
-                    <span className="text-sm opacity-80">→</span>
+                    <div className="text-center">
+                      <div className="font-semibold text-sm">View Patient</div>
+                      <div className="font-semibold text-sm">Records</div>
+                    </div>
+                  </button>
+                  
+                  {/* Manage Prescriptions */}
+                  <button
+                    onClick={() => setActiveTab("prescriptions")}
+                    className="aspect-square bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 flex flex-col items-center justify-center space-y-3 hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105"
+                  >
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                      <Pill className="w-6 h-6" />
+                    </div>
+                    <div className="text-center">
+                      <div className="font-semibold text-sm">Manage</div>
+                      <div className="font-semibold text-sm">Prescriptions</div>
+                    </div>
+                  </button>
+                  
+                  {/* Upload Records */}
+                  <button
+                    className="aspect-square bg-gradient-to-br from-red-500 to-red-600 text-white rounded-2xl p-6 flex flex-col items-center justify-center space-y-3 hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105"
+                  >
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                      <Upload className="w-6 h-6" />
+                    </div>
+                    <div className="text-center">
+                      <div className="font-semibold text-sm">Upload</div>
+                      <div className="font-semibold text-sm">Records</div>
+                    </div>
                   </button>
                 </div>
               </div>
