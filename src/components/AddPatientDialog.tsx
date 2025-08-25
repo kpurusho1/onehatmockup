@@ -254,45 +254,15 @@ export function AddPatientDialog({ open, onOpenChange }: AddPatientDialogProps) 
               />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="dob" className="text-sm font-medium mb-2 block">
-                  DOB (DD/MM/YYYY)
-                </Label>
-                <Input
-                  id="dob"
-                  placeholder="DD/MM/YYYY"
-                  value={formData.dob}
-                  onChange={(e) => setFormData({...formData, dob: e.target.value})}
-                  disabled={!!selectedProfile}
-                />
-              </div>
-              <div className="flex items-center justify-center">
-                <span className="text-muted-foreground">OR</span>
-              </div>
-              <div>
-                <Label htmlFor="age" className="text-sm font-medium mb-2 block">
-                  Age
-                </Label>
-                <Input
-                  id="age"
-                  placeholder="Enter age"
-                  value={formData.age}
-                  onChange={(e) => setFormData({...formData, age: e.target.value})}
-                  disabled={!!selectedProfile}
-                />
-              </div>
-            </div>
-
             <div>
-              <Label htmlFor="regNo" className="text-sm font-medium mb-2 block">
-                Reg No / ID (if any)
+              <Label htmlFor="dob" className="text-sm font-medium mb-2 block">
+                DOB (DD/MM/YYYY)
               </Label>
               <Input
-                id="regNo"
-                placeholder="Enter registration number or ID"
-                value={formData.regNo}
-                onChange={(e) => setFormData({...formData, regNo: e.target.value})}
+                id="dob"
+                placeholder="DD/MM/YYYY"
+                value={formData.dob}
+                onChange={(e) => setFormData({...formData, dob: e.target.value})}
                 disabled={!!selectedProfile}
               />
             </div>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { 
   Search, 
@@ -15,7 +16,10 @@ import {
   Mic,
   CheckCircle2,
   Clock,
-  ArrowLeft
+  ArrowLeft,
+  Eye,
+  MessageSquare,
+  Bot
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -51,7 +55,12 @@ type Record = {
 const mockPatients: Patient[] = [
   { id: "1", name: "John Doe", age: 45, phone: "9876543210" },
   { id: "2", name: "Jane Smith", age: 32, phone: "9765432109" },
-  { id: "3", name: "Patient (Test)", age: 28, phone: "8954229999" },
+  { id: "3", name: "Robert Johnson", age: 28, phone: "8754321098" },
+  { id: "4", name: "Emily Davis", age: 32, phone: "9123456789" },
+  { id: "5", name: "Michael Brown", age: 58, phone: "8765432109" },
+  { id: "6", name: "Sarah Wilson", age: 29, phone: "9234567890" },
+  { id: "7", name: "David Miller", age: 42, phone: "8654321987" },
+  { id: "8", name: "Lisa Garcia", age: 36, phone: "9345678901" },
 ];
 
 const mockRecords: Record[] = [
@@ -98,11 +107,25 @@ export default function ViewHealthRecordsTab() {
   const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
   const [showSendDialog, setShowSendDialog] = useState(false);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
+  const [aiQuery, setAiQuery] = useState("");
+  const [aiResponse, setAiResponse] = useState("");
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
   const filteredPatients = mockPatients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.phone.includes(searchTerm)
   );
+
+  const handleAiQuery = async () => {
+    if (!aiQuery.trim()) return;
+    
+    setIsAiLoading(true);
+    // Simulate AI response
+    setTimeout(() => {
+      setAiResponse(`Based on ${selectedPatient?.name}'s medical history, I can provide insights about their recent consultations and treatment patterns. What specific aspect would you like me to analyze?`);
+      setIsAiLoading(false);
+    }, 2000);
+  };
 
   const handleSendToPatient = () => {
     setShowSendDialog(false);
@@ -147,23 +170,32 @@ export default function ViewHealthRecordsTab() {
           {filteredPatients.map((patient) => (
             <Card 
               key={patient.id} 
-              className="cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => setSelectedPatient(patient)}
+              className="hover:bg-accent/50 transition-colors"
             >
               <CardContent className="p-4">
-                <div className="flex items-center space-x-3">
-                  <Avatar>
-                    <AvatarImage src={patient.avatar} />
-                    <AvatarFallback>
-                      <User size={20} />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{patient.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Age: {patient.age} • Phone: {patient.phone}
-                    </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3 flex-1">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <User size={20} className="text-primary" />
+                    </div>
+                    <div className="flex-1 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-foreground">{patient.name}</span>
+                        <span className="text-muted-foreground">•</span>
+                        <span className="text-sm text-muted-foreground">{patient.age} yrs</span>
+                      </div>
+                      <span className="text-sm text-muted-foreground/70 italic ml-auto">{patient.phone}</span>
+                    </div>
                   </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setSelectedPatient(patient)}
+                    className="ml-3"
+                  >
+                    <Eye size={16} className="mr-1" />
+                    View
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -372,6 +404,47 @@ export default function ViewHealthRecordsTab() {
           </div>
         </div>
       </div>
+
+      {/* AI Query Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center space-x-2">
+            <Bot size={20} className="text-primary" />
+            <CardTitle>Ask 1hat AI about patient history</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex space-x-2">
+            <Input
+              placeholder="Ask about patient's medical history, patterns, or specific conditions..."
+              value={aiQuery}
+              onChange={(e) => setAiQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAiQuery()}
+              className="flex-1"
+            />
+            <Button 
+              onClick={handleAiQuery}
+              disabled={!aiQuery.trim() || isAiLoading}
+              className="px-4"
+            >
+              {isAiLoading ? (
+                <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+              ) : (
+                <Send size={16} />
+              )}
+            </Button>
+          </div>
+          
+          {aiResponse && (
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-start space-x-2">
+                <Bot size={16} className="text-primary mt-1 flex-shrink-0" />
+                <p className="text-sm">{aiResponse}</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Medical Records List */}
       <Card>
