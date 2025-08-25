@@ -46,7 +46,19 @@ export default function CreateRecordTab() {
   const [patients] = useState<Patient[]>([
     { id: "1", name: "John Doe", phone: "8954229999", age: 35 },
     { id: "2", name: "Jane Smith", phone: "9876543210", age: 28 },
-    { id: "3", name: "Test Patient", phone: "8954229999", age: 45 },
+    { id: "3", name: "Robert Johnson", phone: "8754321098", age: 45 },
+    { id: "4", name: "Emily Davis", phone: "9123456789", age: 32 },
+    { id: "5", name: "Michael Brown", phone: "8765432109", age: 58 },
+    { id: "6", name: "Sarah Wilson", phone: "9234567890", age: 29 },
+    { id: "7", name: "David Miller", phone: "8654321987", age: 42 },
+    { id: "8", name: "Lisa Garcia", phone: "9345678901", age: 36 },
+    { id: "9", name: "Thomas Anderson", phone: "8543219876", age: 51 },
+    { id: "10", name: "Maria Rodriguez", phone: "9456789012", age: 27 },
+    { id: "11", name: "James Taylor", phone: "8432198765", age: 39 },
+    { id: "12", name: "Jennifer Lee", phone: "9567890123", age: 44 },
+    { id: "13", name: "Christopher White", phone: "8321987654", age: 33 },
+    { id: "14", name: "Amanda Clark", phone: "9678901234", age: 26 },
+    { id: "15", name: "Daniel Harris", phone: "8210987643", age: 48 }
   ]);
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -263,67 +275,74 @@ export default function CreateRecordTab() {
   // Patient Selection View
   if (currentStep === 'select-patient') {
     return (
-      <div className="p-4 space-y-4 h-full pb-24">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Create Record</h2>
+      <div className="relative h-full pb-32">
+        <div className="p-4 space-y-4 h-full">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Create Record</h2>
+            <Button 
+              onClick={() => setShowAddPatient(true)}
+              className="flex items-center gap-2"
+            >
+              <Plus size={16} />
+              Add Patient
+            </Button>
+          </div>
+
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
+            <Input
+              placeholder="Search patients by name or phone..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Select Patient to Record</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 max-h-96 overflow-y-auto">
+              <RadioGroup value={selectedPatientId} onValueChange={setSelectedPatientId}>
+                {filteredPatients.map((patient) => (
+                  <div
+                    key={patient.id}
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                    onClick={() => setSelectedPatientId(patient.id)}
+                  >
+                    <div className="flex items-center space-x-3 flex-1">
+                      <RadioGroupItem value={patient.id} id={patient.id} />
+                      <div className="flex-1 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground">{patient.name}</span>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-sm text-muted-foreground">{patient.age} yrs</span>
+                        </div>
+                        <span className="text-sm text-muted-foreground/70 italic ml-auto">{patient.phone}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </RadioGroup>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sticky Record Button */}
+        <div className="fixed bottom-20 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t z-40">
           <Button 
-            onClick={() => setShowAddPatient(true)}
-            className="flex items-center gap-2"
+            onClick={startRecording}
+            disabled={!selectedPatientId}
+            className={`w-full h-12 text-lg font-semibold ${
+              selectedPatientId 
+                ? 'bg-red-600 hover:bg-red-700 text-white' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
           >
-            <Plus size={16} />
-            Add Patient
+            Record
           </Button>
         </div>
-
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
-          <Input
-            placeholder="Search patients by name or phone..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Select Patient to Record</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 max-h-96 overflow-y-auto">
-            <RadioGroup value={selectedPatientId} onValueChange={setSelectedPatientId}>
-              {filteredPatients.map((patient) => (
-                <div
-                  key={patient.id}
-                  className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                  onClick={() => setSelectedPatientId(patient.id)}
-                >
-                  <RadioGroupItem value={patient.id} id={patient.id} />
-                  <div className="flex-1">
-                    <label htmlFor={patient.id} className="cursor-pointer">
-                      <div className="font-medium">{patient.name}, {patient.age} yrs, {patient.phone}</div>
-                    </label>
-                  </div>
-                </div>
-              ))}
-            </RadioGroup>
-            
-            {/* Record Button */}
-            <div className="pt-4">
-              <Button 
-                onClick={startRecording}
-                disabled={!selectedPatientId}
-                className={`w-full h-12 text-lg font-semibold ${
-                  selectedPatientId 
-                    ? 'bg-red-600 hover:bg-red-700 text-white' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                Record
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
 
         <AddPatientDialog 
           open={showAddPatient}
