@@ -17,8 +17,15 @@ export default function Login() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, navigate to mobile app
-    navigate("/mobile");
+    // Check URL params to determine where to navigate after login
+    const urlParams = new URLSearchParams(window.location.search);
+    const platform = urlParams.get('platform');
+    
+    if (platform === 'mobile') {
+      navigate("/mobile");
+    } else {
+      navigate("/desktop");
+    }
   };
 
   return (
