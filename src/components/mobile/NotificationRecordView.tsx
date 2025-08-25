@@ -117,7 +117,7 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={onBack}>
             <ArrowLeft size={16} className="mr-2" />
-            Back to Notifications
+            Back to All Patients
           </Button>
           <Badge variant="secondary" className="bg-green-100 text-green-700">
             <CheckCircle2 size={14} className="mr-1" />

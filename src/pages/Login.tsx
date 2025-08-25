@@ -10,9 +10,9 @@ export default function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [credentials, setCredentials] = useState({
-    username: "",
-    password: "",
-    hospital: ""
+    username: "mithra",
+    password: "admin",
+    hospital: "guru"
   });
 
   const handleLogin = (e: React.FormEvent) => {
@@ -103,6 +103,9 @@ export default function Login() {
                       <SelectValue placeholder="Select your hospital" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="guru">Guru Hospital</SelectItem>
+                      <SelectItem value="giri">Giri Hospital</SelectItem>
+                      <SelectItem value="women-child">Women and Child Clinic</SelectItem>
                       <SelectItem value="apollo">Apollo Hospital</SelectItem>
                       <SelectItem value="fortis">Fortis Healthcare</SelectItem>
                       <SelectItem value="manipal">Manipal Hospital</SelectItem>

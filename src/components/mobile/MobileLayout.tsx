@@ -282,7 +282,7 @@ export const MobileLayout = () => {
               className="flex flex-col gap-1 h-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Home size={20} />
-              <span className="text-xs">Home</span>
+              <span className="text-xs">Create new</span>
             </TabsTrigger>
             <TabsTrigger 
               value="view-records" 
