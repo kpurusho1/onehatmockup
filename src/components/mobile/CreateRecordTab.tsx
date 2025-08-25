@@ -171,16 +171,23 @@ export default function CreateRecordTab() {
     setProcessingProgress(0);
     setMedicalRecord(prev => ({ ...prev, patientId: selectedPatient?.id || "" }));
     
+    let hasNavigatedAway = false;
+    
     // Simulate processing with progress
     const progressInterval = setInterval(() => {
       setProcessingProgress(prev => {
+        // Check if user has navigated away from processing
+        if (currentStep !== 'processing') {
+          hasNavigatedAway = true;
+        }
+        
         if (prev >= 100) {
           clearInterval(progressInterval);
-          // Only show summary when processing reaches 100% and user is still on processing page
-          if (currentStep === 'processing') {
+          // Only show summary if user is still on processing screen
+          if (!hasNavigatedAway && currentStep === 'processing') {
             setCurrentStep('view-record');
           } else {
-            // If user navigated away, add notification
+            // If user navigated away, just send notification
             toast({
               title: "Recording processed",
               description: "Your consultation summary is ready for review.",
