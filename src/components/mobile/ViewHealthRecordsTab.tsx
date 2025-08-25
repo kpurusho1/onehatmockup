@@ -167,6 +167,53 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
           <p className="text-muted-foreground">Select a patient to view their records</p>
         </div>
 
+        {/* AI Query Section for Cross-Patient History */}
+        <div className="p-4 border-2 border-transparent bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-lg relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg"></div>
+          <div className="absolute inset-[2px] bg-background rounded-lg"></div>
+          <div className="relative">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+                <span className="text-white text-xs font-bold">AI</span>
+              </div>
+              <h3 className="font-medium text-lg">Ask 1hat AI about patient history</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="Search across all patients for conditions, treatments, patterns..."
+                  value={aiQuery}
+                  onChange={(e) => setAiQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleAiQuery()}
+                  className="flex-1 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20 border-transparent"
+                />
+                <Button 
+                  onClick={handleAiQuery}
+                  disabled={!aiQuery.trim() || isAiLoading}
+                  className="px-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                >
+                  {isAiLoading ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+                  ) : (
+                    <Send size={16} />
+                  )}
+                </Button>
+              </div>
+              
+              {aiResponse && (
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-lg p-4 border border-blue-200/30">
+                  <div className="flex items-start space-x-2">
+                    <Bot size={16} className="text-blue-600 mt-1 flex-shrink-0" />
+                    <div className="text-sm text-gray-700 dark:text-gray-300">
+                      {aiResponse}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Patient Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
