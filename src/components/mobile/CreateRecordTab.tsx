@@ -323,7 +323,8 @@ export default function CreateRecordTab() {
             <h2 className="text-2xl font-bold">Create Record</h2>
             <Button 
               onClick={() => setShowAddPatient(true)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 text-white"
+              style={{ backgroundColor: '#1c2f7f' }}
             >
               <Plus size={16} />
               Add Patient
@@ -509,7 +510,7 @@ export default function CreateRecordTab() {
     return (
       <div className="flex-1 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
+        <div className="text-white p-4" style={{ backgroundColor: '#1c2f7f' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Avatar className="w-12 h-12 bg-white/20">

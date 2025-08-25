@@ -52,7 +52,7 @@ export const MobileLayout = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="bg-primary text-primary-foreground p-4 shadow-lg">
+      <header className="text-primary-foreground p-4 shadow-lg" style={{ backgroundColor: '#1c2f7f' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <img src="/src/assets/1hat-logo.png" alt="1hat" className="w-8 h-8" />
