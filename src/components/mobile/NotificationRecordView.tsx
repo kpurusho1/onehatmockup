@@ -34,7 +34,7 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
   });
 
   // Mock data for the medical record
-  const mockRecord = {
+  const [mockRecord, setMockRecord] = useState({
     id: recordId,
     patientName,
     date: "25 Aug 2025",
@@ -67,7 +67,7 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
       "Ensure adequate sleep and hydration",
       "Consider stress management techniques"
     ]
-  };
+  });
 
   const handleSectionToggle = (section: keyof typeof selectedSections) => {
     setSelectedSections(prev => ({
@@ -152,14 +152,26 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                 Key Facts
                 {!selectedSections.keyFacts && <span className="ml-2 text-xs text-muted-foreground">(not selected for sending)</span>}
               </h3>
-              <ul className={`space-y-2 ${!selectedSections.keyFacts ? 'opacity-50' : ''}`}>
-                {mockRecord.keyFacts.map((fact, index) => (
-                  <li key={index} className="text-sm text-muted-foreground flex items-start">
-                    <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2 mt-2 flex-shrink-0"></span>
-                    {fact}
-                  </li>
-                ))}
-              </ul>
+              {isEditing ? (
+                <textarea
+                  className="w-full p-3 border rounded-lg min-h-[100px] text-sm"
+                  value={mockRecord.keyFacts.join('\n')}
+                  onChange={(e) => setMockRecord(prev => ({
+                    ...prev,
+                    keyFacts: e.target.value.split('\n').filter(fact => fact.trim())
+                  }))}
+                  placeholder="Enter key facts..."
+                />
+              ) : (
+                <ul className={`space-y-2 ${!selectedSections.keyFacts ? 'opacity-50' : ''}`}>
+                  {mockRecord.keyFacts.map((fact, index) => (
+                    <li key={index} className="text-sm text-muted-foreground flex items-start">
+                      <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2 mt-2 flex-shrink-0"></span>
+                      {fact}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {/* Diagnosis */}
@@ -175,7 +187,19 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                 Diagnosis
                 {!selectedSections.diagnosis && <span className="ml-2 text-xs text-muted-foreground">(not selected for sending)</span>}
               </h3>
-              <p className={`text-sm text-muted-foreground ${!selectedSections.diagnosis ? 'opacity-50' : ''}`}>{mockRecord.diagnosis}</p>
+              {isEditing ? (
+                <textarea
+                  className="w-full p-3 border rounded-lg min-h-[80px] text-sm"
+                  value={mockRecord.diagnosis}
+                  onChange={(e) => setMockRecord(prev => ({
+                    ...prev,
+                    diagnosis: e.target.value
+                  }))}
+                  placeholder="Enter diagnosis..."
+                />
+              ) : (
+                <p className={`text-sm text-muted-foreground ${!selectedSections.diagnosis ? 'opacity-50' : ''}`}>{mockRecord.diagnosis}</p>
+              )}
             </div>
 
             {/* Prescription */}
@@ -192,28 +216,86 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                 Prescription
                 {!selectedSections.prescription && <span className="ml-2 text-xs text-muted-foreground">(not selected for sending)</span>}
               </h3>
-              <div className={`space-y-4 ${!selectedSections.prescription ? 'opacity-50' : ''}`}>
-                {mockRecord.medications.map((medication, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <h4 className="font-medium text-primary mb-2">{medication.name}</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Dosage:</span>
-                        <span className="ml-2 font-medium">{medication.dosage}</span>
+              {isEditing ? (
+                <div className="space-y-4">
+                  {mockRecord.medications.map((medication, index) => (
+                    <div key={index} className="p-4 border rounded-lg space-y-3">
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded text-sm font-medium"
+                        value={medication.name}
+                        onChange={(e) => setMockRecord(prev => ({
+                          ...prev,
+                          medications: prev.medications.map((med, i) => 
+                            i === index ? { ...med, name: e.target.value } : med
+                          )
+                        }))}
+                        placeholder="Medication name"
+                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <input
+                          type="text"
+                          className="p-2 border rounded text-sm"
+                          value={medication.dosage}
+                          onChange={(e) => setMockRecord(prev => ({
+                            ...prev,
+                            medications: prev.medications.map((med, i) => 
+                              i === index ? { ...med, dosage: e.target.value } : med
+                            )
+                          }))}
+                          placeholder="Dosage"
+                        />
+                        <input
+                          type="text"
+                          className="p-2 border rounded text-sm"
+                          value={medication.duration}
+                          onChange={(e) => setMockRecord(prev => ({
+                            ...prev,
+                            medications: prev.medications.map((med, i) => 
+                              i === index ? { ...med, duration: e.target.value } : med
+                            )
+                          }))}
+                          placeholder="Duration"
+                        />
                       </div>
-                      <div>
-                        <span className="text-muted-foreground">Duration:</span>
-                        <span className="ml-2 font-medium">{medication.duration}</span>
-                      </div>
+                      <textarea
+                        className="w-full p-2 border rounded text-xs min-h-[60px]"
+                        value={medication.remarks}
+                        onChange={(e) => setMockRecord(prev => ({
+                          ...prev,
+                          medications: prev.medications.map((med, i) => 
+                            i === index ? { ...med, remarks: e.target.value } : med
+                          )
+                        }))}
+                        placeholder="Remarks"
+                      />
                     </div>
-                    {medication.remarks && (
-                      <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
-                        <span className="font-medium">Note:</span> {medication.remarks}
+                  ))}
+                </div>
+              ) : (
+                <div className={`space-y-4 ${!selectedSections.prescription ? 'opacity-50' : ''}`}>
+                  {mockRecord.medications.map((medication, index) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <h4 className="font-medium text-primary mb-2">{medication.name}</h4>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Dosage:</span>
+                          <span className="ml-2 font-medium">{medication.dosage}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Duration:</span>
+                          <span className="ml-2 font-medium">{medication.duration}</span>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      {medication.remarks && (
+                        <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
+                          <span className="font-medium">Note:</span> {medication.remarks}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Next Steps */}
@@ -229,14 +311,26 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                 Next Steps
                 {!selectedSections.nextSteps && <span className="ml-2 text-xs text-muted-foreground">(not selected for sending)</span>}
               </h3>
-              <ul className={`space-y-2 ${!selectedSections.nextSteps ? 'opacity-50' : ''}`}>
-                {mockRecord.nextSteps.map((step, index) => (
-                  <li key={index} className="text-sm text-muted-foreground flex items-start">
-                    <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2 mt-2 flex-shrink-0"></span>
-                    {step}
-                  </li>
-                ))}
-              </ul>
+              {isEditing ? (
+                <textarea
+                  className="w-full p-3 border rounded-lg min-h-[100px] text-sm"
+                  value={mockRecord.nextSteps.join('\n')}
+                  onChange={(e) => setMockRecord(prev => ({
+                    ...prev,
+                    nextSteps: e.target.value.split('\n').filter(step => step.trim())
+                  }))}
+                  placeholder="Enter next steps..."
+                />
+              ) : (
+                <ul className={`space-y-2 ${!selectedSections.nextSteps ? 'opacity-50' : ''}`}>
+                  {mockRecord.nextSteps.map((step, index) => (
+                    <li key={index} className="text-sm text-muted-foreground flex items-start">
+                      <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2 mt-2 flex-shrink-0"></span>
+                      {step}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {/* Action Buttons */}

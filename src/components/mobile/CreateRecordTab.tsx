@@ -318,12 +318,13 @@ export default function CreateRecordTab() {
   if (currentStep === 'select-patient') {
     return (
       <div className="relative h-full pb-32">
-        <div className="p-4 space-y-4 h-full">
+        <div className={`p-4 space-y-4 h-full transition-all ${selectedPatientId ? 'opacity-30' : ''}`}>
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Create Record</h2>
             <Button 
               onClick={() => setShowAddPatient(true)}
               className="flex items-center gap-2"
+              disabled={!!selectedPatientId}
             >
               <Plus size={16} />
               Add Patient
@@ -338,6 +339,7 @@ export default function CreateRecordTab() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
+              disabled={!!selectedPatientId}
             />
           </div>
 
@@ -349,7 +351,7 @@ export default function CreateRecordTab() {
                   selectedPatientId === patient.id 
                     ? 'border-primary bg-primary/5' 
                     : 'hover:bg-muted/50'
-                }`}
+                } ${selectedPatientId && selectedPatientId !== patient.id ? 'pointer-events-none' : ''}`}
                 onClick={() => setSelectedPatientId(patient.id)}
               >
                 {/* Selection Overlay */}
@@ -373,20 +375,20 @@ export default function CreateRecordTab() {
           </div>
         </div>
 
-        {/* Sticky Record Button */}
-        <div className="fixed bottom-20 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t z-40">
-          <Button 
-            onClick={startRecording}
-            disabled={!selectedPatientId}
-            className={`w-full h-12 text-lg font-semibold ${
-              selectedPatientId 
-                ? 'bg-red-600 hover:bg-red-700 text-white' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Record
-          </Button>
-        </div>
+        {/* Overlaid Record Button when patient is selected */}
+        {selectedPatientId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="pointer-events-auto">
+              <Button 
+                onClick={startRecording}
+                className="h-16 px-8 text-xl font-semibold bg-red-600 hover:bg-red-700 text-white shadow-2xl rounded-xl"
+              >
+                <Mic size={24} className="mr-3" />
+                Start Recording
+              </Button>
+            </div>
+          </div>
+        )}
 
         <AddPatientDialog 
           open={showAddPatient}
@@ -537,7 +539,7 @@ export default function CreateRecordTab() {
             <div className="space-y-3">
               <h3 className="text-2xl font-bold text-primary">1hat AI is analyzing</h3>
               <p className="text-muted-foreground text-lg">
-                We will notify you once ready! May take 30 - 45 seconds.
+                This may take about 30-45 seconds. We will notify you once the record is ready for review.
               </p>
             </div>
             
@@ -552,7 +554,8 @@ export default function CreateRecordTab() {
           <div className="w-full max-w-md space-y-4">
             <Button 
               size="lg" 
-              className="w-full h-16 text-lg bg-blue-600 hover:bg-blue-700"
+              className="w-full h-16 text-lg text-white"
+              style={{ backgroundColor: '#1c2f7f' }}
               onClick={() => {
                 setCurrentStep('select-patient');
                 setSelectedPatient(null);
@@ -562,9 +565,6 @@ export default function CreateRecordTab() {
             >
               Create New Recording
             </Button>
-            <p className="text-sm text-muted-foreground text-center">
-              We'll notify you once this summary is ready!
-            </p>
           </div>
         </div>
       </div>
