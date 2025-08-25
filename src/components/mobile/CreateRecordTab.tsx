@@ -170,13 +170,33 @@ export default function CreateRecordTab() {
     setProcessingProgress(0);
     setMedicalRecord(prev => ({ ...prev, patientId: selectedPatient?.id || "" }));
     
-    // Simulate processing with progress - now only sends notification, doesn't auto-show summary
+    let wasInterrupted = false;
+    
+    // Monitor for interruption by checking if user goes back to patient selection
+    const checkForInterruption = () => {
+      const currentStepCheck = currentStep;
+      if (currentStepCheck === 'select-patient') {
+        wasInterrupted = true;
+      }
+    };
+    
+    // Simulate processing with progress
     const progressInterval = setInterval(() => {
       setProcessingProgress(prev => {
+        checkForInterruption(); // Check for interruption on each progress update
+        
         if (prev >= 100) {
           clearInterval(progressInterval);
-          // Send notification but don't automatically show summary
-          // setCurrentStep('view-record'); // Removed this line
+          // Only auto-show summary if processing completed without interruption
+          if (!wasInterrupted) {
+            setCurrentStep('view-record');
+          } else {
+            // Send notification instead if interrupted
+            toast({
+              title: "Recording processed",
+              description: "Your consultation summary is ready for review.",
+            });
+          }
           return 100;
         }
         return prev + 10;
@@ -505,9 +525,9 @@ export default function CreateRecordTab() {
             </div>
             
             <div className="space-y-3">
-              <h3 className="text-2xl font-bold text-primary">Processing Recording</h3>
+              <h3 className="text-2xl font-bold text-primary">1hat AI is analyzing</h3>
               <p className="text-muted-foreground text-lg">
-                AI is analyzing your consultation...
+                We will notify you once ready! May take 30 - 45 seconds.
               </p>
             </div>
             

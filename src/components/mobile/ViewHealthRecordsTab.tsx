@@ -157,11 +157,13 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
   if (!selectedPatient) {
     return (
       <div className="p-4 space-y-6 pb-24">
-        {/* Back Button */}
-        <Button variant="ghost" className="mb-4" onClick={() => window.history.back()}>
-          <ArrowLeft size={16} className="mr-2" />
-          Back
-        </Button>
+        {/* Local Header */}
+        <div className="flex items-center mb-4">
+          <Button variant="ghost" onClick={() => window.history.back()}>
+            <ArrowLeft size={16} className="mr-2" />
+          </Button>
+          <h1 className="text-xl font-semibold">Patient Details</h1>
+        </div>
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">View Health Records</h2>
           <p className="text-muted-foreground">Select a patient to view their records</p>
@@ -443,11 +445,13 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
 
   return (
     <div className="p-4 space-y-6 pb-24">
-      {/* Back Button */}
-      <Button variant="ghost" onClick={() => setSelectedPatient(null)}>
-        <ArrowLeft size={16} className="mr-2" />
-        Change Patient
-      </Button>
+        {/* Local Header */}
+        <div className="flex items-center mb-4">
+          <Button variant="ghost" onClick={() => setSelectedPatient(null)}>
+            <ArrowLeft size={16} className="mr-2" />
+          </Button>
+          <h1 className="text-xl font-semibold">Patient Details</h1>
+        </div>
 
       {/* Patient Header */}
       <div className="text-white p-4 rounded-lg" style={{ backgroundColor: '#1c2f7f' }}>
