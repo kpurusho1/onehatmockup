@@ -343,7 +343,10 @@ export default function CreateRecordTab() {
       <div className="relative h-full">
         <div className="p-4 space-y-4 h-full pb-32">
           <div className={`flex items-center justify-between transition-all ${selectedPatientId ? 'opacity-30 pointer-events-none' : ''}`}>
-            <h2 className="text-2xl font-bold">Create Record</h2>
+            <div>
+              <h2 className="text-2xl font-bold">Create New Record</h2>
+              <p className="text-muted-foreground mt-1">Select patient to start recording</p>
+            </div>
             <Button 
               onClick={() => setShowAddPatient(true)}
               className="flex items-center gap-2 text-white"
@@ -365,37 +368,39 @@ export default function CreateRecordTab() {
             />
           </div>
 
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            {filteredPatients.map((patient) => (
-              <div
-                key={patient.id}
-                className={`relative flex items-center p-2 border rounded-lg cursor-pointer transition-all ${
-                  selectedPatientId === patient.id 
-                    ? 'border-primary bg-primary/5 z-10' 
-                    : selectedPatientId 
-                      ? 'opacity-30 pointer-events-none'
-                      : 'hover:bg-muted/50'
-                }`}
-                onClick={() => setSelectedPatientId(patient.id)}
-              >
-                {/* Selection Overlay */}
-                {selectedPatientId === patient.id && (
-                  <div className="absolute inset-0 bg-primary/10 rounded-lg border-2 border-primary"></div>
-                )}
-                
-                <Avatar className="w-6 h-6 mr-2 z-10 flex-shrink-0">
-                  <AvatarImage src={`/src/assets/patient-avatar-${Math.floor(Math.random() * 3) + 1}.jpg`} />
-                  <AvatarFallback className="text-xs">{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 flex items-center justify-between z-10 min-w-0">
-                  <div className="flex items-center space-x-3 flex-1 min-w-0">
-                    <span className="font-medium text-foreground text-sm truncate">{patient.name}</span>
-                    <span className="text-xs text-muted-foreground flex-shrink-0">{patient.age}y</span>
+          <div className="bg-muted/30 rounded-lg p-3">
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {filteredPatients.map((patient) => (
+                <div
+                  key={patient.id}
+                  className={`relative flex items-center p-3 bg-background border rounded-lg cursor-pointer transition-all shadow-sm ${
+                    selectedPatientId === patient.id 
+                      ? 'border-primary bg-primary/5 z-10' 
+                      : selectedPatientId 
+                        ? 'opacity-30 pointer-events-none'
+                        : 'hover:bg-muted/50'
+                  }`}
+                  onClick={() => setSelectedPatientId(patient.id)}
+                >
+                  {/* Selection Overlay */}
+                  {selectedPatientId === patient.id && (
+                    <div className="absolute inset-0 bg-primary/10 rounded-lg border-2 border-primary"></div>
+                  )}
+                  
+                  <Avatar className="w-6 h-6 mr-2 z-10 flex-shrink-0">
+                    <AvatarImage src={`/src/assets/patient-avatar-${Math.floor(Math.random() * 3) + 1}.jpg`} />
+                    <AvatarFallback className="text-xs">{patient.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 flex items-center justify-between z-10 min-w-0">
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
+                      <span className="font-medium text-foreground text-sm truncate">{patient.name}</span>
+                      <span className="text-xs text-muted-foreground flex-shrink-0">{patient.age}y</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground ml-2 flex-shrink-0">{patient.phone}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground ml-2 flex-shrink-0">{patient.phone}</span>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
