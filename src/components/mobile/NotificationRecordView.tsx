@@ -15,7 +15,8 @@ import {
   Pill,
   FileText,
   CheckCircle2,
-  Eye
+  Eye,
+  Plus
 } from "lucide-react";
 
 interface NotificationRecordViewProps {
@@ -151,10 +152,16 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Medical Summary</CardTitle>
-              <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)}>
-                <Edit size={16} className="mr-2" />
-                {isEditing ? 'Cancel' : 'Edit'}
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="text-white" style={{ backgroundColor: '#1c2f7f' }}>
+                  <Plus size={16} className="mr-2" />
+                  Create Rx
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)}>
+                  <Edit size={16} className="mr-2" />
+                  {isEditing ? 'Cancel' : 'Edit'}
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -167,7 +174,8 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                   onCheckedChange={() => handleSectionToggle('keyFacts')}
                 />
               </div>
-              <h3 className={`font-semibold text-lg mb-3 flex items-center ${!selectedSections.keyFacts ? 'opacity-50' : ''}`}>
+              <h3 className={`font-semibold text-lg mb-3 flex items-center cursor-pointer ${!selectedSections.keyFacts ? 'opacity-50' : ''}`}
+                  onClick={() => handleSectionToggle('keyFacts')}>
                 <FileText size={20} className="mr-2 text-primary" />
                 Key Facts
                 {!selectedSections.keyFacts && <span className="ml-2 text-xs text-muted-foreground">(not selected for sending)</span>}
@@ -203,7 +211,8 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                   onCheckedChange={() => handleSectionToggle('diagnosis')}
                 />
               </div>
-              <h3 className={`font-semibold text-lg mb-3 ${!selectedSections.diagnosis ? 'opacity-50' : ''}`}>
+              <h3 className={`font-semibold text-lg mb-3 cursor-pointer ${!selectedSections.diagnosis ? 'opacity-50' : ''}`}
+                  onClick={() => handleSectionToggle('diagnosis')}>
                 Diagnosis
                 {!selectedSections.diagnosis && <span className="ml-2 text-xs text-muted-foreground">(not selected for sending)</span>}
               </h3>
@@ -231,7 +240,8 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                   onCheckedChange={() => handleSectionToggle('prescription')}
                 />
               </div>
-              <h3 className={`font-semibold text-lg mb-3 flex items-center ${!selectedSections.prescription ? 'opacity-50' : ''}`}>
+              <h3 className={`font-semibold text-lg mb-3 flex items-center cursor-pointer ${!selectedSections.prescription ? 'opacity-50' : ''}`}
+                  onClick={() => handleSectionToggle('prescription')}>
                 <Pill size={20} className="mr-2 text-primary" />
                 Prescription
                 {!selectedSections.prescription && <span className="ml-2 text-xs text-muted-foreground">(not selected for sending)</span>}
@@ -439,7 +449,8 @@ export default function NotificationRecordView({ patientName, recordId, onBack }
                   onCheckedChange={() => handleSectionToggle('nextSteps')}
                 />
               </div>
-              <h3 className={`font-semibold text-lg mb-3 ${!selectedSections.nextSteps ? 'opacity-50' : ''}`}>
+              <h3 className={`font-semibold text-lg mb-3 cursor-pointer ${!selectedSections.nextSteps ? 'opacity-50' : ''}`}
+                  onClick={() => handleSectionToggle('nextSteps')}>
                 Next Steps
                 {!selectedSections.nextSteps && <span className="ml-2 text-xs text-muted-foreground">(not selected for sending)</span>}
               </h3>

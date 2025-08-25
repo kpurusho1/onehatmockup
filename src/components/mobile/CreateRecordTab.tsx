@@ -376,7 +376,10 @@ export default function CreateRecordTab() {
                       ? 'opacity-30 pointer-events-none'
                       : 'hover:bg-muted/50'
                 }`}
-                onClick={() => setSelectedPatientId(patient.id)}
+                onClick={() => {
+                  console.log("Patient clicked:", patient.id, patient.name);
+                  setSelectedPatientId(patient.id);
+                }}
               >
                 {/* Selection Overlay */}
                 {selectedPatientId === patient.id && (
