@@ -125,7 +125,13 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
     setIsAiLoading(true);
     // Simulate AI response
     setTimeout(() => {
-      setAiResponse(`Based on ${selectedPatient?.name}'s medical history, I can provide insights about their recent consultations and treatment patterns. What specific aspect would you like me to analyze?`);
+      if (aiQuery.toLowerCase().includes("any new trends") || aiQuery.toLowerCase().includes("trends")) {
+        setAiResponse("Based on recent patient data, there have been 4 new cases of fever with headache symptoms in the past week, which is trending upward. This pattern suggests a possible flu outbreak in the community. Consider monitoring for additional respiratory symptoms and recommend preventive measures to patients.");
+      } else if (selectedPatient) {
+        setAiResponse(`Based on ${selectedPatient.name}'s medical history, I can provide insights about their recent consultations and treatment patterns. What specific aspect would you like me to analyze?`);
+      } else {
+        setAiResponse("I can help analyze patient trends and medical histories. Try asking about specific conditions, medications, or recent trends.");
+      }
       setIsAiLoading(false);
     }, 2000);
   };
