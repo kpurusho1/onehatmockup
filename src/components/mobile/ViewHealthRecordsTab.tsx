@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import NotificationRecordView from "./NotificationRecordView";
 import { 
   Search, 
   User, 
@@ -101,7 +102,7 @@ const mockRecords: Record[] = [
   }
 ];
 
-export default function ViewHealthRecordsTab() {
+export default function ViewHealthRecordsTab({ fromNotification, notificationData }: { fromNotification?: boolean, notificationData?: any } = {}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
@@ -110,6 +111,7 @@ export default function ViewHealthRecordsTab() {
   const [aiQuery, setAiQuery] = useState("");
   const [aiResponse, setAiResponse] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [showNotificationRecord, setShowNotificationRecord] = useState(fromNotification || false);
 
   const filteredPatients = mockPatients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -140,6 +142,17 @@ export default function ViewHealthRecordsTab() {
         : [...prev, section]
     );
   };
+
+  // Handle notification record view
+  if (showNotificationRecord && notificationData) {
+    return (
+      <NotificationRecordView
+        patientName={notificationData.patientName}
+        recordId={notificationData.recordId}
+        onBack={() => setShowNotificationRecord(false)}
+      />
+    );
+  }
 
   if (!selectedPatient) {
     return (

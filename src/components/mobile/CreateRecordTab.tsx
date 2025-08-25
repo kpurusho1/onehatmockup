@@ -522,6 +522,29 @@ export default function CreateRecordTab() {
             <p className="text-muted-foreground">
               Usually takes 30-60 seconds for record generation
             </p>
+
+            {/* New section for continuing workflow */}
+            <div className="mt-8 p-4 bg-white dark:bg-card rounded-lg border border-primary/20">
+              <div className="text-center space-y-3">
+                <h4 className="font-medium text-primary">Continue Your Workflow</h4>
+                <p className="text-sm text-muted-foreground">
+                  You can record for another patient while this summary is being generated. 
+                  You'll receive a notification once it's ready.
+                </p>
+                <Button 
+                  onClick={() => {
+                    setCurrentStep('select-patient');
+                    setSelectedPatient(null);
+                    setSelectedPatientId("");
+                    setRecordingDuration(0);
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Record for Another Patient
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
