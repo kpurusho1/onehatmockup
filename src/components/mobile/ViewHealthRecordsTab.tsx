@@ -305,6 +305,84 @@ export default function ViewHealthRecordsTab({ fromNotification, notificationDat
     );
   }
 
-  // Rest of the component would go here for other patient records view
-  return null;
+  // Patient selected, show their records
+  return (
+    <div className="relative pb-24">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b p-4">
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedPatient(null)}
+            className="p-0"
+          >
+            <ArrowLeft size={20} />
+          </Button>
+          <h1 className="text-xl font-semibold">{selectedPatient.name}'s Records</h1>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-6">
+        {/* Patient Info */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                <User size={24} className="text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold">{selectedPatient.name}</h3>
+                <p className="text-sm text-muted-foreground">{selectedPatient.age} years • {selectedPatient.phone}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Records List */}
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold">Health Records</h2>
+          {mockRecords.map((record) => (
+            <Card key={record.id} className="hover:bg-accent/50 transition-colors">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium">{record.date}</span>
+                      <Badge variant={record.status === 'sent' ? 'default' : 'secondary'}>
+                        {record.status === 'sent' ? (
+                          <>
+                            <CheckCircle2 size={12} className="mr-1" />
+                            Sent
+                          </>
+                        ) : (
+                          <>
+                            <Clock size={12} className="mr-1" />
+                            Draft
+                          </>
+                        )}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      <p>{record.segments} segments • {record.sent} sent • {record.edited} edited</p>
+                      {record.diagnosis && <p className="font-medium text-foreground">Diagnosis: {record.diagnosis}</p>}
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setSelectedRecord(record)}
+                    className="ml-3"
+                  >
+                    <Eye size={16} className="mr-1" />
+                    View
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }

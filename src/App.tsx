@@ -24,8 +24,8 @@ const App = () => (
         {/* Login page */}
         <Route path="/login" element={<Login />} />
         
-        {/* Redirect to mobile app */}
-        <Route path="/" element={<Navigate to="/mobile" replace />} />
+        {/* Redirect to login first */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
         
         {/* Mobile App Route */}
         <Route path="/mobile" element={<MobileLayout />} />
