@@ -4,8 +4,8 @@ import StorageUtil, { STORAGE_KEYS } from '../utils/storageUtil';
 import navigationUtil from '../utils/navigationUtil';
 
 // Base API configuration - loaded directly from .env file
-// Using process.env for TypeScript compatibility
-const API_BASE_URL = process.env.VITE_API_URL;
+// Using process.env for Expo compatibility (EXPO_PUBLIC_ prefix required)
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://vhrbackend-production.up.railway.app';
 
 // Create axios instance with retry configuration
 const apiClient = axios.create({
@@ -13,12 +13,22 @@ const apiClient = axios.create({
   timeout: 15000, 
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Cache-Control': 'no-cache',
   },
 });
 
 // Request interceptor for adding auth token
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
+    // Debug logging for each request
+    console.log('🌐 Making API Request:');
+    console.log('  - Method:', config.method?.toUpperCase());
+    console.log('  - URL:', config.url);
+    console.log('  - Base URL:', config.baseURL);
+    console.log('  - Full URL:', `${config.baseURL}${config.url}`);
+    console.log('  - Timeout:', config.timeout);
+    
     // Get token and return a Promise that resolves with the modified config
     try {
       const token = await StorageUtil.getSecureItem(STORAGE_KEYS.AUTH_TOKEN);
@@ -41,7 +51,6 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
     // First, handle retry logic for network/timeout errors
     const shouldRetry = !error.response && 
                        (error.code === 'ECONNABORTED' || 

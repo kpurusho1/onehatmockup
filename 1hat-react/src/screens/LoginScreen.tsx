@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { colors } from '../theme/colors';
 import CustomDropdown, { DropdownOption } from '../components/CustomDropdown';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import AuthService from '../services/authService';
 
 // Extended colors with missing properties

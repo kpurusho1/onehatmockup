@@ -15,7 +15,8 @@ import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import NotificationsModal from '../components/NotificationsModal';
 import AddPatientModal from '../components/AddPatientModal';
 import audioRecorder from '../utils/audioRecorder';
-import { useAuth } from '../contexts/AuthContext';
+import { AuthProvider } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import pradhiRecorder from '../services/pradhiService';
 import PatientService, { Patient } from '../services/patientService';
 import PradhiService from '../services/pradhiService';
@@ -127,7 +128,7 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
 
     fetchPatients();
     fetchDashboardStats();
-  }, []);
+  }, [statsperiod]);
 
   // Refresh patients when modal closes or component gains focus
   useEffect(() => {
