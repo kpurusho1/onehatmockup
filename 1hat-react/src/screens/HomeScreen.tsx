@@ -11,27 +11,22 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import NotificationsModal from '../components/NotificationsModal';
 import AddPatientModal from '../components/AddPatientModal';
-import pradhiApi from '../services/pradhiApi';
 import audioRecorder from '../utils/audioRecorder';
 import { useAuth } from '../contexts/AuthContext';
+import pradhiRecorder from '../services/pradhiService';
+import PatientService, { Patient } from '../services/patientService';
+import PradhiService from '../services/pradhiService';
+import DashboardService, { NewPatient, DashboardStats } from '../services/dashboardService';
 
 interface HomeScreenProps {
   onLogout?: () => void;
-  navigation?: any;
+  navigation?: NavigationProp<ParamListBase>;
 }
 
 type RecordingStatus = 'idle' | 'recording' | 'paused' | 'processing' | 'completed' | 'error';
-
-// Mock patient data
-const PATIENTS = [
-  { id: 'AS', name: 'Arjun Sharma', age: 32, phone: '+91 98765 43210' },
-  { id: 'PP', name: 'Priya Patel', age: 28, phone: '+91 87654 32109' },
-  { id: 'VS', name: 'Vikram Singh', age: 45, phone: '+91 76543 21098' },
-  { id: 'DR', name: 'Deepika Reddy', age: 35, phone: '+91 65432 10987' },
-  { id: 'RK', name: 'Rohit Kumar', age: 29, phone: '+91 54321 09876' },
-];
 
 const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
   // Get auth context
@@ -41,11 +36,20 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
   const [statsToggle, setStatsToggle] = useState<'today' | 'weekly'>('today');
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [addPatientModalVisible, setAddPatientModalVisible] = useState(false);
+  const [patients, setPatients] = useState<NewPatient[]>([]);
+  const [filteredPatients, setFilteredPatients] = useState<NewPatient[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsperiod, setStatsperiod] = useState<'daily' | 'weekly'>('weekly');
+  const [searchPage, setSearchPage] = useState(1);
+  const [searchHasMore, setSearchHasMore] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [correlationId, setCorrelationId] = useState<string>('');
   const [submissionId, setSubmissionId] = useState<string>('');
-  const [patients, setPatients] = useState(PATIENTS);
   const [recordingProgress, setRecordingProgress] = useState<number>(0);
   const [recordingDuration, setRecordingDuration] = useState<string>('00:00');
   const [processingProgress, setProcessingProgress] = useState<number>(0);
@@ -56,8 +60,230 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
   // Format recording time (mm:ss)
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
+    const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Reusable function to refresh patient list
+  const refreshPatientList = async () => {
+    try {
+      setIsLoading(true);
+      const response = await DashboardService.getNewPatients(2, 50);
+      setPatients(response.patients);
+      setFilteredPatients(response.patients);
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+      // If the new patients endpoint fails, try the working JWT endpoint
+      try {
+        const response = await PatientService.getAllPatients();
+        const formattedPatients = response.map(patient => ({
+          patient_id: patient.id,
+          full_name: patient.full_name,
+          phone_number: patient.phone_number,
+          onehat_patient_id: patient.onehat_patient_id,
+          relation_created_at: patient.created_at,
+          relation_updated_at: patient.created_at,
+          total_consultations: patient.number_of_records || 0,
+          last_consultation_date: patient.last_consultation_date
+        }));
+        setPatients(formattedPatients);
+        setFilteredPatients(formattedPatients);
+      } catch (fallbackError) {
+        console.error('Error with fallback patient fetch:', fallbackError);
+        Alert.alert('Error', 'Failed to fetch patients');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch patients data on component mount
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        setIsLoading(true);
+        const response = await DashboardService.getNewPatients(2, 50);
+        setPatients(response.patients);
+        setFilteredPatients(response.patients);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+        Alert.alert('Error', 'Failed to fetch patients');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const fetchDashboardStats = async () => {
+      try {
+        setStatsLoading(true);
+        const stats = await DashboardService.getDetailedStats(statsperiod);
+        setDashboardStats(stats);
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    fetchPatients();
+    fetchDashboardStats();
+  }, []);
+
+  // Refresh patients when modal closes or component gains focus
+  useEffect(() => {
+    const refreshPatients = async () => {
+      try {
+        setIsLoading(true);
+        const response = await DashboardService.getNewPatients(2, 50);
+        setPatients(response.patients);
+        setFilteredPatients(response.patients);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (!addPatientModalVisible) {
+      // Modal closed, refresh patient list
+      refreshPatients();
+    }
+  }, [addPatientModalVisible]);
+
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        setStatsLoading(true);
+        const stats = await DashboardService.getDetailedStats(statsperiod);
+        setDashboardStats(stats);
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+    fetchDashboardStats();
+  }, [statsperiod]);
+
+  // Handle search functionality with pagination
+  const handleSearch = async (query: string, page: number = 1, append: boolean = false) => {
+    if (!append) {
+      setSearchQuery(query);
+      setSearchPage(1);
+    }
+
+    if (query.trim() === '') {
+      // Search cleared - refresh patient list instead of using stale state
+      try {
+        setIsLoading(true);
+        const response = await DashboardService.getNewPatients(2, 50);
+        setPatients(response.patients);
+        setFilteredPatients(response.patients);
+      } catch (error) {
+        console.error('Error refreshing patients on search clear:', error);
+        // Fallback to existing patients if refresh fails
+        setFilteredPatients(patients);
+      } finally {
+        setIsLoading(false);
+      }
+      setSearchHasMore(false);
+      return;
+    }
+
+    try {
+      setSearchLoading(true);
+      const searchData = await PatientService.searchPatients(query);
+      
+      // Convert Patient[] to NewPatient[] format for consistency
+      const convertedPatients = searchData.patients.map(patient => ({
+        patient_id: patient.id,
+        full_name: patient.full_name || '',
+        phone_number: patient.phone_number || '',
+        onehat_patient_id: patient.onehat_patient_id,
+        relation_created_at: patient.created_at || new Date().toISOString(),
+        relation_updated_at: patient.last_consultation_date || new Date().toISOString(),
+        total_consultations: 0,
+        last_consultation_date: patient.last_consultation_date
+      }));
+      
+      if (append) {
+        setFilteredPatients(prev => [...prev, ...convertedPatients]);
+      } else {
+        setFilteredPatients(convertedPatients);
+      }
+      
+      // Check if there are more results
+      setSearchHasMore(searchData.patients.length === 20);
+      if (append) {
+        setSearchPage(page);
+      }
+    } catch (error) {
+      console.error('Error searching patients:', error);
+      Alert.alert('Error', 'Failed to search patients');
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  // Load more search results
+  const loadMoreSearchResults = () => {
+    if (searchQuery && searchHasMore && !searchLoading) {
+      handleSearch(searchQuery, searchPage + 1, true);
+    }
+  };
+
+  // Handle add patient
+  const handleAddPatient = async (patientData: {
+    name: string;
+    mobile_number: string;
+    date_of_birth: string;
+    gender: string;
+    age?: number;
+  }) => {
+    try {
+      // Debug: Log the current doctor ID from auth context
+      console.log('🔍 Current doctor ID from auth context:', authDoctorId);
+      
+      const result = await PatientService.createPatient(patientData);
+      if (result.success) {
+        Alert.alert('Success', 'Patient added successfully');
+        // Refresh the patient list using the working JWT endpoint instead of the buggy new patients endpoint
+        try {
+          const response = await PatientService.getAllPatients();
+          // Convert to the format expected by HomeScreen
+          const formattedPatients = response.map(patient => ({
+            patient_id: patient.id,
+            full_name: patient.full_name,
+            phone_number: patient.phone_number,
+            onehat_patient_id: patient.onehat_patient_id,
+            relation_created_at: patient.created_at,
+            relation_updated_at: patient.created_at,
+            total_consultations: patient.number_of_records || 0,
+            last_consultation_date: patient.last_consultation_date
+          }));
+          setPatients(formattedPatients);
+          setFilteredPatients(formattedPatients);
+        } catch (refreshError) {
+          console.error('Error refreshing patient list after creation:', refreshError);
+          // Fallback: just reload the page data using the existing refresh function
+          refreshPatientList();
+        }
+      } else {
+        Alert.alert('Error', result.message || 'Failed to add patient');
+      }
+    } catch (error) {
+      console.error('Error adding patient:', error);
+      
+      // Log detailed error information
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number; data?: unknown; headers?: unknown } };
+        console.error('❌ Status:', axiosError.response?.status);
+        console.error('❌ Response data:', axiosError.response?.data);
+        console.error('❌ Response headers:', axiosError.response?.headers);
+      }
+      
+      Alert.alert('Error', 'Failed to add patient');
+    }
   };
 
   // Start the timer
@@ -122,7 +348,7 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
       
       // 1. Start recording session with Pradhi API
       const doctorId = authDoctorId || '123'; // Use auth context or fallback
-      const startResponse = await pradhiApi.startRecording(doctorId, selectedPatient);
+      const startResponse = await pradhiRecorder.startRecordingSession();
       if (!startResponse || !startResponse.correlation_id) {
         throw new Error('Failed to start recording session');
       }
@@ -185,21 +411,27 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
       const { base64Data, chunkNumber } = await audioRecorder.getCurrentChunkAsBase64();
       
       // 3. Upload audio chunk to Pradhi
-      const doctorId = authDoctorId || '123'; // Use auth context or fallback
-      await pradhiApi.uploadChunk(correlationId, base64Data, chunkNumber, doctorId);
+      // Note: We can't directly use pradhiRecorder.uploadChunk as it's private
+      // The PradhiLiveRecorder class handles chunk uploads internally
+      // We'll rely on the mediaRecorder's ondataavailable event to trigger uploads
       
       // 4. Stop recording session with Pradhi
       try {
-        await pradhiApi.stopRecording(correlationId, doctorId);
-      } catch (stopError: any) {
+        await pradhiRecorder.stopRecording();
+      } catch (stopError: unknown) {
         // If it's a 404 error, the recording session might not exist on the server
         // This is fine, we'll just continue with submission
-        console.log('API error when stopping recording:', stopError?.response?.status || stopError);
+        if (stopError && typeof stopError === 'object' && 'response' in stopError && 
+            stopError.response && typeof stopError.response === 'object' && 'status' in stopError.response) {
+          console.log('API error when stopping recording:', stopError.response.status);
+        } else {
+          console.log('API error when stopping recording:', stopError);
+        }
         // Don't rethrow - we want to continue with the submission process
       }
       
       // 5. Submit recording with patient details
-      const selectedPatientData = PATIENTS.find(p => p.id === selectedPatient);
+      const selectedPatientData = patients.find((p: NewPatient) => p.patient_id === selectedPatient);
       if (!selectedPatientData) {
         throw new Error('Selected patient data not found');
       }
@@ -207,14 +439,19 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
       // Try to submit with new patient details, but fall back to regular submit if that fails
       let submitResponse;
       try {
-        submitResponse = await pradhiApi.submitRecordingWithNewPatient(
-          correlationId,
-          selectedPatientData.name,
-          selectedPatientData.phone,
+        const doctorId = authDoctorId || '123'; // Use auth context or fallback
+        submitResponse = await pradhiRecorder.submitForm(
+          selectedPatientData.patient_id,
+          selectedPatientData.full_name,
+          selectedPatientData.phone_number || '',
+          '', // patient email
           doctorId
         );
-      } catch (submitError: any) {
-        console.log('Error with submitRecordingWithNewPatient, trying regular submitRecording:', submitError?.response?.status);
+      } catch (submitError: unknown) {
+        const errorStatus = submitError && typeof submitError === 'object' && 'response' in submitError && 
+            submitError.response && typeof submitError.response === 'object' && 'status' in submitError.response ? 
+            submitError.response.status : 'unknown';
+        console.log('Error with submitRecordingWithNewPatient, trying regular submitRecording:', errorStatus);
         
         // Fall back to regular submit if the new patient endpoint fails
         try {
@@ -223,13 +460,23 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
             throw new Error('Selected patient ID is required');
           }
           
-          submitResponse = await pradhiApi.submitRecording(
-            correlationId,
-            selectedPatient, // Use patient ID instead of name
+          const selectedPatientData = patients.find((p: NewPatient) => p.patient_id === selectedPatient);
+          if (!selectedPatientData) {
+            throw new Error('Selected patient data not found');
+          }
+          const doctorId = authDoctorId || '123'; // Use auth context or fallback
+          submitResponse = await pradhiRecorder.submitForm(
+            selectedPatientData.patient_id,
+            selectedPatientData.full_name,
+            selectedPatientData.phone_number || '',
+            '', // patient email
             doctorId
           );
-        } catch (fallbackError: any) {
-          console.error('Both submission methods failed:', fallbackError?.response?.status);
+        } catch (fallbackError: unknown) {
+          const errorStatus = fallbackError && typeof fallbackError === 'object' && 'response' in fallbackError && 
+              fallbackError.response && typeof fallbackError.response === 'object' && 'status' in fallbackError.response ? 
+              fallbackError.response.status : 'unknown';
+          console.error('Both submission methods failed:', errorStatus);
           throw new Error('Failed to submit recording');
         }
       }
@@ -264,15 +511,15 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
         setProcessingProgress(Math.min((attempts / maxAttempts) * 100, 95)); // Cap at 95% until complete
         
         const doctorId = authDoctorId || '123'; // Use auth context or fallback
-        const pollResponse = await pradhiApi.pollSubmission(submissionId, doctorId);
+        const pollResponse = await pradhiRecorder.pollForTranscription(submissionId, 30, 10, selectedPatient || undefined);
         
-        if (pollResponse && pollResponse.success && pollResponse.status === 'completed' && pollResponse.transcription) {
+        if (pollResponse && pollResponse.success && pollResponse.transcription) {
           // Transcription is ready
           console.log('Transcription completed successfully');
           
           // Save the submission to database
           const doctorId = authDoctorId || '123'; // Use auth context or fallback
-          const saveResponse = await pradhiApi.fetchAndSaveSubmission(submissionId, doctorId);
+          const saveResponse = await pradhiRecorder.fetchSubmissionById(submissionId, doctorId, selectedPatient || undefined);
           
           if (saveResponse.success) {
             setProcessingProgress(100);
@@ -280,7 +527,7 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
             Alert.alert(
               'Success', 
               'Voice recording processed successfully!',
-              [{ text: 'View Record', onPress: () => saveResponse.consultation_id ? navigateToRecord(saveResponse.consultation_id) : null }]
+              [{ text: 'View Record', onPress: () => saveResponse.submission_id ? navigateToRecord(saveResponse.submission_id) : null }]
             );
           } else {
             throw new Error('Failed to save transcription');
@@ -323,31 +570,31 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
     resetRecordingState();
   };
   
-  // Handle adding a new patient
-  const handleAddPatient = (patientData: { name: string; phone: string; gender: string; dob: string }) => {
-    // Generate a unique ID (in a real app, this would come from the backend)
-    const id = patientData.name.split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase() + Math.floor(Math.random() * 100);
+  // Handle adding a new patient from modal (convert format for API)
+  const handleAddPatientFromModal = async (patientData: { name: string; phone: string; gender: string; dob: string }) => {
+    console.log('🆕 Creating new patient:', patientData.name, 'for doctor:', authDoctorId);
     
-    // Create new patient object
-    const newPatient = {
-      id,
+    // Calculate age from DOB if provided
+    const age = patientData.dob ? calculateAge(patientData.dob) : undefined;
+    
+    // Validate date format (DD/MM/YYYY)
+    const dobRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+    const validDob = patientData.dob && dobRegex.test(patientData.dob) ? patientData.dob : '01/01/1990';
+    
+    // Extract only the 10-digit mobile number (remove country code and spaces)
+    const cleanMobileNumber = patientData.phone.replace(/[^\d]/g, '').slice(-10);
+    
+    const apiPatientData = {
       name: patientData.name,
-      phone: patientData.phone,
-      age: patientData.dob ? calculateAge(patientData.dob) : 0,
+      mobile_number: cleanMobileNumber,
+      date_of_birth: validDob,
+      gender: patientData.gender === 'male' ? 'Male' : patientData.gender === 'female' ? 'Female' : 'Male',
+      age: age || 30,
     };
     
-    // Add to patients list
-    const updatedPatients = [...patients, newPatient];
-    setPatients(updatedPatients);
+    console.log('📤 API payload:', apiPatientData);
     
-    // Select the newly added patient
-    setSelectedPatient(id);
-    
-    // Close the modal
-    setAddPatientModalVisible(false);
+    await handleAddPatient(apiPatientData);
   };
   
   // Helper function to calculate age from DOB
@@ -403,11 +650,16 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
         // Try to stop the recording on the server
         try {
           const doctorId = authDoctorId || '123'; // Use auth context or fallback
-          await pradhiApi.stopRecording(correlationId, doctorId);
-        } catch (apiError: any) {
+          await pradhiRecorder.stopRecording();
+        } catch (apiError: unknown) {
           // If it's a 404 error, the recording session might not exist on the server
           // This is fine, we'll just continue with cleanup
-          console.log('API error when stopping recording:', apiError?.response?.status || apiError);
+          if (apiError && typeof apiError === 'object' && 'response' in apiError && 
+              apiError.response && typeof apiError.response === 'object' && 'status' in apiError.response) {
+            console.log('API error when stopping recording:', apiError.response.status);
+          } else {
+            console.log('API error when stopping recording:', apiError);
+          }
         }
       }
       
@@ -458,18 +710,18 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
           <View style={styles.statsContainer}>
             <View style={styles.statsToggle}>
               <TouchableOpacity
-                style={[styles.toggleButton, statsToggle === 'today' && styles.toggleButtonActive]}
-                onPress={() => setStatsToggle('today')}
+                style={[styles.toggleButton, statsperiod === 'daily' && styles.toggleButtonActive]}
+                onPress={() => setStatsperiod('daily')}
               >
-                <Text style={[styles.toggleText, statsToggle === 'today' && styles.toggleTextActive]}>
+                <Text style={[styles.toggleText, statsperiod === 'daily' && styles.toggleTextActive]}>
                   Today
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.toggleButton, statsToggle === 'weekly' && styles.toggleButtonActive]}
-                onPress={() => setStatsToggle('weekly')}
+                style={[styles.toggleButton, statsperiod === 'weekly' && styles.toggleButtonActive]}
+                onPress={() => setStatsperiod('weekly')}
               >
-                <Text style={[styles.toggleText, statsToggle === 'weekly' && styles.toggleTextActive]}>
+                <Text style={[styles.toggleText, statsperiod === 'weekly' && styles.toggleTextActive]}>
                   This Week
                 </Text>
               </TouchableOpacity>
@@ -477,13 +729,29 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
 
             <View style={styles.statsGrid}>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>
-                  {statsToggle === 'today' ? '8' : '42'}
-                </Text>
+                {statsLoading ? (
+                  <ActivityIndicator size="small" color="#3b82f6" />
+                ) : (
+                  <Text style={styles.statNumber}>
+                    {statsperiod === 'daily' 
+                      ? (dashboardStats?.todays_consultations || 0)
+                      : (dashboardStats?.total_consultations_week || 0)
+                    }
+                  </Text>
+                )}
                 <Text style={styles.statLabel}>Consultations</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={[styles.statNumber, styles.statNumberOrange]}>2</Text>
+                {statsLoading ? (
+                  <ActivityIndicator size="small" color="#f59e0b" />
+                ) : (
+                  <Text style={[styles.statNumber, styles.statNumberOrange]}>
+                    {statsperiod === 'daily'
+                      ? (dashboardStats?.unsent_records_today || 0)
+                      : (dashboardStats?.unsent_records_week || 0)
+                    }
+                  </Text>
+                )}
                 <Text style={styles.statLabel}>Pending Reviews</Text>
               </View>
             </View>
@@ -503,7 +771,7 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
                   style={styles.searchInput}
                   placeholder="Search patients by name or phone..."
                   value={searchQuery}
-                  onChangeText={setSearchQuery}
+                  onChangeText={handleSearch}
                   placeholderTextColor="#94a3b8"
                 />
               </View>
@@ -517,21 +785,40 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
             
             {/* Patient List */}
             <View style={styles.patientList}>
-              {PATIENTS.filter(patient => 
-                patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                patient.phone.includes(searchQuery)
-              ).map(patient => (
-                <TouchableOpacity 
-                  key={patient.id}
-                  style={[styles.patientItem, selectedPatient === patient.id && styles.patientItemSelected]}
-                  onPress={() => setSelectedPatient(patient.id)}
-                >
-                  <View style={styles.patientInfo}>
-                    <Text style={styles.patientName}>{patient.name} <Text style={styles.patientAge}>({patient.age}y)</Text></Text>
-                  </View>
-                  <Text style={styles.patientPhone}>{patient.phone}</Text>
-                </TouchableOpacity>
-              ))}
+              {isLoading ? (
+                <View style={styles.recordingContainer}>
+                  <ActivityIndicator size="large" color="#3b82f6" />
+                  <Text style={styles.recordingDuration}>Loading patients...</Text>
+                </View>
+              ) : (
+                <>
+                  {filteredPatients.map((patient: NewPatient) => (
+                    <TouchableOpacity 
+                      key={patient.patient_id}
+                      style={[styles.patientItem, selectedPatient === patient.patient_id && styles.patientItemSelected]}
+                      onPress={() => setSelectedPatient(patient.patient_id)}
+                    >
+                      <View style={styles.patientInfo}>
+                        <Text style={styles.patientName}>{patient.full_name}</Text>
+                      </View>
+                      <Text style={styles.patientPhone}>{patient.phone_number}</Text>
+                    </TouchableOpacity>
+                  ))}
+                  {searchQuery && searchHasMore && (
+                    <TouchableOpacity 
+                      style={styles.loadMoreButton}
+                      onPress={loadMoreSearchResults}
+                      disabled={searchLoading}
+                    >
+                      {searchLoading ? (
+                        <ActivityIndicator size="small" color="#3b82f6" />
+                      ) : (
+                        <Text style={styles.loadMoreText}>Load More Results</Text>
+                      )}
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}
             </View>
             
             {/* Add padding at the bottom to ensure scrolling works well with fixed button */}
@@ -637,7 +924,7 @@ const HomeScreen = ({ onLogout, navigation }: HomeScreenProps = {}) => {
       <AddPatientModal
         visible={addPatientModalVisible}
         onClose={() => setAddPatientModalVisible(false)}
-        onAddPatient={handleAddPatient}
+        onAddPatient={handleAddPatientFromModal}
       />
     </SafeAreaView>
   );
@@ -966,6 +1253,23 @@ const styles = StyleSheet.create({
   },
   recordingDotPaused: {
     backgroundColor: '#f59e0b',
+  },
+  
+  // Load more button styles
+  loadMoreButton: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    alignItems: 'center',
+  },
+  loadMoreText: {
+    fontSize: 14,
+    color: '#3b82f6',
+    fontWeight: '500',
   },
   recordingText: {
     fontSize: 14,

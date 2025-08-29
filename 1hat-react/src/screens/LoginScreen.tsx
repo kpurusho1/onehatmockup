@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { LOGO } from '../assets/images';
 import {
   View,
   Text,
@@ -14,7 +15,7 @@ import {
 import { colors } from '../theme/colors';
 import CustomDropdown, { DropdownOption } from '../components/CustomDropdown';
 import { useAuth } from '../contexts/AuthContext';
-import vhrApi from '../services/vhrApi';
+import AuthService from '../services/authService';
 
 // Extended colors with missing properties
 const extendedColors = {
@@ -28,6 +29,7 @@ const extendedColors = {
 };
 
 interface LoginScreenProps {
+  onLogin?: (username: string, password: string, hospitalId: string) => Promise<void>;
   onLoginSuccess?: () => void;
 }
 
@@ -180,7 +182,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const LoginScreen = ({ onLoginSuccess }: LoginScreenProps = {}) => {
+const LoginScreen = ({ onLogin, onLoginSuccess }: LoginScreenProps = {}) => {
   const { login, setHospital } = useAuth();
 
   const [credentials, setCredentials] = useState({
@@ -193,21 +195,28 @@ const LoginScreen = ({ onLoginSuccess }: LoginScreenProps = {}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [availableHospitals, setAvailableHospitals] = useState<DropdownOption[]>([]);
   const [isLoadingHospitals, setIsLoadingHospitals] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Fetch hospitals from API
+  // Clear authentication and fetch hospitals from API
   useEffect(() => {
+    // Clear any existing authentication when user lands on login page
+    console.log('Login page accessed - clearing existing authentication');
+    AuthService.logout();
+    
     const fetchHospitals = async () => {
       try {
         setIsLoadingHospitals(true);
+        setError(null);
         console.log('Fetching hospitals from API...');
-        const response = await vhrApi.getHospitals();
-        console.log('Hospitals API response:', response);
+        const hospitals = await AuthService.getHospitals();
+        console.log('Hospitals API response:', hospitals);
 
-        if (response.success && response.hospitals && response.hospitals.length > 0) {
+        if (hospitals && hospitals.length > 0) {
           // Transform hospital data to dropdown format
-          const hospitalOptions = response.hospitals.map((hospital) => ({
+          const hospitalOptions = hospitals.map((hospital) => ({
             label: hospital.name,
-            value: String(hospital.id) // Convert to string to ensure type safety
+            value: String(hospital.id),
           }));
           console.log('Hospital options:', hospitalOptions);
           setAvailableHospitals(hospitalOptions);
@@ -221,16 +230,17 @@ const LoginScreen = ({ onLoginSuccess }: LoginScreenProps = {}) => {
           }
         } else {
           console.warn('No hospitals returned from API or success is false');
-          setLoginStatus('Failed to load hospitals. Please try again later.');
+          setError('Failed to load hospitals. Please try again later.');
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error fetching hospitals:', error);
         // Try to provide more detailed error information
-        if (error.response) {
-          console.error('Error response:', error.response.data);
-          console.error('Status code:', error.response.status);
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as { response: { data: unknown; status: number } };
+          console.error('Error response:', axiosError.response.data);
+          console.error('Status code:', axiosError.response.status);
         }
-        setLoginStatus('Failed to load hospitals. Please try again later.');
+        setError('Failed to load hospitals. Please try again later.');
       } finally {
         setIsLoadingHospitals(false);
       }
@@ -243,53 +253,63 @@ const LoginScreen = ({ onLoginSuccess }: LoginScreenProps = {}) => {
   const handleLogin = async () => {
     const { username, password, hospital } = credentials;
     
-    if (!username || !password || !hospital) {
-      setLoginStatus('Please fill in all fields');
+    setError(null);
+    setValidationError(null);
+    setLoginStatus('');
+    
+    // Frontend validation - check if all fields are filled
+    if (!username.trim() || !password.trim() || !hospital.trim()) {
+      setValidationError('Enter All Details');
       return;
     }
 
+    setIsLoading(true);
+    
     try {
-      setIsLoading(true);
-      setLoginStatus('');
-      
-      // Call login from auth context with hospital ID as integer
-      // Convert string hospital ID to number for the API
-      const hospitalId = parseInt(hospital, 10);
-      console.log('Attempting login with:', { username, password: '***', hospitalId });
-      
-      const loginResult = await login(username, password, hospitalId);
-      console.log('Login result:', { ...loginResult, token: loginResult.token ? '***' : null });
-      
-      if (loginResult.success) {
-        // Save selected hospital
-        const selectedHospital = availableHospitals.find(h => h.value === hospital);
-        if (selectedHospital) {
-          console.log('Setting selected hospital:', { id: hospital, name: selectedHospital.label });
-          await setHospital(hospital, selectedHospital.label);
-        }
-        
-        setLoginStatus('Login successful! Welcome to 1hat Healthcare.');
-        
-        // Call the onLoginSuccess callback if provided
-        setTimeout(() => {
-          onLoginSuccess && onLoginSuccess();
-        }, 1500); // Give user time to see success message
+      if (onLogin) {
+        // Use the callback pattern like the web version
+        await onLogin(username, password, hospital);
+        // Don't reset isLoading here - let the parent handle it when navigation completes
       } else {
-        // Display the detailed error message if available
-        const errorMessage = loginResult.error || 'Authentication failed. Please check your credentials.';
-        console.error('Login failed:', errorMessage);
-        setLoginStatus(errorMessage);
+        // Direct login without callback - use AuthContext login function
+        console.log('Attempting login with:', { username, password: '***', hospitalId: hospital });
+        const result = await login(username, password, hospital);
+        console.log('Login result:', { ...result, access_token: result.access_token ? '***' : null });
+        
+        if (result && result.access_token) {
+          // Set selected hospital
+          const hospitalName = result.hospital_name || 'Unknown Hospital';
+          console.log('Setting selected hospital:', { id: hospital, name: hospitalName });
+          setHospital(hospital, hospitalName);
+          
+          setLoginStatus('Login successful! Redirecting...');
+          
+          // Call onLoginSuccess if provided
+          setTimeout(() => {
+            if (onLoginSuccess) {
+              onLoginSuccess();
+            }
+          }, 1500);
+        } else {
+          const errorMessage = 'Authentication failed. Please check your credentials.';
+          console.error('Login failed:', errorMessage);
+          setError(errorMessage);
+        }
+        setIsLoading(false);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      // Try to provide more detailed error information
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-        console.error('Status code:', error.response.status);
-      }
-      setLoginStatus('Login failed. Please try again later.');
-    } finally {
+      setError('login failed, try again');
       setIsLoading(false);
+      
+      // Refresh the login page after showing error (like web version)
+      setTimeout(() => {
+        // In React Native, we can't reload the page, but we can reset the form
+        setCredentials({ username: '', password: '', hospital: '' });
+        setError(null);
+        setValidationError(null);
+        setLoginStatus('');
+      }, 2000); // Show error for 2 seconds before resetting
     }
   };
 
@@ -298,7 +318,7 @@ const LoginScreen = ({ onLoginSuccess }: LoginScreenProps = {}) => {
       <View style={styles.content}>
         <View style={styles.header}>
           <Image 
-            source={require('../../assets/1hat-logo.png')} 
+            source={LOGO} 
             style={styles.logoImage} 
             resizeMode="contain"
           />
@@ -380,10 +400,10 @@ const LoginScreen = ({ onLoginSuccess }: LoginScreenProps = {}) => {
             )}
           </TouchableOpacity>
 
-          {loginStatus ? (
+          {(loginStatus || error || validationError) ? (
             <View style={styles.statusContainer}>
               <Text style={[styles.statusText, loginStatus.includes('successful') ? styles.successText : styles.errorText]}>
-                {loginStatus}
+                {loginStatus || error || validationError}
               </Text>
             </View>
           ) : null}

@@ -7,6 +7,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 
 import {
   Avatar,
@@ -23,7 +24,7 @@ import {
 } from '../components/ui';
 
 interface ComponentDemoScreenProps {
-  navigation?: any;
+  navigation?: NavigationProp<ParamListBase>;
 }
 
 const ComponentDemoScreen: React.FC<ComponentDemoScreenProps> = ({ navigation }) => {

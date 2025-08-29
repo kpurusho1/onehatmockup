@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 
 import LoginScreen from '../screens/LoginScreen';
@@ -8,9 +8,15 @@ import BottomTabNavigator from './BottomTabNavigator';
 import { useAuth } from '../contexts/AuthContext';
 import { colors } from '../theme/colors';
 
-const Stack = createNativeStackNavigator();
+type RootStackParamList = {
+  Login: undefined;
+  Main: undefined;
+};
 
-const AppNavigator = () => {
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+// Create a separate component that uses the auth context
+const AuthenticatedNavigator = () => {
   const { isAuthenticated, isLoading, logout } = useAuth();
 
   if (isLoading) {
@@ -27,7 +33,7 @@ const AppNavigator = () => {
         {!isAuthenticated ? (
           // Auth screens
           <Stack.Screen name="Login">
-            {(props: any) => (
+            {(props: NativeStackScreenProps<RootStackParamList, 'Login'>) => (
               <LoginScreen 
                 {...props} 
                 onLoginSuccess={() => {}} // Auth context handles the state
@@ -37,7 +43,7 @@ const AppNavigator = () => {
         ) : (
           // App screens
           <Stack.Screen name="Main">
-            {(props: any) => (
+            {(props: NativeStackScreenProps<RootStackParamList, 'Main'>) => (
               <BottomTabNavigator 
                 {...props} 
                 onLogout={logout}
@@ -48,6 +54,11 @@ const AppNavigator = () => {
       </Stack.Navigator>
     </NavigationContainer>
   );
+};
+
+// Main AppNavigator component that doesn't use auth context
+const AppNavigator = () => {
+  return <AuthenticatedNavigator />;
 };
 
 const styles = StyleSheet.create({

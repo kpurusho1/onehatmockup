@@ -245,7 +245,7 @@ const TreatmentScreen: React.FC<TreatmentScreenProps> = ({ navigation }) => {
             />
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesContainer}>
             <TouchableOpacity 
               style={[styles.categoryButton, !selectedCategory && styles.categoryButtonActive]}
               onPress={() => setSelectedCategory(null)}
@@ -264,7 +264,6 @@ const TreatmentScreen: React.FC<TreatmentScreenProps> = ({ navigation }) => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-
           <ScrollView style={styles.plansContainer}>
             {filteredPlans.map(plan => (
               <TouchableOpacity 
@@ -348,11 +347,14 @@ const styles = StyleSheet.create({
   },
   categoriesContainer: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+    alignItems: 'center',
   },
   categoryButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderRadius: 20,
     backgroundColor: '#f1f5f9',
     borderWidth: 1,
@@ -372,9 +374,9 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   plansContainer: {
-    flex: 1,
+    flex: 0.5,
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 2,
     paddingBottom: 16,
   },
   planCard: {
